@@ -3,6 +3,8 @@ require("dotenv").config({path: '../.env'});
 const fs = require("fs");
 
 const { Collection, Client, GatewayIntentBits,SlashCommandBuilder } = require('discord.js');
+const SCverifiedAccountDB = require("../models/SCverifiedAccountDB");
+const db = require("./db");
 
 
 
@@ -23,6 +25,7 @@ for (const file of commandFiles) {
     const command = require(`../commands/${file}`);
     // Set a new item in the Collection
     // With the key as the command name and the value as the exported module
+    console.log(command)
     bot.commands.set(command.data.name, command);
 }
 
@@ -49,6 +52,8 @@ for (const file of eventFiles) {
 
 bot.on("ready", async () => {
     console.log(`>>>>${bot.user.username} has logged in`)
+    SCverifiedAccountDB.init(db)
+    SCverifiedAccountDB.sync(db)
     
 })
 
