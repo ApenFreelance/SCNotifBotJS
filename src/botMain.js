@@ -7,6 +7,7 @@ const SCverifiedAccountDB = require("../models/SCverifiedAccountDB");
 const db = require("./db");
 const WoWCharacters = require("../models/WoWCharacters");
 const characterHistory = require("../models/CharacterHistory");
+const SCverifV2 = require("../models/SCVerifV2");
 
 
 
@@ -56,9 +57,13 @@ bot.on("ready", async () => {
     console.log(`>>>>${bot.user.username} has logged in`)
     //SCverifiedAccountDB.init(db)
     //SCverifiedAccountDB.sync(db)
-    WoWCharacters.init(db)
-    WoWCharacters.sync(db)
 
+    SCverifV2.init(db)
+    await SCverifV2.sync(db)
+    await SCverifV2.create({
+        userID: "1",
+        userEmail: "email@email.cm",
+        userTag: "tag#155"}).catch(err=>{console.log(err.errors[0].message)})
     
 })
 
