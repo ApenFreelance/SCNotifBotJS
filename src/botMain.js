@@ -5,6 +5,8 @@ const fs = require("fs");
 const { Collection, Client, GatewayIntentBits,SlashCommandBuilder } = require('discord.js');
 const SCverifiedAccountDB = require("../models/SCverifiedAccountDB");
 const db = require("./db");
+const WoWCharacters = require("../models/WoWCharacters");
+const characterHistory = require("../models/CharacterHistory");
 
 
 
@@ -52,8 +54,11 @@ for (const file of eventFiles) {
 
 bot.on("ready", async () => {
     console.log(`>>>>${bot.user.username} has logged in`)
-    SCverifiedAccountDB.init(db)
-    SCverifiedAccountDB.sync(db)
+    //SCverifiedAccountDB.init(db)
+    //SCverifiedAccountDB.sync(db)
+    WoWCharacters.init(db)
+    WoWCharacters.sync(db)
+
     
 })
 

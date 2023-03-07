@@ -17,15 +17,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 import time
 
-WoWDC = "294958471953252353" #Wow server ID
-DevDC = "1024961321768329246" #DEV SERVER ID
- # The oldest dump, will update itself
-global WoWDump
-WoWDump = ""
-# instantiate a chrome options object so you can set the size and headless preference
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("--headless") 
-chrome_options.add_argument("--window-size=1920x1080")
+
+ 
 chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
 currentVersionDump = "C:\\Users\julia\\Desktop\\wotlkConnection\\dumps.json"
 # Finds driver in current directory
@@ -33,7 +26,6 @@ chrome_driver = "C:\\Users\\julia\\Desktop\\wotlkConnection\\chromedriver.exe"
 
 
 # Creates driver to go to correct site
-driver = webdriver.Chrome(executable_path=chrome_driver, options=chrome_options)
 
 def scriptRunner(roleDict, originLink, findLink, game, logChannelID):
 
@@ -219,11 +211,11 @@ def scriptRunner(roleDict, originLink, findLink, game, logChannelID):
                 
     async def siteCheck(url,server):
 
-        global WoWDump
+        
         channel2 = client.get_channel(logChannelID) # Fetch specific channel depending on roleDict
 
         try:
-            driver.get(originLink) # Grab site with headless browser
+            
 
 
 

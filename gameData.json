@@ -32,11 +32,11 @@
     }
     },
     "wrath": {
-    "lastDump": "https://lol-content-dumps.s3.amazonaws.com/courses_v2/wow/course_dump_1674624635709.json",
-    "originLink": "https://www.skill-capped.com/wrath/browse3/course/t1j8zhsx8c/tzvytv5bnj",
-    "findLink": "https://lol-content-dumps.s3.amazonaws.com/courses_v2/wrath/course_dump_[0-9]+.json",
-    "logChannelID": 1025384994077679616,
-    "roleDict": {
+        "lastDump": "https://lol-content-dumps.s3.amazonaws.com/courses_v2/wow/course_dump_1674624635709.json",
+        "originLink": "https://www.skill-capped.com/wrath/browse3/course/t1j8zhsx8c/tzvytv5bnj",
+        "findLink": "https://lol-content-dumps.s3.amazonaws.com/courses_v2/wrath/course_dump_[0-9]+.json",
+        "logChannelID": 1025384994077679616,
+        "roleDict": {
         "Academy": {"id": 995049041429790730, "channelid": 1029817668083130459, "img": "" },
         "General": {"id": 1042505315326898236, "channelid": 978414879604113458, "img": ""},
         "DK": {"id": 545374754950086656, "channelid": 994063573242351696, "img": "https://media.discordapp.net/attachments/1024961321768329249/1037086131134668900/unknown.png"},
@@ -50,16 +50,10 @@
         "Rogue": {"id": 545374701544013826, "channelid":994065023762694166, "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087715356844032/unknown.png"}, 
         "Shaman": {"id": 545374752500482053, "channelid":  994065205573189662, "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087788627132426/unknown.png"}, 
         "Warlock": {"id": 545374760939421710, "channelid":994065301148799017, "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087889999265862/unknown.png"}, 
-        "Warrior": {"id": 545374692903485440, "channelid":994065408338448414, "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087977064648745/unknown.png"}}
+            "Warrior": {"id": 545374692903485440, "channelid":994065408338448414, "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087977064648745/unknown.png"}}
     },
     "Valorant":"",
     "lol":""
 }
 
 
-
-
-
-
-
-logChannelID = 1025384994077679616

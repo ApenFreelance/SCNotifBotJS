@@ -1,9 +1,24 @@
 
-const { SlashCommandBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle, ModalBuilder, EmbedBuilder, ButtonBuilder } = require('discord.js');
+const { SlashCommandBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle, ModalBuilder,Client, GatewayIntentBits, EmbedBuilder, ButtonBuilder } = require('discord.js');
 
 const axios = require('axios');
 
 const SCverifiedAccountDB = require('../models/SCverifiedAccountDB');
+
+
+const submissionModal = new ModalBuilder()
+.setCustomId('submissionmodal')
+.setTitle('Submission Modal');
+
+const armoryInput = new TextInputBuilder()
+.setCustomId('armory')    
+.setLabel("Please link your armory.") 
+.setStyle(TextInputStyle.Short);
+
+const submissionRow = new ActionRowBuilder().addComponents(armoryInput);
+
+submissionModal.addComponents(submissionRow);
+
 
 
 async function verifyEmailExists(email) {
@@ -79,32 +94,44 @@ async function performVerification(email, interaction) {
           await interaction.reply({content:"This mail does not exist", ephemeral:true})
       }
 }
+const regexTemplateFullLink = /(https):\/\/(worldofwarcraft\.blizzard\.com\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/[\w_-]+\/)/
 
 module.exports = {
     name: 'interactionCreate',
     once: false,
     async execute(interaction) {
-        
+      
+      console.log(interaction)
         if(interaction.customId == "verificationmodal") {
             const email = interaction.fields.getTextInputValue("email")
             await performVerification(email, interaction)
         }
         if(interaction.customId == "verificationbutton") {
-            const modal = new ModalBuilder()
+            const verificationmodal = new ModalBuilder()
                 .setCustomId('verificationmodal')
                 .setTitle('Verification Modal');
 
-                const favoriteColorInput = new TextInputBuilder()
+                const emailInput = new TextInputBuilder()
                     .setCustomId('email')
-                    // The label is the prompt the user sees for this input
                     .setLabel("What is your email?")
-                    // Short means only a single line of text
                     .setStyle(TextInputStyle.Short);
-                // TODO: Add components to modal...
-                const firstActionRow = new ActionRowBuilder().addComponents(favoriteColorInput);
-                modal.addComponents(firstActionRow);
-                await interaction.showModal(modal);
+                const verificationRow = new ActionRowBuilder().addComponents(emailInput);
+                verificationmodal.addComponents(verificationRow);
+                await interaction.showModal(verificationmodal);
         }
+      if(interaction.customId == "submissionmodal") {
+        
+        if(regexTemplateFullLink.test(interaction.fields.fields.get("armory").value)) {
+          bot.emit("submitReview", interaction)
+        }
+        else {
+          await interaction.reply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
+        }
+      }
+        if(interaction.customId == "submitreview") {
+         
+          await interaction.showModal(submissionModal);
+      }
         
         if (interaction.isCommand()) {
             const command = interaction.client.commands.get(interaction.commandName);
