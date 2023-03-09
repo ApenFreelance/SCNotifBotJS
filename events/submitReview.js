@@ -106,7 +106,7 @@ module.exports = {
 };
 
 
-const statuses = ["Reviewed", "Available", "Rejected", "Broken"]
+const statuses = ["Reviewed", "Available", "Rejected", "Broken", "In Progress"]
 
 
 

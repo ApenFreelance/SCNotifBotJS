@@ -59,11 +59,8 @@ bot.on("ready", async () => {
     //SCverifiedAccountDB.sync(db)
 
     SCverifV2.init(db)
-    await SCverifV2.sync(db)
-    await SCverifV2.create({
-        userID: "1",
-        userEmail: "email@email.cm",
-        userTag: "tag#155"}).catch(err=>{console.log(err.errors[0].message)})
+    SCverifV2.sync(db)
+    
     
 })
 

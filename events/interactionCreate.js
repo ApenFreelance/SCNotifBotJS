@@ -4,6 +4,8 @@ const { SlashCommandBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle,
 const axios = require('axios');
 
 const SCverifiedAccountDB = require('../models/SCverifiedAccountDB');
+const SCverifV2 = require('../models/SCVerifV2');
+const bot = require('../src/botMain');
 
 
 const submissionModal = new ModalBuilder()
@@ -11,9 +13,9 @@ const submissionModal = new ModalBuilder()
 .setTitle('Submission Modal');
 
 const armoryInput = new TextInputBuilder()
-.setCustomId('armory')    
-.setLabel("Please link your armory.") 
-.setStyle(TextInputStyle.Short);
+  .setCustomId('armory')    
+  .setLabel("Please link your armory.") 
+  .setStyle(TextInputStyle.Short);
 
 const submissionRow = new ActionRowBuilder().addComponents(armoryInput);
 
@@ -24,32 +26,38 @@ submissionModal.addComponents(submissionRow);
 async function verifyEmailExists(email) {
   console.log("Verifying Email")
   const response = await axios.post('https://www.skill-capped.com/lol/api/user/emailAvailable', { email: email })
+ console.log(response)
   console.log("Result: ", response.data.available)
   return response.data.available
 }
-async function alreadyLinkedToAccount(email, memberID) {
-  const dbUserInfo = await SCverifiedAccountDB.findOne({ where: { userID: memberID } });
-  if (dbUserInfo !== null) {
-    return(true)}
-  else {
-    return(false)
-  }
-}
-async function verifyEmailNotInUse(email, memberID) {
-  const dbUserInfo = await SCverifiedAccountDB.findOne({ where: { userEmail: email } });
 
-if (dbUserInfo === null) {
-  console.log('Not found!');
-  return(true)}
-if(dbUserInfo.userID == memberID) {
-  return(true, "Same user")  
 
-} else {
- return(false, "Mail already in use")
+async function addToSCDB(userID, email, tag, interaction) {
+  let track = true
+  await SCverifV2.create({
+    userID: userID,
+    userEmail: email,
+    userTag: tag}).catch(err=>{
 
-}}
-async function addToSCDB(userID, email) {
-  await SCverifiedAccountDB.findOrCreate({where: {userID:userID, userEmail:email}})
+      switch(err.errors[0].message) {
+        case "userID must be unique":
+          
+          interaction.reply({content:"You have been verified to an existing account", ephemeral:true})
+          giveRoleToUser(interaction)
+         
+          break;
+        case "userEmail must be unique":
+          interaction.reply({content:"Mail is already in use!", ephemeral:true})
+          
+          break;
+        default:
+          interaction.reply({content:"You have not been verified due to technical reasons. Contact staff", ephemeral:true})
+         
+      }
+      track = false
+    })
+  return track
+  
 }
 
 async function giveRoleToUser(interaction) {
@@ -63,37 +71,30 @@ async function giveRoleToUser(interaction) {
 }
 
 async function performVerification(email, interaction) {
-    if(await verifyEmailExists(email) == false){
+    switch(await verifyEmailExists(email)){
+      case false:
         try {
-        switch(await verifyEmailNotInUse(email, interaction.user.id)){
-          case "Mail already in use":
-            await interaction.reply({content:"Mail already in use!", ephemeral:true})
-            break;
-          case "Same user":
-            giveRoleToUser(interaction)
-            await interaction.reply({content:"You have been verified to an existing account", ephemeral:true})
-            break;
-          default:
-            addToSCDB(interaction.user.id, email)
-            giveRoleToUser(interaction)
-            await interaction.reply({content:"You have been verified", ephemeral:true})
-            break;
-        }
+          if(await addToSCDB(interaction.user.id, email, interaction.user.tag, interaction)) {
+            interaction.reply({content:"You have been verified, welcome!", ephemeral:true})
+          }
       
         } catch(err) {
           console.log(err)
           console.log("failed to add to SCDB or give role")
           await interaction.reply({content:"You have not been verified due to technical reasons. Contact staff", ephemeral:true})
-          }  }
+          } 
+      break;
 
+    case "currently down":
+      const exampleEmbed = new EmbedBuilder().setImage("https://dxjql3wvvra4n.cloudfront.net/temp/announcement1.png")
+      await interaction.reply({embeds:[exampleEmbed], ephemeral:true})
+      break;
         
-          
-
-        
-      else {
-          await interaction.reply({content:"This mail does not exist", ephemeral:true})
-      }
-}
+    default:
+        await interaction.reply({content:"This mail does not exist", ephemeral:true})
+        break;
+      
+}}
 const regexTemplateFullLink = /(https):\/\/(worldofwarcraft\.blizzard\.com\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/[\w_-]+\/)/
 
 module.exports = {
@@ -101,7 +102,7 @@ module.exports = {
     once: false,
     async execute(interaction) {
       
-      console.log(interaction)
+
         if(interaction.customId == "verificationmodal") {
             const email = interaction.fields.getTextInputValue("email")
             await performVerification(email, interaction)
