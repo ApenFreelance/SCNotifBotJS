@@ -147,11 +147,11 @@ module.exports = {
 
           const emailInput = new TextInputBuilder()
               .setCustomId('email')
-              .setLabel("What is your email?")
+              .setLabel("What is your skill-capped email?")
               .setStyle(TextInputStyle.Short);
           const passwordInput = new TextInputBuilder()
               .setCustomId('password')
-              .setLabel("What is your password?")
+              .setLabel("What is your skill-capped password?")
               .setStyle(TextInputStyle.Short);
           const emailVerifRow = new ActionRowBuilder().addComponents(emailInput)
           const passVerifRow = new ActionRowBuilder().addComponents(passwordInput)
