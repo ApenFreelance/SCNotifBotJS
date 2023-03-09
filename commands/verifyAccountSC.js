@@ -45,20 +45,22 @@ module.exports = {
 		.setName('verify')
 		.setDescription('Verify you account!'),
 	async execute(interaction) {
-    const modal = new ModalBuilder()
-    .setCustomId('verificationmodal')
-    .setTitle('Verification Modal');
+    const verificationmodal = new ModalBuilder()
+                .setCustomId('verificationmodal')
+                .setTitle('Verification Modal');
 
-    const favoriteColorInput = new TextInputBuilder()
-        .setCustomId('email')
-        // The label is the prompt the user sees for this input
-        .setLabel("What is your email?")
-        // Short means only a single line of text
-        .setStyle(TextInputStyle.Short);
-    // TODO: Add components to modal...
-    const firstActionRow = new ActionRowBuilder().addComponents(favoriteColorInput);
-    modal.addComponents(firstActionRow);
-    await interaction.showModal(modal);
+                const emailInput = new TextInputBuilder()
+                    .setCustomId('email')
+                    .setLabel("What is your email?")
+                    .setStyle(TextInputStyle.Short);
+                const passwordInput = new TextInputBuilder()
+                    .setCustomId('password')
+                    .setLabel("What is your password?")
+                    .setStyle(TextInputStyle.Short);
+                const emailVerifRow = new ActionRowBuilder().addComponents(emailInput)
+                const passVerifRow = new ActionRowBuilder().addComponents(passwordInput)
+                verificationmodal.addComponents(emailVerifRow, passVerifRow);
+                await interaction.showModal(verificationmodal);
 
     }
 }

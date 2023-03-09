@@ -62,6 +62,7 @@ bot.on("ready", async () => {
     SCverifV2.sync(db)
     
     
+    
 })
 
 
