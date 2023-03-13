@@ -8,6 +8,7 @@ const db = require("./db");
 const WoWCharacters = require("../models/WoWCharacters");
 const characterHistory = require("../models/CharacterHistory");
 const SCverifV2 = require("../models/SCVerifV2");
+const ReviewHistory = require("../models/ReviewHistory");
 
 
 
@@ -58,8 +59,10 @@ bot.on("ready", async () => {
     //SCverifiedAccountDB.init(db)
     //SCverifiedAccountDB.sync(db)
 
-    SCverifV2.init(db)
-    SCverifV2.sync(db)
+    //SCverifV2.init(db)
+    //SCverifV2.sync(db)
+    ReviewHistory.init(db)
+    ReviewHistory.sync(db)
     
     
     

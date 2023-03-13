@@ -5,9 +5,8 @@ module.exports = class ReviewHistory extends Model {
         return super.init({
             userEmail: { 
                 type: DataTypes.STRING,
-                unique:true
          },
-         discordId: { type: DataTypes.STRING,unique:true },
+         userID: { type: DataTypes.STRING },
          reviewLink: { type: DataTypes.STRING },
          status: {type: DataTypes.STRING },
          completedAt: {type: DataTypes.DATE}

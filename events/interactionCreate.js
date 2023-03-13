@@ -106,7 +106,7 @@ async function giveRoleToUser(interaction) {
 }
 
 
-const regexTemplateFullLink = /(https):\/\/(worldofwarcraft\.blizzard\.com\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/[\w_-]+\/)/
+const regexTemplateFullLink = /(https):\/\/(worldofwarcraft\.blizzard\.com\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/[\w_-]+)/
 
 module.exports = {
     name: 'interactionCreate',
@@ -159,7 +159,7 @@ module.exports = {
           await interaction.showModal(verificationmodal);
         }
       if(interaction.customId == "submissionmodal") {
-        
+        console.log(interaction.fields.fields.get("armory").value)
         if(regexTemplateFullLink.test(interaction.fields.fields.get("armory").value)) {
           bot.emit("submitReview", interaction)
         }

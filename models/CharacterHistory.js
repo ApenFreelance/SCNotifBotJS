@@ -1,6 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
 
-module.exports = class characterHistory extends Model {
+module.exports = class CharacterHistory extends Model {
     static init(sequelize) {
         return super.init({
             characterName: { type: DataTypes.STRING },

@@ -17,7 +17,7 @@ module.exports = {
         .setDescription('Test Command for now'),
                     
     async execute(interaction) {
-        interaction.reply({content:"Sheeehs", components:[row]})
+        await interaction.reply({content:"Sheeehs", components:[row]})
         
         
     },
