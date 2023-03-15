@@ -21,7 +21,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    
+    const scopesString = encodeURIComponent(scopes.join(' '));
+    const redirectUriString = encodeURIComponent(redirectUri);
+    const authorizeUrl
+        = `${AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&scope=${scopesString}&redirect_uri=${redirectUriString}&response_type=code`;
     res.redirect(authorizeUrl);
 });
 
@@ -58,7 +61,7 @@ app.get('/oauth/callback', async (req, res, next) => {
 
     // work with the oauth response
     const responseData = await oauthResponse.json();
-    console.log(responseData)
+
     // do something with the `access_token` from `responseData`
     // {
     //     "access_token": "123456789",
@@ -79,12 +82,6 @@ const port = process.env.PORT || 3000;
 
 app.listen(port, () => console.log(`listening on port ${port}`));
 async function rl() {
-    const scopesString = encodeURIComponent(scopes.join(' '));
-    const redirectUriString = encodeURIComponent(redirectUri);
-    const authorizeUrl
-        = `${AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&scope=${scopesString}&redirect_uri=${redirectUriString}&response_type=code`;
-    console.log(authorizeUrl)
-    const l = await axios.get(authorizeUrl.data)
-    console.log(l)
+    const r = axios.get("http://localhost:3000/login")
+    console.log(r)
 }
-rl()
