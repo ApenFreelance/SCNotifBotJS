@@ -7,9 +7,14 @@ module.exports = class ReviewHistory extends Model {
                 type: DataTypes.STRING,
          },
          userID: { type: DataTypes.STRING },
-         reviewLink: { type: DataTypes.STRING },
          status: {type: DataTypes.STRING },
-         completedAt: {type: DataTypes.DATE}
+         claimedBy: {type: DataTypes.STRING},
+         claimedAt: {type: DataTypes.DATE},
+         completedBy: {type: DataTypes.STRING},
+         completedAt: {type: DataTypes.DATE},
+         reviewLink: { type: DataTypes.STRING },
+         reviewRating: {type:DataTypes.STRING},
+         reviewRatingComment: {type: DataTypes.STRING}
         }, {
             tableName: "ReviewHistory",
             timestamps:true,
