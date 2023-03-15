@@ -61,8 +61,11 @@ bot.on("ready", async () => {
 
     //SCverifV2.init(db)
     //SCverifV2.sync(db)
+    WoWCharacters.init(db)
+    WoWCharacters.sync(db)
+
     ReviewHistory.init(db)
-    ReviewHistory.sync(db)
+    ReviewHistory.sync({alter:true})
     
     
     
