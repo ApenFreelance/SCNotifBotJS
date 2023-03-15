@@ -13,7 +13,7 @@ module.exports = class ReviewHistory extends Model {
          completedBy: {type: DataTypes.STRING},
          completedAt: {type: DataTypes.DATE},
          reviewLink: { type: DataTypes.STRING },
-         reviewRating: {type:DataTypes.STRING},
+         reviewRating: {type:DataTypes.INTEGER},
          reviewRatingComment: {type: DataTypes.STRING}
         }, {
             tableName: "ReviewHistory",
