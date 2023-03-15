@@ -59,6 +59,10 @@ module.exports = {
                     id: reviewHistory.userID,
                     allow: [PermissionsBitField.Flags.ViewChannel],
                 },
+                {
+                    id: "1020404504430133269",
+                    allow: [PermissionsBitField.Flags.ViewChannel],
+                },
             ],
             
         }).catch(err => interaction.reply(err))
