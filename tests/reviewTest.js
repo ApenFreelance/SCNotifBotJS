@@ -4,6 +4,7 @@ const fs = require("fs");
 const { Collection, Client, GatewayIntentBits,SlashCommandBuilder } = require('discord.js');
 const ReviewHistory = require("../models/ReviewHistory");
 const db = require("../src/db");
+const WoWCharacters = require("../models/WoWCharacters");
 
 const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers]});
 
@@ -212,6 +213,9 @@ const interaction = {
 bot.on("ready", async () => {
     console.log(`>>>>${bot.user.username} has logged in during test`)
     try {
+        WoWCharacters.init(db)
+        WoWCharacters.sync(db)
+
         ReviewHistory.init(db)
         ReviewHistory.sync(db)
         bot.emit("submitReview", interaction)
