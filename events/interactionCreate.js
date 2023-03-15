@@ -177,6 +177,16 @@ module.exports = {
       if(interaction.customId == "rejectsubmission") {
         bot.emit("rejectReview", interaction)
       }
+      if(interaction.customId == "completesubmission") {
+        bot.emit("completeReview", interaction)
+      }
+      console.log(/^rating\d-\d+/.test(interaction.customId))
+      if(/^rating\d-\d+/.test(interaction.customId)) {
+        bot.emit("rateReview", interaction, "button")
+      }
+      if(interaction.customId.startsWith("reviewratingmodal")) {
+        bot.emit("rateReview", interaction, "modal")
+      }
         
         if (interaction.isCommand()) {
             const command = interaction.client.commands.get(interaction.commandName);
