@@ -171,6 +171,12 @@ module.exports = {
          
           await interaction.showModal(submissionModal);
       }
+      if(interaction.customId == "claimsubmission") {
+        bot.emit("claimReview", interaction)
+      }
+      if(interaction.customId == "rejectsubmission") {
+        bot.emit("rejectReview", interaction)
+      }
         
         if (interaction.isCommand()) {
             const command = interaction.client.commands.get(interaction.commandName);
