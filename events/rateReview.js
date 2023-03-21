@@ -1,4 +1,5 @@
 const { ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle } = require("discord.js");
+const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
 
 
@@ -61,7 +62,25 @@ module.exports = {
                 reviewRating:parseInt(ratingNumber)
                 
             })
-           
+            const forSpread = [
+                {
+                  "range": `H${history.id}`,
+                  "values": [
+                    [
+                      reviewInDB.reviewRating
+                    ]
+                  ]
+                },
+                {
+                  "range": `I${reviewInDB.id}`,
+                  "values": [
+                    [
+                      history.reviewRatingComment
+                    ]
+                  ]
+                }
+              ]
+            await main(forSpread)
             await interaction.showModal(createRatingModal(submissionNumber, ratingNumber))
             await interaction.user.send(`Set the rating to ${ratingNumber}`)
         }

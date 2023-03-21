@@ -1,4 +1,5 @@
 const { EmbedBuilder, ButtonBuilder, PermissionsBitField, ActionRowBuilder } = require("discord.js");
+const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
 const categoryId = "1085409586997108746"
 function updateEmbed(user, embed) {
@@ -45,6 +46,33 @@ module.exports = {
                 claimedBy:interaction.user.id,
                 claimedAt:Date.now()
             })
+        const forSpread = [
+                {
+                  "range": `B${reviewHistory.id}`,
+                  "values": [
+                    [
+                      reviewInDB.status
+                    ]
+                  ]
+                },
+                {
+                  "range": `C${reviewHistory.id}`,
+                  "values": [
+                    [
+                      reviewHistory.claimedAt
+                    ]
+                  ]
+                },
+                {
+                    "range": `F${reviewHistory.id}`,
+                    "values": [
+                      [
+                        reviewHistory.claimedBy
+                      ]
+                    ]
+                  }
+              ]
+              await main(forSpread)
         
         await interaction.reply({content:"Submission Claimed", ephemeral:true})
         const newChannel = await interaction.guild.channels.create({
@@ -66,7 +94,9 @@ module.exports = {
             ],
             
         }).catch(err => interaction.reply(err))
-        await interaction.message.edit({embeds:updateEmbed(interaction.user, interaction.message.embeds[0].data), components:updateButtons(newChannel)})
+        
+        await interaction.message.delete()
+        //await interaction.message.edit({embeds:updateEmbed(interaction.user, interaction.message.embeds[0].data), components:updateButtons(newChannel)})
        
         // do your stuff
     },

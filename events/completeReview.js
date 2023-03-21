@@ -1,4 +1,5 @@
 const { ActionRowBuilder, ButtonBuilder } = require("discord.js");
+const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
 
 function createReviewButtons(submissionNumber) {
@@ -33,14 +34,14 @@ function createReviewButtons(submissionNumber) {
 module.exports = {
     name: 'completeReview',
     once: false,
-    async execute(interaction) {   
+    async execute(interaction, ticketChannel) {   
         
-        const embedAuthor = interaction.message.embeds[0].author.name.match(/\d{18}/)
-        const user = await interaction.guild.members.fetch(embedAuthor[0])
-        const submissionNumber = interaction.message.embeds[0].title.replace("Submission ", "")
-        console.log(interaction.guild.channels.cache)
-        const channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
-        console.log(channel, `review-${submissionNumber}`)
+        //const embedAuthor = interaction.message.embeds[0].author.name.match(/\d{18}/)
+        //const user = await interaction.guild.members.fetch(embedAuthor[0])
+        const submissionNumber = ticketChannel.name.replace("review-", "")
+
+        //const channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
+        console.log(ticketChannel, `review-${submissionNumber}`)
         const reviewInDB = await ReviewHistory.findOne({
             where:{
                 id:submissionNumber
@@ -51,20 +52,49 @@ module.exports = {
             completedBy:interaction.user.id,
             completedAt: Date.now()
         })
-        await interaction.message.reply({content:`Completed ${interaction.message.embeds[0].author.name}`})
+       
+        const forSpread = [
+            {
+              "range": `B${reviewInDB.id}`,
+              "values": [
+                [
+                  reviewInDB.status
+                ]
+              ]
+            },
+            {
+              "range": `E${reviewInDB.id}`,
+              "values": [
+                [
+                  reviewInDB.completedAt
+                ]
+              ]
+            },
+            {
+                "range": `F${reviewInDB.id}`,
+                "values": [
+                  [
+                    reviewInDB.completedBy
+                  ]
+                ]
+              }
+          ]
+        await main(forSpread)
+        const user = await interaction.guild.members.fetch(reviewInDB.userID)
+        //await interaction.message.reply({content:`Completed ${interaction.message.embeds[0].author.name}`})
         await user.send({content:"Your review has been completed.\n\n\nHow would you rate this review?", components:createReviewButtons(submissionNumber)}).catch(err => {
-            if(err.rawError.message == "Cannot send messages to this user") {
-                interaction.channel.send(`${interaction.message.embeds[0].author.name} ( review-${submissionNumber} ) most likely has their DM's off and could not be reached. Therefor channel has not been deleted.`)
-                return
-            }
-            else {
-                interaction.channel.send(`Unknown error when rejecting ${interaction.message.embeds[0].author.name} ( review-${submissionNumber} ), therefor channel has not been deleted.`)
-                return
-            }
+        if(err.rawError.message == "Cannot send messages to this user") {
+            interaction.channel.send(`${interaction.message.embeds[0].author.name} ( review-${submissionNumber} ) most likely has their DM's off and could not be reached. Therefor channel has not been deleted.`)
+            return
+        }
+        else {
+            interaction.channel.send(`Unknown error when rejecting ${interaction.message.embeds[0].author.name} ( review-${submissionNumber} ), therefor channel has not been deleted.`)
+            return
+        }
         
         })
-        await interaction.message.delete()
-        await channel.delete()
+
+        await ticketChannel.delete()
         //console.log(await interaction.message.embeds[0].author.name.match(/\d{18}/))
         
         // do your stuff

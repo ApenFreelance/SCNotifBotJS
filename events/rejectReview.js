@@ -1,3 +1,4 @@
+const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
 
 module.exports = {
@@ -26,7 +27,34 @@ module.exports = {
             completedBy:interaction.user.id,
             completedAt: Date.now()
         })
-        await interaction.message.reply({content:`Rejected ${interaction.message.embeds[0].author.name}`})
+        const forSpread = [
+            {
+              "range": `B${reviewInDB.id}`,
+              "values": [
+                [
+                  reviewInDB.status
+                ]
+              ]
+            },
+            {
+              "range": `E${reviewInDB.id}`,
+              "values": [
+                [
+                  reviewInDB.completedAt
+                ]
+              ]
+            },
+            {
+                "range": `F${reviewInDB.id}`,
+                "values": [
+                  [
+                    reviewInDB.completedBy
+                  ]
+                ]
+              }
+          ]
+          await main(forSpread)
+        //await interaction.message.reply({content:`Rejected ${interaction.message.embeds[0].author.name}`, ephemeral:true})
         await interaction.message.delete()
         //console.log(await interaction.message.embeds[0].author.name.match(/\d{18}/))
         
