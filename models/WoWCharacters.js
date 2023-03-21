@@ -26,9 +26,10 @@ module.exports = class WoWCharacters extends Model {
          twoVtwoRating: { type: DataTypes.INTEGER, allowNull:true },
          threeVthreeRating: { type: DataTypes.INTEGER, allowNull:true },
          tenVtenRating: { type: DataTypes.INTEGER, allowNull:true },
-         soloShuffleFuryRating: { type: DataTypes.INTEGER, allowNull:true }, 
-         soloShuffleArmsRating: { type: DataTypes.INTEGER, allowNull:true }, 
-         soloShuffleProtectionRating: { type: DataTypes.INTEGER, allowNull:true },
+         soloShuffleSpec1Rating: { type: DataTypes.INTEGER, allowNull:true }, 
+         soloShuffleSpec2Rating: { type: DataTypes.INTEGER, allowNull:true }, 
+         soloShuffleSpec3Rating: { type: DataTypes.INTEGER, allowNull:true },
+         soloShuffleSpec4Rating: { type: DataTypes.INTEGER, allowNull:true },
         }, {
             tableName: "WoWCharacters",
             timestamps:true,
