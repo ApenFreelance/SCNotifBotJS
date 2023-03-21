@@ -167,26 +167,37 @@ module.exports = {
           await interaction.reply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
         }
       }
+
+      try {
         if(interaction.customId == "submitreview") {
-         
           await interaction.showModal(submissionModal);
+        }
+        if(interaction.customId == "claimsubmission") {
+          bot.emit("claimReview", interaction)
+        }
+        if(interaction.customId == "rejectsubmission") {
+          bot.emit("rejectReview", interaction)
+        }
+        if(interaction.customId == "completesubmission") {
+          bot.emit("completeReview", interaction)
+        }
+        if(/^rating\d-\d+/.test(interaction.customId)) {
+          bot.emit("rateReview", interaction, "button")
+        }
+        if(interaction.customId.startsWith("reviewratingmodal")) {
+          bot.emit("rateReview", interaction, "modal")
+        }
+
+      } catch (err) {
+        if(err.toString().startsWith("TypeError: Cannot read properties of undefined (reading 'startsWith')")) {
+          console.log("Not review related")
+        } else {
+        console.log(err) }
       }
-      if(interaction.customId == "claimsubmission") {
-        bot.emit("claimReview", interaction)
-      }
-      if(interaction.customId == "rejectsubmission") {
-        bot.emit("rejectReview", interaction)
-      }
-      if(interaction.customId == "completesubmission") {
-        bot.emit("completeReview", interaction)
-      }
-      console.log(/^rating\d-\d+/.test(interaction.customId))
-      if(/^rating\d-\d+/.test(interaction.customId)) {
-        bot.emit("rateReview", interaction, "button")
-      }
-      if(interaction.customId.startsWith("reviewratingmodal")) {
-        bot.emit("rateReview", interaction, "modal")
-      }
+        
+
+
+
         
         if (interaction.isCommand()) {
             const command = interaction.client.commands.get(interaction.commandName);
