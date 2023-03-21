@@ -1,3 +1,5 @@
+const {main } = require("../components/functions/googleApi.js")
+
 const util = require('util')
 const axios = require('axios');
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
@@ -6,7 +8,8 @@ const noBreakSpace = "\u00A0"
 const SCverifiedAccountDB = require('../models/SCverifiedAccountDB');
 const WoWCharacters = require('../models/WoWCharacters');
 const bot = require('../src/botMain');
-
+const classes = require("../classes.json");
+const { data } = require('../commands/dumps');
 const accessToken = process.env.accessToken
 const regexTemplateFullLink = "/(https):\/\/(worldofwarcraft\.blizzard\.com\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/[\w_-]+)/"
 
@@ -15,33 +18,45 @@ const linkTemplate = "https://worldofwarcraft.blizzard.com/{lang}/character/{reg
 const testLink = "https://worldofwarcraft.blizzard.com/en-gb/character/eu/tarren-mill/blizo/pve/raids"
 
 async function createWaitingForReviewMessage(interaction, charInfo, verifiedAccount) {
+  console.log(charInfo)
   const submissionChannel = await bot.channels.fetch("1084873371797434438")
-  
+  const maxLengt = 65
+  let description = `
+  Name: **${charInfo.dataValues.characterName}** 
+  Class: **${charInfo.dataValues.characterClass}**
+  Region: **${charInfo.dataValues.characterRegion}**`
+
+  if(charInfo.dataValues.twoVtwoRating != null) {
+    let n = `\n\n__2v2:${noBreakSpace.repeat()}**${charInfo.dataValues.twoVtwoRating}**__`.length
+    description+=`\n\n__2v2:${noBreakSpace.repeat(65-n)}**${charInfo.dataValues.twoVtwoRating}**__`
+  }
+  if(charInfo.dataValues.threeVthreeRating != null) {
+    let n = `\n\n__3v3:${noBreakSpace.repeat()}**${charInfo.dataValues.threeVthreeRating}**__`.length
+    description+=`\n\n__3v3:${noBreakSpace.repeat(65-n)}**${charInfo.dataValues.threeVthreeRating}**__`
+  }
+  if(charInfo.dataValues.soloShuffleSpec1Rating != null&& charInfo.dataValues.soloShuffleSpec1Rating!= undefined) {
+    let n = `\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][0]}:${noBreakSpace.repeat()}**${charInfo.dataValues.soloShuffleSpec1Rating}**__`.length
+    description+=`\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][0]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.dataValues.soloShuffleSpec1Rating}**__`
+  }
+  if(charInfo.dataValues.soloShuffleSpec2Rating != null&& charInfo.dataValues.soloShuffleSpec2Rating!= undefined) {
+    let n = `\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][1]}:${noBreakSpace.repeat()}**${charInfo.dataValues.soloShuffleSpec2Rating}**__`.length
+    description+=`\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][1]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.dataValues.soloShuffleSpec2Rating}**__`
+  }
+  if(charInfo.dataValues.soloShuffleSpec3Rating != null&& charInfo.dataValues.soloShuffleSpec3Rating!= undefined) {
+    let n = `\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][2]}:${noBreakSpace.repeat()}**${charInfo.dataValues.soloShuffleSpec3Rating}**__`.length
+    description+=`\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][2]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.dataValues.soloShuffleSpec3Rating}**__`
+  }
+  if(charInfo.dataValues.soloShuffleSpec4Rating != null && charInfo.dataValues.soloShuffleSpec4Rating!= undefined) {
+    let n = `\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][3]}:${noBreakSpace.repeat()}**${charInfo.dataValues.soloShuffleSpec4Rating}**__`.length
+    description+=`\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][3]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.dataValues.soloShuffleSpec4Rating}**__`
+  }
 
   const waitingForReviewEmbed = new EmbedBuilder()
   .setTitle(`Submission ${verifiedAccount.dataValues.id}`)  
   .setAuthor({ name: `${interaction.user.tag} ( ${interaction.user.id} )`, iconURL: interaction.member.displayAvatarURL(true)})
-    .setDescription(`
-    Name: **${charInfo.dataValues.characterName}** 
-    Race: **${charInfo.dataValues.characterRace}**
-    Class: **${charInfo.dataValues.characterClass}**
-    Region: **${charInfo.dataValues.characterRegion}**
-
-    __Honorable Kills${noBreakSpace.repeat(12)}**${charInfo.dataValues.honorableKills}**__
-      
-    __2v2:${noBreakSpace.repeat(36)}**${charInfo.dataValues.twoVtwoRating}**__
-      
-    __3v3:${noBreakSpace.repeat(35)}**${charInfo.dataValues.threeVthreeRating}**__
-      
-    __10v10:${noBreakSpace.repeat(32)}**${charInfo.dataValues.tenVtenRating}**__
-      
-    __Shuffle Fury:${noBreakSpace.repeat(22)}**${charInfo.dataValues.soloShuffleFuryRating}**__
-      
-    __Shuffle Arms:${noBreakSpace.repeat(20)}**${charInfo.dataValues.soloShuffleArmsRating}**__
-      
-    __Shuffle Protection:${noBreakSpace.repeat(10)}**${charInfo.dataValues.soloShuffleProtectionRating}**__`)
-    .setImage(charInfo.characterImage)
-    .setFooter({text:"This submission is unclaimed"})
+    .setDescription(description)
+    //.setThumbnail(charInfo.characterImage)
+    //.setFooter({text:"This submission is unclaimed"})
 
   const waitingForReviewRow = new ActionRowBuilder()
     .addComponents(
@@ -61,64 +76,82 @@ async function getCharacterInfo(region, slug, characterName, interaction) {
     
     const response = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
     console.log(`characterSummary: ${response.status}. [ ${response.statusText} ]`)
+
     const responseSummary = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-summary?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
     console.log(`pvpSummary: ${responseSummary.status}. [ ${responseSummary.statusText} ]`)
     const media = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/character-media?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+
+    let twoVtwoRating= threeVthreeRating= tenVtenRating=  soloShuffleSpec1Rating=  soloShuffleSpec2Rating= soloShuffleSpec3Rating=  soloShuffleSpec4Rating = null
+  
     
-    let twoVtwoRating= threeVthreeRating= tenVtenRating= soloShuffleArmsRating= soloShuffleFuryRating=soloShuffleProtectionRating = null
-  
-    console.log(twoVtwoRating, threeVthreeRating, tenVtenRating, soloShuffleArmsRating, soloShuffleFuryRating, soloShuffleProtectionRating )
-  
   
   for(const bracket of responseSummary.data.brackets) {
-    if(bracket.href.includes("2v2")) {
-  
-      const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/2v2?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
-      twoVtwoRating = bracketInfo.data.rating
-    }
-    else if(bracket.href.includes("3v3")) {
-    
-    const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/3v3?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+    try {
 
-    threeVthreeRating = bracketInfo.data.rating
-  }
     
-    else if(bracket.href.includes("rbg")) {
-    const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/rbg?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
-    tenVtenRating = bracketInfo.data.rating
-  }
-    else if(bracket.href.includes(`shuffle-${response.data.character_class.name}-arms`)) {
-    const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/shuffle-${characterClass}-arms?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
-    soloShuffleArmsRating =bracketInfo.data.rating
-  }
-    else if(bracket.href.includes(`shuffle-${response.data.character_class.name}-fury`)) {
-    const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/shuffle-${characterClass}-fury?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
-    soloShuffleFuryRating = bracketInfo.data.rating
-  }
-    else if(bracket.href.includes(`shuffle-${response.data.character_class.name}-protection`)) {
-    const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/shuffle-${characterClass}-protection?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
-    soloShuffleProtectionRating = bracketInfo.data.rating
-  }
-    else {
-      console.log("FOUND NO MATCH FOR BRACKET: ", bracket.href)
+      if(bracket.href.includes("2v2")) {
+    
+        const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/2v2?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+        twoVtwoRating = bracketInfo.data.rating
+      }
+      else if(bracket.href.includes("3v3")) {
+      
+      const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/3v3?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+
+      threeVthreeRating = bracketInfo.data.rating
+      }
+        
+      /*   else if(bracket.href.includes("rbg")) {
+        const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/rbg?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+        tenVtenRating = bracketInfo.data.rating
+      } */
+        else if(bracket.href.includes(`shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][0].toLowerCase()}`)) {
+        const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][0].toLowerCase()}?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+        soloShuffleSpec1Rating =bracketInfo.data.rating
+      }
+        else if(bracket.href.includes(`shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][1].toLowerCase()}`)) {
+        const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][1].toLowerCase()}?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+        soloShuffleSpec2Rating = bracketInfo.data.rating
+      }
+        else if(bracket.href.includes(`shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][2].toLowerCase()}`)) {
+        const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][2].toLowerCase()}?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+
+        soloShuffleSpec3Rating = bracketInfo.data.rating
+      }
+        else if(bracket.href.includes(`shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][3].toLowerCase()}`)) {
+          const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][3].toLowerCase()}?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+
+          soloShuffleSpec4Rating = bracketInfo.data.rating
+        }
+        else {
+          console.log("FOUND NO MATCH FOR BRACKET: ", bracket.href)
+        }
+  } catch(err) {
+    if (err.toString().includes("TypeError: Cannot read properties of undefined (reading 'toLowerCase')")) {
+      console.log("This role does not exist in classes")
     }
-    
+    else {
+      console.log(err)
+    }
   }
-  
-  const wowChar = await WoWCharacters.create({
-    characterName:characterName,
+    console.log("in")
+  }
+  console.log("pre")
+  let wowChar = await WoWCharacters.create({
+    characterName:response.data.name,
     characterRegion:region,
     slug:slug,
-    characterRace:response.data.race.name,
+    //characterRace:response.data.race.name,
     characterClass:response.data.character_class.name,
-    characterImage:media.data.assets[2].value,
-    honorableKills:responseSummary.data.honorable_kills,
+    characterImage:media.data.assets[1].value,
+    //honorableKills:responseSummary.data.honorable_kills,
     twoVtwoRating:twoVtwoRating,
     threeVthreeRating:threeVthreeRating,
     tenVtenRating:tenVtenRating,
-    soloShuffleArmsRating:soloShuffleArmsRating,
-    soloShuffleFuryRating:soloShuffleFuryRating,
-    soloShuffleProtectionRating:soloShuffleProtectionRating
+    soloShuffleSpec1Rating:soloShuffleSpec1Rating,
+    soloShuffleSpec2Rating:soloShuffleSpec2Rating,
+    soloShuffleSpec3Rating:soloShuffleSpec3Rating,
+    soloShuffleSpec4Rating:soloShuffleSpec4Rating
   })
   
   return wowChar
@@ -138,10 +171,10 @@ module.exports = {
     let link = interaction.fields.fields.get("armory").value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
     //let link = interaction.fields.fields.armory.value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
     const wowChar = await getCharacterInfo(link[1], link[2], link[3],  interaction).catch(err=> { console.log("failed to get character info: ", err)})
-    console.log("region: ", link[1])
+/*     console.log("region: ", link[1])
     console.log("slug: ", link[2])
     console.log("name: ", link[3])
-    //console.log(wowChar)
+    console.log(wowChar, "wow") */
     //await getCharacterInfo(link[1], link[2], link[3], "warrior", interaction)
 
    
@@ -157,15 +190,15 @@ module.exports = {
       return
     }
     if(created) { // if a new entry is created there is no reason to check the rest
-      createWaitingForReviewMessage(interaction, wowChar)
+      createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
       return
     }
 
-    if(Date.now() - (2629743*1000) >= verifiedAccount.createdAt) {  // 30 day reduction
+    /* if(Date.now() - (2629743*1000) >= verifiedAccount.createdAt) {  // 30 day reduction
       console.log(verifiedAccount.createdAt)
       await interaction.reply({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
       return
-    }
+    } */
     
     // if none of the ones apply, create new entry
     verifiedAccount = await ReviewHistory.create({
@@ -174,7 +207,24 @@ module.exports = {
     })
     await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
     await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
-
+    const forSpread = [
+      {
+        "range": `A${reviewHistory.id}`,
+        "values": [
+          [
+            verifiedAccount.userID
+          ]
+        ]
+      },
+      {
+        "range": `B${verifiedAccount.id}`,
+        "values": [
+          [
+            verifiedAccount.status
+          ]
+        ]
+      }]
+    await main(forSpread)
       // do your stuff
   },
 };
