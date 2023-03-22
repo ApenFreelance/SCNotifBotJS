@@ -166,14 +166,14 @@ async function checkForChanges(newDumpString, oldDumpString, game) {
     })
     
   
-    await createEmbed(updateObject, game)
+    await createEmbed(updateObject, game, interaction)
     
     
   
   }
 
   
-async function createEmbed(uploads, game)  {
+async function createEmbed(uploads, game, interaction)  {
     let breakdown = {}
     let failed = []
     fs.readFile("./gameData.json", "utf-8", function(err, data) {
@@ -200,7 +200,7 @@ async function createEmbed(uploads, game)  {
   
       }
         
-    console.log(failed)
+    
     const forLoop = async _ => {
         console.log("start")
         for(const tag in breakdown) {
@@ -209,9 +209,9 @@ async function createEmbed(uploads, game)  {
             logChannel.send(`<@${logChannel}`)
             breakdown[tag].forEach(video => {
             let videoEmbed = new EmbedBuilder()
-            .setTitle(video.courseTitle)  
-            .setAuthor({ name: `A new Skill-Capped video has been released!`, iconURL: "https://media.discordapp.net/attachments/991013102688555069/994302850580631622/unknown.png"})
-            .setDescription(`${video.videoTitle}\n(click here to watch)[${video.link}]`)
+                .setTitle(video.courseTitle)  
+                .setAuthor({ name: `A new Skill-Capped video has been released!`, iconURL: "https://media.discordapp.net/attachments/991013102688555069/994302850580631622/unknown.png"})
+                .setDescription(`${video.videoTitle}\n(click here to watch)[${video.link}]`)
             //.setThumbnail(charInfo.characterImage)
             //.setFooter({text:"This submission is unclaimed"})
             .setThumbnail(data[game][tag].img)
