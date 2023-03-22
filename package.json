@@ -1,5 +1,5 @@
 {
-  "main":"./src/botMain.js"
+  "main":"./src/botMain.js",
   "scripts": {
     "test": "node ./tests/reviewTest.js"
   },
