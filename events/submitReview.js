@@ -1,5 +1,5 @@
 const {main } = require("../components/functions/googleApi.js")
-
+const blizzard = require('blizzard.js')
 const util = require('util')
 const axios = require('axios');
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
@@ -18,9 +18,10 @@ const linkTemplate = "https://worldofwarcraft.blizzard.com/{lang}/character/{reg
 const testLink = "https://worldofwarcraft.blizzard.com/en-gb/character/eu/tarren-mill/blizo/pve/raids"
 
 async function createWaitingForReviewMessage(interaction, charInfo, verifiedAccount) {
-  console.log(charInfo)
+  console.log(charInfo, "charInfo")
   const submissionChannel = await bot.channels.fetch("1084873371797434438")
   const maxLengt = 65
+  
   let description = `
   Name: **${charInfo.dataValues.characterName}** 
   Class: **${charInfo.dataValues.characterClass}**
@@ -72,31 +73,32 @@ async function createWaitingForReviewMessage(interaction, charInfo, verifiedAcco
       await submissionChannel.send({embeds:[waitingForReviewEmbed], components:[waitingForReviewRow]  })
   }
 
-async function getCharacterInfo(region, slug, characterName, interaction) {
+async function getCharacterInfo(region, slug, characterName, wowClient) {
+    const Cprofile = await wowClient.characterProfile({ realm: slug, name: characterName })
+    //console.log(Cprofile.data)
+
+    console.log(`Cprofile: ${Cprofile.status}. [ ${Cprofile.statusText} ]`)
+    const Cpvp = await wowClient.characterPVP({ realm: slug, name: characterName})
+    console.log(`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`, Cpvp.data)
+    //const media = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/character-media?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
     
-    const response = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
-    console.log(`characterSummary: ${response.status}. [ ${response.statusText} ]`)
-
-    const responseSummary = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-summary?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
-    console.log(`pvpSummary: ${responseSummary.status}. [ ${responseSummary.statusText} ]`)
-    const media = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/character-media?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
-
     let twoVtwoRating= threeVthreeRating= tenVtenRating=  soloShuffleSpec1Rating=  soloShuffleSpec2Rating= soloShuffleSpec3Rating=  soloShuffleSpec4Rating = null
   
     
   
-  for(const bracket of responseSummary.data.brackets) {
+  for(const bracket of Cpvp.data.brackets) {
     try {
 
     
       if(bracket.href.includes("2v2")) {
-    
-        const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/2v2?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+        const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: "2v2"})
+        
+       
         twoVtwoRating = bracketInfo.data.rating
       }
       else if(bracket.href.includes("3v3")) {
       
-      const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/3v3?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+        const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: "3v3"})
 
       threeVthreeRating = bracketInfo.data.rating
       }
@@ -105,21 +107,21 @@ async function getCharacterInfo(region, slug, characterName, interaction) {
         const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/rbg?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
         tenVtenRating = bracketInfo.data.rating
       } */
-        else if(bracket.href.includes(`shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][0].toLowerCase()}`)) {
-        const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][0].toLowerCase()}?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][0].toLowerCase()}`)) {
+        const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][0].toLowerCase()}`})
         soloShuffleSpec1Rating =bracketInfo.data.rating
       }
-        else if(bracket.href.includes(`shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][1].toLowerCase()}`)) {
-        const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][1].toLowerCase()}?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][1].toLowerCase()}`)) {
+          const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][1].toLowerCase()}`})
         soloShuffleSpec2Rating = bracketInfo.data.rating
       }
-        else if(bracket.href.includes(`shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][2].toLowerCase()}`)) {
-        const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][2].toLowerCase()}?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][2].toLowerCase()}`)) {
+          const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][2].toLowerCase()}`})
 
         soloShuffleSpec3Rating = bracketInfo.data.rating
       }
-        else if(bracket.href.includes(`shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][3].toLowerCase()}`)) {
-          const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/shuffle-${response.data.character_class.name.toLowerCase()}-${classes[response.data.character_class.name][3].toLowerCase()}?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][3].toLowerCase()}`)) {
+          const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][3].toLowerCase()}`})
 
           soloShuffleSpec4Rating = bracketInfo.data.rating
         }
@@ -134,16 +136,16 @@ async function getCharacterInfo(region, slug, characterName, interaction) {
       console.log(err)
     }
   }
-    console.log("in")
+    
   }
-  console.log("pre")
+
   let wowChar = await WoWCharacters.create({
-    characterName:response.data.name,
+    characterName:Cprofile.data.name,
     characterRegion:region,
     slug:slug,
     //characterRace:response.data.race.name,
-    characterClass:response.data.character_class.name,
-    characterImage:media.data.assets[1].value,
+    characterClass:Cprofile.data.character_class.name,
+    //characterImage:media.data.assets[1].value,
     //honorableKills:responseSummary.data.honorable_kills,
     twoVtwoRating:twoVtwoRating,
     threeVthreeRating:threeVthreeRating,
@@ -170,7 +172,15 @@ module.exports = {
     
     let link = interaction.fields.fields.get("armory").value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
     //let link = interaction.fields.fields.armory.value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
-    const wowChar = await getCharacterInfo(link[1], link[2], link[3],  interaction).catch(err=> { console.log("failed to get character info: ", err)})
+    const wowClient = await blizzard.wow.createInstance({
+      key: process.env.BCID,
+      secret: process.env.BCS,
+      origin: link[1], // optional
+      locale: 'en_US', // optional
+      token: '', // optional
+    })
+    
+    const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient).catch(err=> { console.log("failed to get character info: ", err)})
 /*     console.log("region: ", link[1])
     console.log("slug: ", link[2])
     console.log("name: ", link[3])
@@ -193,6 +203,8 @@ module.exports = {
       createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
       return
     }
+    await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
+    
 
     /* if(Date.now() - (2629743*1000) >= verifiedAccount.createdAt) {  // 30 day reduction
       console.log(verifiedAccount.createdAt)
@@ -206,10 +218,9 @@ module.exports = {
       status:"Available"
     })
     await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
-    await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
     const forSpread = [
       {
-        "range": `A${reviewHistory.id}`,
+        "range": `A${verifiedAccount.id}`,
         "values": [
           [
             verifiedAccount.userID

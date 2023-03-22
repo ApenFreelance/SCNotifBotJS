@@ -46,12 +46,13 @@ module.exports = {
                 claimedBy:interaction.user.id,
                 claimedAt:Date.now()
             })
+            console.log(reviewHistory.claimedAt)
         const forSpread = [
                 {
                   "range": `B${reviewHistory.id}`,
                   "values": [
                     [
-                      reviewInDB.status
+                      reviewHistory.status
                     ]
                   ]
                 },

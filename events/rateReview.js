@@ -67,12 +67,12 @@ module.exports = {
                   "range": `H${history.id}`,
                   "values": [
                     [
-                      reviewInDB.reviewRating
+                      history.reviewRating
                     ]
                   ]
                 },
                 {
-                  "range": `I${reviewInDB.id}`,
+                  "range": `I${history.id}`,
                   "values": [
                     [
                       history.reviewRatingComment

@@ -1,5 +1,5 @@
 require("dotenv").config({path: '../.env'});
-
+const blizzard = require('blizzard.js')
 const fs = require("fs");
 
 const { Collection, Client, GatewayIntentBits,SlashCommandBuilder } = require('discord.js');
@@ -65,9 +65,10 @@ bot.on("ready", async () => {
     WoWCharacters.sync(db)
 
     ReviewHistory.init(db)
-    ReviewHistory.sync({alter:true})
+    ReviewHistory.sync(db)
     
     
+
     
 })
 

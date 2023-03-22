@@ -33,10 +33,12 @@ module.exports = {
         let oldDump = interaction.options.getString('olddump');
         console.log(game, newDump, oldDump)
         if(game == null) {
-            fs.readFile("../gameData.json", "utf-8", function(err, gameData){  
+            console.log("hi")
+            fs.readFile("./gameData.json", "utf-8", function(err, gameData){  
                 gameData = JSON.parse(gameData)
+               
                 let dumpList = {}
-                
+                console.log(gameData)
                 for(const game in gameData) {
                   try {
                     dumpList[game] = gameData[game].lastDump
@@ -45,15 +47,20 @@ module.exports = {
                     console.log(err)
                   }
                 }
-                let dumpListString = JSON.stringify(dumpList).replace(",", "\n").replace("{", "").replace("}", "")
+                let dumpListString = JSON.stringify(dumpList).replaceAll(",", "\n\n").replace("{", "").replace("}", "").replaceAll('"', '`')
                 
                 console.log(dumpListString)
+                let videoEmbed = new EmbedBuilder()
+                    .setTitle("Current dumps")  
+                    .setDescription(dumpListString)
+            
+            
+               
                 
-                // Display the file content
-                console.log(gameData, dumpList);
-                interaction.reply(dumpListString)
+                interaction.reply({embeds:[videoEmbed]})
                 
             })
+            return
       
         }
       

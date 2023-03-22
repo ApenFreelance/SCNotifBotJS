@@ -42,7 +42,7 @@ app.get('/oauth/callback', async (req, res, next) => {
     const params = new URLSearchParams();
     params.append('redirect_uri', redirectUri);
     params.append('scope', scopes.join(' '));
-    params.append('grant_type', 'authorization_code');
+    params.append('grant_type', 'client_credentials');
     params.append('code', code);
 
     // execute request
@@ -61,7 +61,7 @@ app.get('/oauth/callback', async (req, res, next) => {
 
     // work with the oauth response
     const responseData = await oauthResponse.json();
-
+    
     // do something with the `access_token` from `responseData`
     // {
     //     "access_token": "123456789",
@@ -78,10 +78,11 @@ app.use((err, req, res, next) => {
     res.end(err.toString());
 });
 
+
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => console.log(`listening on port ${port}`));
-async function rl() {
-    const r = axios.get("http://localhost:3000/login")
-    console.log(r)
-}
+
+
+
+

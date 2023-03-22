@@ -1,5 +1,7 @@
 const { default: axios } = require("axios")
 require("dotenv").config();
+const fs = require("fs");
+const { stringify } = require("querystring");
 async function verifyEmailExists() {
     console.log("Verifying Email")
     const response = await axios.post('https://www.skill-capped.com/lol/api/new/loginv2', { email:process.env.mail, password:process.env.pass})
@@ -21,4 +23,247 @@ async function verifyEmailExists() {
     return response.data.available
   }
 
-verifyEmailExists()
+async function getIt() {
+  let a = 13
+  let j = {}
+  while (a < 14) {
+  const response = await axios.get(`https://eu.battle.net/oauth?code=MjEzMjczMDY3ZmJlNDYwN2FlNTg4YWE1NmI3ZGNmZGQ6cEhORnJXSmJHV0RiS253Z3BEM3hZYWpBSXdsdm91dko`)
+    f = []
+    console.log(response.data)
+    response.data.specializations.forEach(spec => {
+      f.push(spec.name)
+    })
+    j[response.data.name] += f
+
+    a+=1
+  }
+  console.log(j)
+}
+
+
+//updateValues("1oCLc7RGXaK79gewCkhm1s30QD9zQ3KiZs3fPoPBg7LM", `A${verifiedAccount.userID}`, "USER_ENTERED", verifiedAccount.userID)
+
+async function updateValues(spreadsheetId, range, valueInputOption, _values) {
+  const {GoogleAuth} = require('google-auth-library');
+  const {google} = require('googleapis');
+
+  const auth = new GoogleAuth({
+    scopes: 'https://www.googleapis.com/auth/spreadsheets',
+  });
+
+  const service = google.sheets({version: 'v4', auth});
+  let values = [
+    [
+      // Cell values ...
+    ],
+    // Additional rows ...
+  ];
+  const resource = {
+    values,
+  };
+  try {
+    const result = await service.spreadsheets.values.update({
+      spreadsheetId,
+      range,
+      valueInputOption,
+      resource,
+    });
+    console.log('%d cells updated.', result.data.updatedCells);
+    return result;
+  } catch (err) {
+    // TODO (Developer) - Handle exception
+    throw err;
+  }
+}
+
+
+
+async function dumpFunction(game, newDump, oldDump) {
+  //const game = interaction.options.getString('game');
+  //const newDump = interaction.options.getString('newdump');
+  //const oldDump = interaction.options.getString('olddump');
+
+
+  if(game == null) {
+      fs.readFile("./gameData.json", "utf-8", function(err, gameData){  
+          gameData = JSON.parse(gameData)
+          let dumpList = {}
+          for(const game in gameData) {
+            try {
+              dumpList[game] = gameData[game].lastDump
+            }    
+            catch (err) {
+              console.log(err)
+            }
+          }
+          let dumpListString = JSON.stringify(dumpList).replace(",", "\n").replace("{", "").replace("}", "")
+          console.log(dumpListString)
+          
+          // Display the file content
+          console.log(gameData, dumpList);
+          
+      })
+
+  }
+
+  if(newDump != null) {
+    fs.readFile("./gameData.json", "utf-8", function(err, gameData){  
+      gameData = JSON.parse(gameData)
+      console.log(gameData[game])
+      try{
+        if(oldDump == null) { oldDump = gameData[game].lastDump}
+      } catch (err) {
+        console.log(err)
+      }
+      
+        try {
+          
+          gameData[game].lastDump = newDump
+          fs.writeFile("./gameData.json", JSON.stringify(gameData, null, 2), (err) => {
+            if (err)
+              console.log(err);
+            else {
+              console.log("File written successfully\n");
+              
+              
+            }})
+        }    
+        catch (err) {
+          console.log(err)
+        }
+      })
+      
+      
+      // Display the file content
+      
+    }
+  }
+  
+
+
+  
+  
+
+async function checkForChanges(newDumpString, oldDumpString) {
+  let newDump = await axios.get(newDumpString)
+  let oldDump = await axios.get(oldDumpString)
+  newDump = newDump.data
+  oldDump = oldDump.data
+
+  let updateObject = {}
+  let oldVideos = []
+  Object.values(oldDump.videos).forEach(video =>{
+    oldVideos.push(video.title)
+  })
+  Object.values(newDump.videos).forEach(vid => {
+
+    
+
+    if(!oldVideos.includes(vid.title)) {
+      updateObject[vid.title] = {"courseTitle": null,"courseuuid":null,"videoTitle":vid.title, "videouuid": vid.uuid,"link":null,"tag": null,"tId": vid.tId}
+      for(const video in updateObject) {
+        //console.log(updateObject[video].videouuid, "video")
+         for(const course in newDump.videosToCourses) {
+          
+          
+          //console.log(newDump.videosToCourses[course].chapters)
+    
+          if(newDump.videosToCourses[course].chapters[0].vids.find(item => item.uuid == updateObject[video].videouuid) != undefined ) {
+            
+            updateObject[video].courseTitle = course
+          }
+
+          
+          
+        }
+        
+        if (newDump.courses.find(item => item.title == updateObject[video].courseTitle) != undefined) {
+
+          updateObject[video].courseuuid = newDump.courses.find(item => item.title == updateObject[video].courseTitle).uuid
+          updateObject[video].tag = newDump.courses.find(item => item.title == updateObject[video].courseTitle).tags[0]
+        }
+        
+
+      }
+    }
+    
+  })
+  
+
+  createEmbed(updateObject, "wow")
+  
+  
+
+}
+
+
+//checkForChanges("https://lol-content-dumps.s3.amazonaws.com/courses_v2/wow/course_dump_1674624635709.json", "https://lol-content-dumps.s3.amazonaws.com/courses_v2/wow/course_dump_1677799755405.json")
+
+
+
+
+const {main, authorize} = require("./components/functions/googleApi")
+const forSpread = [
+  {
+    "range": `B2`,
+    "values": [
+      [
+        "WORKS"
+      ]
+    ]
+  }
+]
+
+
+
+
+
+
+function createAccessToken(apiKey, apiSecret, region = 'eu') {
+  return new Promise((resolve, reject) => {
+      let credentials = Buffer.from(`${apiKey}:${apiSecret}`);
+
+      const requestOptions = {
+          host: `${region}.battle.net`,
+          path: '/oauth/token',
+          method: 'POST',
+          headers: {
+              'Authorization': `Basic ${credentials.toString('base64')}`,
+              'Content-Type': 'application/x-www-form-urlencoded'
+          }
+      };
+
+      let responseData = '';
+
+      function requestHandler(res) {
+          res.on('data', (chunk) => {
+              responseData += chunk;
+              console.log(chunk)
+          });
+          res.on('end', () => {
+              let data = JSON.parse(responseData);
+              resolve(data);
+              console.log(data)
+          });
+      }
+      console.log(responseData)
+      let request = require('https').request(requestOptions, requestHandler);
+      request.write('grant_type=client_credentials');
+      request.end();
+      console.log(request)
+      request.on('error', (error) => {
+          reject(error);
+      });
+  });
+}
+
+
+//createAccessToken("213273067fbe4607ae588aa56b7dcfdd", "pHNFrWJbGWDbKnwgpD3xYajAIwlvouvJ")
+const blizzard = require('blizzard.js')
+const wowClient = blizzard.wow.createInstance({
+  key: process.env.BCID,
+  secret: process.env.BCS,
+  origin: 'us', // optional
+  locale: 'en_US', // optional
+  token: '', // optional
+})
