@@ -1,6 +1,7 @@
 const { default: axios } = require('axios');
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, EmbedBuilder } = require('discord.js');
 const fs = require("fs");
+const bot = require('../src/botMain');
 
 
 
@@ -31,14 +32,15 @@ module.exports = {
         let game = interaction.options.getString('game');
         let newDump = interaction.options.getString('newdump');
         let oldDump = interaction.options.getString('olddump');
-        console.log(game, newDump, oldDump)
+
+        await interaction.deferReply({ ephemeral: true })
         if(game == null) {
             console.log("hi")
             fs.readFile("./gameData.json", "utf-8", function(err, gameData){  
                 gameData = JSON.parse(gameData)
                
                 let dumpList = {}
-                console.log(gameData)
+                
                 for(const game in gameData) {
                   try {
                     dumpList[game] = gameData[game].lastDump
@@ -49,7 +51,7 @@ module.exports = {
                 }
                 let dumpListString = JSON.stringify(dumpList).replaceAll(",", "\n\n").replace("{", "").replace("}", "").replaceAll('"', '`')
                 
-                console.log(dumpListString)
+                
                 let videoEmbed = new EmbedBuilder()
                     .setTitle("Current dumps")  
                     .setDescription(dumpListString)
@@ -57,7 +59,7 @@ module.exports = {
             
                
                 
-                interaction.reply({embeds:[videoEmbed]})
+                interaction.editReply({embeds:[videoEmbed],  ephemeral: true })
                 
             })
             return
@@ -90,7 +92,7 @@ module.exports = {
                   }
                   try {
                     console.log("checking for changes")
-                      checkForChanges(newDump, oldDump, game)
+                      checkForChanges(newDump, oldDump, game, interaction)
                   } catch(err) {
                       console.log(err)
                   }
@@ -111,7 +113,7 @@ module.exports = {
     }
 };
 
-async function checkForChanges(newDumpString, oldDumpString, game) {
+async function checkForChanges(newDumpString, oldDumpString, game, interaction) {
     let newDump = await axios.get(newDumpString)
     let oldDump = await axios.get(oldDumpString)
     newDump = newDump.data
@@ -174,6 +176,7 @@ async function checkForChanges(newDumpString, oldDumpString, game) {
 
   
 async function createEmbed(uploads, game, interaction)  {
+    
     let breakdown = {}
     let failed = []
     fs.readFile("./gameData.json", "utf-8", function(err, data) {
@@ -200,30 +203,46 @@ async function createEmbed(uploads, game, interaction)  {
   
       }
         
-    
+    interaction.editReply({contents:`Will now attempt to post all videos.`, ephemeral:true})
     const forLoop = async _ => {
         console.log("start")
+        
+        
         for(const tag in breakdown) {
-            let logChannel = await interaction.channels.fetch(channelid)
-            console.log(logChannel, "log")
-            logChannel.send(`<@${logChannel}`)
+            console.log(breakdown[tag].length, tag)
+            if(breakdown[tag].length == 0) {
+                console.log("No videos uploaded for: ", tag)
+                continue
+            }
+            console.log(data[game].logChannelID.toString())
+            let logChannel = await bot.channels.fetch(data[game].roleDict[tag].channelid.toString()).catch(err => {
+                if(err.toString().startsWith("DiscordAPIError[10003]: Unknown Channel")){
+                    console.log(err)
+                    console.log("erred")
+                    interaction.editReply({contents:`This channel does not exist in this server: ${tag} ( Set to: ${data[game].roleDict[tag].channelid.toString()})`, ephemeral:true})
+                    return
+                }
+            })
+            
+            await logChannel.send(`${logChannel}, ${tag}`)
             breakdown[tag].forEach(video => {
+                video.link = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
             let videoEmbed = new EmbedBuilder()
                 .setTitle(video.courseTitle)  
                 .setAuthor({ name: `A new Skill-Capped video has been released!`, iconURL: "https://media.discordapp.net/attachments/991013102688555069/994302850580631622/unknown.png"})
-                .setDescription(`${video.videoTitle}\n(click here to watch)[${video.link}]`)
-            //.setThumbnail(charInfo.characterImage)
+                .setDescription(`${video.videoTitle}\n[click here to watch](${video.link})`)
+                .setImage(`https://skillcappedzencoder.s3.amazonaws.com/${video.videouuid}/thumbnails/thumbnail_medium_${video.tId}.jpg`)
             //.setFooter({text:"This submission is unclaimed"})
-            .setThumbnail(data[game][tag].img)
-            if(data[game][tag].img == "") {
-                videoEmbed.setImage(`https://skillcappedzencoder.s3.amazonaws.com/${video.videouuid}/thumbnails/thumbnail_medium_${value['tId']}.jpg`)
+            //.setThumbnail(data[game].roleDict[tag].img)
+            if(data[game].roleDict[tag].img == "") {
+                videoEmbed.setThumbnail(`https://media.discordapp.net/attachments/991013102688555069/994302850580631622/unknown.png`)
             } else {
-                videoEmbed.setImage(data[game][tag].img)
+                videoEmbed.setThumbnail(data[game].roleDict[tag].img)
             }
-            console.log(videoEmbed)
-            return
+            
+            
             logChannel.send({embeds:[videoEmbed]})
-            process.exit()
+            
             })
         
       }}
@@ -231,9 +250,8 @@ async function createEmbed(uploads, game, interaction)  {
       console.log("done")
      
     })
+    await interaction.editReply({contents:`Dump upload completed`, ephemeral:true})
     
   }
 
-  async function getChannel(channelid) {
-    return bot.channels.fetch(channelid)
-  }
+ 
