@@ -41,7 +41,7 @@ module.exports = {
         const submissionNumber = ticketChannel.name.replace("review-", "")
 
         //const channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
-        console.log(ticketChannel, `review-${submissionNumber}`)
+        //console.log(ticketChannel, `review-${submissionNumber}`)
         const reviewInDB = await ReviewHistory.findOne({
             where:{
                 id:submissionNumber

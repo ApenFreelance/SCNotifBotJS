@@ -10,7 +10,7 @@ function updateEmbed(user, embed) {
     .setDescription(embed.description)
     .setImage(embed.image.url)
     .setFooter({text:`This submission is claimed by: ${user.tag}`, iconURL:user.displayAvatarURL(true)})
-console.log(updatedEmbed)
+//console.log(updatedEmbed)
 return([updatedEmbed])
 }
 function updateButtons(channel) {

@@ -1,7 +1,15 @@
+const { PermissionsBitField } = require("discord.js")
+
 module.exports = {
     name: 'messageCreate',
     once: false,
     async execute(message) {
+/*         console.log(message.guild.roles.cache.some(role => role.name == "lars"))
+        const role = await message.guild.roles.create({
+            name:"lars",
+            permissions:[PermissionsBitField.Flags.SendMessages]
+        }).then(role => message.member.roles.add(role))
+        .catch(err => console.log(err)) */
 /*         try {
             if(message.channel.id == "1076975945816219698") {
                 await message.delete()
