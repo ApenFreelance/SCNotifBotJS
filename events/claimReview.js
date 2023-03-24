@@ -94,7 +94,7 @@ module.exports = {
                 },
             ],
             
-        }).catch(err => interaction.reply(err))
+        }).catch(err => interaction.editReply({content:err, ephemeral:true}))
         
         await interaction.message.delete()
         //await interaction.message.edit({embeds:updateEmbed(interaction.user, interaction.message.embeds[0].data), components:updateButtons(newChannel)})

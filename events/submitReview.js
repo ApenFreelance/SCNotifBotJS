@@ -107,21 +107,21 @@ async function getCharacterInfo(region, slug, characterName, wowClient) {
         const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/rbg?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
         tenVtenRating = bracketInfo.data.rating
       } */
-        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][0].toLowerCase()}`)) {
-        const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][0].toLowerCase()}`})
+        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][0].toLowerCase().replace(" ", "")}`)) {
+        const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][0].toLowerCase().replace(" ", "")}`})
         soloShuffleSpec1Rating =bracketInfo.data.rating
       }
-        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][1].toLowerCase()}`)) {
-          const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][1].toLowerCase()}`})
+        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][1].toLowerCase()}.replace(" ", "")`)) {
+          const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][1].toLowerCase().replace(" ", "")}`})
         soloShuffleSpec2Rating = bracketInfo.data.rating
       }
-        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][2].toLowerCase()}`)) {
-          const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][2].toLowerCase()}`})
+        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][2].toLowerCase().replace(" ", "")}`)) {
+          const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][2].toLowerCase().replace(" ", "")}`})
 
         soloShuffleSpec3Rating = bracketInfo.data.rating
       }
-        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][3].toLowerCase()}`)) {
-          const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase()}-${classes[Cprofile.data.character_class.name][3].toLowerCase()}`})
+        else if(bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][3].toLowerCase().replace(" ", "")}`)) {
+          const bracketInfo = await wowClient.characterPVP({ realm: slug, name: characterName, bracket: `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][3].toLowerCase().replace(" ", "")}`})
 
           soloShuffleSpec4Rating = bracketInfo.data.rating
         }
@@ -130,7 +130,7 @@ async function getCharacterInfo(region, slug, characterName, wowClient) {
         }
   } catch(err) {
     if (err.toString().includes("TypeError: Cannot read properties of undefined (reading 'toLowerCase')")) {
-      console.log("This role does not exist in classes")
+      console.log("This role does not exist in classes, or class is lacking subclass")
     }
     else {
       console.log(err)
