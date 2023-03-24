@@ -206,7 +206,7 @@ module.exports = {
     await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
     
 
-    if(Date.now() - (2629743*1000) >= verifiedAccount.createdAt) {  // 30 day reduction
+    if(Date.now() - (2629743*1000) <= verifiedAccount.createdAt) {  // 30 day reduction
       console.log(verifiedAccount.createdAt)
       await interaction.reply({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
       return
