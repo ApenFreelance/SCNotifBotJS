@@ -133,7 +133,7 @@ async function checkForChanges(newDumpString, oldDumpString, game, interaction) 
     
    
       if(!oldVideos.includes(vid.title)) {
-        console.log("new video added")
+        
         updateObject[vid.title] = {"courseTitle": null,"courseuuid":null,"videoTitle":vid.title, "videouuid": vid.uuid,"link":null,"tag": null,"tId": vid.tId}
         for(const video in updateObject) {
           //console.log(updateObject[video].videouuid, "video")
@@ -190,7 +190,7 @@ async function createEmbed(uploads, game, interaction)  {
             try {
                 if(uploads[video].tag.includes(tags)) {
                     breakdown[tags].push(uploads[video])
-                    console.log("worked")
+                    
                   }
             } catch(err) {
                 console.log(err)
