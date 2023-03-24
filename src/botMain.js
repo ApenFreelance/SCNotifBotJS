@@ -10,7 +10,7 @@ const characterHistory = require("../models/CharacterHistory");
 const SCverifV2 = require("../models/SCVerifV2");
 const ReviewHistory = require("../models/ReviewHistory");
 
-const logChannelServer = bot.channels.fetch("1024961321768329249").catch(err => console.log(err))
+//const logChannelServer = bot.channels.fetch("1024961321768329249").catch(err => console.log(err))
 
 
 
