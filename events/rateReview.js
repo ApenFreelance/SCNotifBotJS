@@ -31,10 +31,10 @@ module.exports = {
         
 
         if(type == "modal") {
-            console.log(interaction)
+            //console.log(interaction)
 
             const submissionNumber = interaction.customId.replace("reviewratingmodal","")
-            console.log(interaction.fields.fields.get("feedback").value)
+            //console.log(interaction.fields.fields.get("feedback").value)
             const history = await ReviewHistory.findOne({
                 where:{
                     id: submissionNumber
