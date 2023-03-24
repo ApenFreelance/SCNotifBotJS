@@ -10,6 +10,7 @@ const characterHistory = require("../models/CharacterHistory");
 const SCverifV2 = require("../models/SCVerifV2");
 const ReviewHistory = require("../models/ReviewHistory");
 
+const logChannelServer = bot.channels.fetch("1024961321768329249").catch(err => console.log(err))
 
 
 
@@ -19,6 +20,7 @@ module.exports = bot;
 bot.commands = new Collection();
 process.on('unhandledRejection', error => {
 	console.error('Unhandled promise rejection:', error);
+    //logChannelServer.send()
 });
 
 
@@ -29,7 +31,7 @@ for (const file of commandFiles) {
     const command = require(`../commands/${file}`);
     // Set a new item in the Collection
     // With the key as the command name and the value as the exported module
-    console.log(command)
+    
     bot.commands.set(command.data.name, command);
 }
 
