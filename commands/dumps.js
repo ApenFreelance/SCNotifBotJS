@@ -30,12 +30,12 @@ module.exports = {
                     
     async execute(interaction) {
         let game = interaction.options.getString('game');
-        let newDump = interaction.options.getString('newdump');
+        let newDump = interaction.options.getStrings('newdump');
         let oldDump = interaction.options.getString('olddump');
-
+        const logChannelServer = interaction.guild.channels.fetch("1024961321768329249").catch(err => console.log(err))
         await interaction.deferReply({ ephemeral: true })
         if(game == null) {
-            console.log("hi")
+            
             fs.readFile("./gameData.json", "utf-8", function(err, gameData){  
                 gameData = JSON.parse(gameData)
                
@@ -103,7 +103,7 @@ module.exports = {
             })
             
             
-            // Display the file content
+           
             
           }
 
@@ -160,6 +160,7 @@ async function checkForChanges(newDumpString, oldDumpString, game, interaction) 
             } else {
             updateObject[video].tag = newDump.courses.find(item => item.title == updateObject[video].courseTitle).tags[0]
           }}
+          updateObject[video].link = `https://www.skill-capped.com/${game}/browse3/course/${updateObject[video].videouuid}/${updateObject[video].courseuuid}`
           
   
         }
@@ -219,14 +220,14 @@ async function createEmbed(uploads, game, interaction)  {
                 if(err.toString().startsWith("DiscordAPIError[10003]: Unknown Channel")){
                     console.log(err)
                     console.log("erred")
-                    interaction.editReply({contents:`This channel does not exist in this server: ${tag} ( Set to: ${data[game].roleDict[tag].channelid.toString()})`, ephemeral:true})
+                    //interaction.editReply({contents:`This channel does not exist in this server: ${tag} ( Set to: ${data[game].roleDict[tag].channelid.toString()})`, ephemeral:true})
                     return
                 }
             })
             
             await logChannel.send(`${logChannel}, ${tag}`)
             breakdown[tag].forEach(video => {
-                video.link = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                
             let videoEmbed = new EmbedBuilder()
                 .setTitle(video.courseTitle)  
                 .setAuthor({ name: `A new Skill-Capped video has been released!`, iconURL: "https://media.discordapp.net/attachments/991013102688555069/994302850580631622/unknown.png"})

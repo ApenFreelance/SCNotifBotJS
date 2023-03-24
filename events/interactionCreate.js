@@ -112,7 +112,22 @@ module.exports = {
     name: 'interactionCreate',
     once: false,
     async execute(interaction) {
-      
+      if (interaction.isCommand()) {
+        const command = interaction.client.commands.get(interaction.commandName);
+        if (command) {
+            try {
+                await command.execute(interaction);
+               
+                
+            }
+            catch (error) {
+                console.error(error);
+                await interaction.reply({ content: `${error}`, ephemeral: true });
+            }
+        }
+    }
+    
+                    
 
         if(interaction.customId == "verificationmodal") {
             const email = interaction.fields.getTextInputValue("email")
@@ -199,21 +214,6 @@ module.exports = {
 
 
         
-        if (interaction.isCommand()) {
-            const command = interaction.client.commands.get(interaction.commandName);
-            if (command) {
-                try {
-                    await command.execute(interaction);
-                   
-                    
-                }
-                catch (error) {
-                    console.error(error);
-                    await interaction.reply({ content: `${error}`, ephemeral: true });
-                }
-            }
-        }
-        
-                        }}
+    }}  
     
     

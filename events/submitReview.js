@@ -18,9 +18,9 @@ const linkTemplate = "https://worldofwarcraft.blizzard.com/{lang}/character/{reg
 const testLink = "https://worldofwarcraft.blizzard.com/en-gb/character/eu/tarren-mill/blizo/pve/raids"
 
 async function createWaitingForReviewMessage(interaction, charInfo, verifiedAccount) {
-  console.log(charInfo, "charInfo")
+  
   const submissionChannel = await bot.channels.fetch("1084873371797434438")
-  const maxLengt = 65
+  const maxLengt = 60
   
   let description = `
   Name: **${charInfo.dataValues.characterName}** 
