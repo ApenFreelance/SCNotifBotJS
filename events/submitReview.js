@@ -201,12 +201,13 @@ module.exports = {
     }
     if(created) { // if a new entry is created there is no reason to check the rest
       createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
+      await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
       return
     }
-    await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
+    
     
 
-    if(Date.now() - (2629743*1000) <= verifiedAccount.createdAt) {  // 30 day reduction
+    if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
       console.log(verifiedAccount.createdAt)
       await interaction.reply({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
       return
@@ -217,6 +218,7 @@ module.exports = {
       userID:interaction.user.id,
       status:"Available"
     })
+    await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
     await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
     const forSpread = [
       {
