@@ -52,34 +52,27 @@ module.exports = {
             completedBy:interaction.user.id,
             completedAt: Date.now()
         })
-       
+        let submissionPos = reviewInDB.dataValues.id
         const forSpread = [
-            {
-              "range": `B${reviewInDB.id}`,
-              "values": [
-                [
-                  reviewInDB.status
-                ]
+          {
+            "range": `O${submissionPos}`, // Status
+            "values": [
+              [
+                reviewInDB.dataValues.status
               ]
-            },
-            {
-              "range": `E${reviewInDB.id}`,
-              "values": [
-                [
-                  reviewInDB.completedAt
-                ]
+            ]
+          },
+          {
+            "range": `S${submissionPos}`,
+            "values": [
+              [
+                reviewInDB.dataValues.completedAt //completed at
               ]
-            },
-            {
-                "range": `F${reviewInDB.id}`,
-                "values": [
-                  [
-                    reviewInDB.completedBy
-                  ]
-                ]
-              }
-          ]
+            ]
+          }
+        ]
         await main(forSpread)
+        await interaction.user.send(`Name your clip \`${verifiedAccount.id}\`, then send it to : https://link`)
         const user = await interaction.guild.members.fetch(reviewInDB.userID)
         //await interaction.message.reply({content:`Completed ${interaction.message.embeds[0].author.name}`})
         await user.send({content:"Your review has been completed.\n\n\nHow would you rate this review?", components:createReviewButtons(submissionNumber)}).catch(err => {

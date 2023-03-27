@@ -62,20 +62,21 @@ module.exports = {
                 reviewRating:parseInt(ratingNumber)
                 
             })
+            let submissionPos = history.dataValues.id
             const forSpread = [
                 {
-                  "range": `H${history.id}`,
+                  "range": `H${submissionPos}`, //Rating number
                   "values": [
                     [
-                      history.reviewRating
+                      history.dataValues.reviewRating
                     ]
                   ]
                 },
                 {
-                  "range": `I${history.id}`,
+                  "range": `I${submissionPos}`, // Rating Comment
                   "values": [
                     [
-                      history.reviewRatingComment
+                      history.dataValues.reviewRatingComment
                     ]
                   ]
                 }

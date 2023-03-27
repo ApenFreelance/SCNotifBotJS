@@ -46,29 +46,40 @@ module.exports = {
                 claimedBy:interaction.user.id,
                 claimedAt:Date.now()
             })
-            console.log(reviewHistory.claimedAt)
+            console.log(reviewHistory.claimedAt, reviewHistory.dataValues.claimedAt, "THESE AER BOTH")
+            let submissionPos = reviewHistory.dataValues.id
         const forSpread = [
                 {
-                  "range": `B${reviewHistory.id}`,
+                  "range": `O${submissionPos}`, //Status 
                   "values": [
                     [
-                      reviewHistory.status
+                      reviewHistory.dataValues.status
+                    ]
+                  ]
+                },
+
+
+                {
+                  "range": `P${submissionPos}`, // Claimed At
+                  "values": [
+                    [
+                      reviewHistory.dataValues.claimedAt
                     ]
                   ]
                 },
                 {
-                  "range": `C${reviewHistory.id}`,
-                  "values": [
-                    [
-                      reviewHistory.claimedAt
-                    ]
-                  ]
-                },
-                {
-                    "range": `F${reviewHistory.id}`,
+                    "range": `Q${submissionPos}`, //Claimed by ID
                     "values": [
                       [
-                        reviewHistory.claimedBy
+                        reviewHistory.dataValues.claimedByID
+                      ]
+                    ]
+                  },
+                  {
+                    "range": `R${submissionPos}`, //Claimed by Tag
+                    "values": [
+                      [
+                        reviewHistory.dataValues.claimedByTag
                       ]
                     ]
                   }
@@ -81,15 +92,15 @@ module.exports = {
             name:`review-${submissionNumber}`,
             permissionOverwrites: [
                 {
-                    id: interaction.guild.id,
+                    id: interaction.guild.id, // everyone in server (not admin)
                     deny: [PermissionsBitField.Flags.ViewChannel],
                 },
                 {
-                    id: reviewHistory.userID,
+                    id: reviewHistory.userID, // Ticket owner
                     allow: [PermissionsBitField.Flags.ViewChannel],
                 },
                 {
-                    id: "1020404504430133269",
+                    id: "1020404504430133269", // Bot
                     allow: [PermissionsBitField.Flags.ViewChannel],
                 },
             ],
@@ -97,6 +108,7 @@ module.exports = {
         }).catch(err => interaction.editReply({content:err, ephemeral:true}))
         
         await interaction.message.delete()
+        await newChannel.send({content:"Please upload your clipLink named as your ticket number: https://link"})
         //await interaction.message.edit({embeds:updateEmbed(interaction.user, interaction.message.embeds[0].data), components:updateButtons(newChannel)})
        
         // do your stuff

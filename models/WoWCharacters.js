@@ -6,6 +6,9 @@ module.exports = class WoWCharacters extends Model {
             userEmail: { 
                 type: DataTypes.STRING,
          },
+         armoryLink: {
+            type: DataTypes.STRING
+         },
          characterName: {
             type: DataTypes.STRING
          },

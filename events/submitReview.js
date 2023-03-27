@@ -170,7 +170,7 @@ module.exports = {
   once: false,
   async execute(interaction) {  
     
-    let link = interaction.fields.fields.get("armory").value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
+    let link = interaction.fields.getTextInputValue("armory").replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
     //let link = interaction.fields.fields.armory.value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
     const wowClient = await blizzard.wow.createInstance({
       key: process.env.BCID,
@@ -191,7 +191,9 @@ module.exports = {
     //console.log(verifiedAccount, created)
     let [verifiedAccount, created] = await ReviewHistory.findOrCreate({ 
       where:{ userID: interaction.user.id }, 
-      defaults:{  status:"Available"  }, 
+      defaults:{  status:"Available", 
+      userEmail:interaction.fields.getTextInputValue("email"),
+      userTag:interaction.user.tag  }, 
       order: [['CreatedAt', 'DESC']]})
     
     
@@ -207,36 +209,150 @@ module.exports = {
     
     
 
-    if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
+/*     if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
       console.log(verifiedAccount.createdAt)
       await interaction.reply({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
       return
-    }
+    } */
     
     // if none of the ones apply, create new entry
     verifiedAccount = await ReviewHistory.create({
+      userEmail:interaction.fields.getTextInputValue("email"),
       userID:interaction.user.id,
-      status:"Available"
+      status:"Available",
+      userTag:interaction.user.tag
     })
+    console.log(verifiedAccount)
+    await interaction.user.send(`Name your clip \`${verifiedAccount.id}\`, then send it to : https://link`)
     await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
     await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
+    let submissionPos = verifiedAccount.dataValues.id
     const forSpread = [
+      //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
       {
-        "range": `A${verifiedAccount.id}`,
+        "range": `O${submissionPos}`, //Ticket created
         "values": [
           [
-            verifiedAccount.userID
+            verifiedAccount.dataValues.status
+          ]
+        ]
+      },
+      //BELOW THIS IS REVIEW HISTORY
+      {
+        "range": `A${submissionPos}`, //Ticket created
+        "values": [
+          [
+            verifiedAccount.dataValues.createdAt
           ]
         ]
       },
       {
-        "range": `B${verifiedAccount.id}`,
+        "range": `B${submissionPos}`, //Ticket ID
         "values": [
           [
-            verifiedAccount.status
+            verifiedAccount.dataValues.id
           ]
         ]
-      }]
+      },
+      {
+        "range": `C${submissionPos}`, // User ID
+        "values": [
+          [
+            verifiedAccount.dataValues.userID
+          ]
+        ]
+      },
+      {
+        "range": `D${submissionPos}`, // User Tag
+        "values": [
+          [
+            verifiedAccount.dataValues.userTag
+          ]
+        ]
+      },{
+        "range": `E${submissionPos}`, // User Mail
+        "values": [
+          [
+            verifiedAccount.dataValues.userEmail
+          ]
+        ]
+      },
+      {
+        "range": `F${submissionPos}`, // User Mail
+        "values": [
+          [
+            "WIP: cliplink"
+            //verifiedAccount.dataValues.userEmail
+          ]
+        ]
+      },
+      // BELOW IS ALL FROM WOWCHARACTER AND NOT REVIEWHISTORY
+      {
+        "range": `G${submissionPos}`, // Armory Link
+        "values": [
+          [
+            wowChar.dataValues.armoryLink 
+          ]
+        ]
+      },
+      {
+        "range": `H${submissionPos}`, // Character class
+        "values": [
+          [
+            wowChar.dataValues.characterClass
+          ]
+        ]
+      },
+      {
+        "range": `I${submissionPos}`, // 2v2
+        "values": [
+          [
+            wowChar.dataValues.twoVtwoRating
+          ]
+        ]
+      },
+      {
+        "range": `J${submissionPos}`, // 3v3
+        "values": [
+          [
+            wowChar.dataValues.threeVthreeRating
+          ]
+        ]
+      },
+      {
+        "range": `K${submissionPos}`, // Solo1
+        "values": [
+          [
+            wowChar.dataValues.soloShuffleSpec1Rating
+          ]
+        ]
+      },
+      {
+        "range": `L${submissionPos}`, // Solo2
+        "values": [
+          [
+            wowChar.dataValues.soloShuffleSpec2Rating 
+          ]
+        ]
+      },
+      {
+        "range": `M${submissionPos}`, // Solo3
+        "values": [
+          [
+            wowChar.dataValues.soloShuffleSpec3Rating
+          ]
+        ]
+      },
+      {
+        "range": `N${submissionPos}`, // Solo4
+        "values": [
+          [
+            wowChar.dataValues.soloShuffleSpec4Rating
+          ]
+        ]
+      },
+    ]
+    console.log(forSpread)
     await main(forSpread)
       // do your stuff
   },

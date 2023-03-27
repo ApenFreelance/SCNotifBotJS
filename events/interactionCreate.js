@@ -11,15 +11,19 @@ const bot = require('../src/botMain');
 const submissionModal = new ModalBuilder()
 .setCustomId('submissionmodal')
 .setTitle('Submission Modal');
-
+const emailInput = new TextInputBuilder()
+  .setCustomId('email')
+  .setLabel("What is your skill-capped email?")
+  .setStyle(TextInputStyle.Short);
+  
 const armoryInput = new TextInputBuilder()
   .setCustomId('armory')    
   .setLabel("Please link your armory.") 
   .setStyle(TextInputStyle.Short);
 
 const submissionRow = new ActionRowBuilder().addComponents(armoryInput);
-
-submissionModal.addComponents(submissionRow);
+const emailRow = new ActionRowBuilder().addComponents(emailInput);
+submissionModal.addComponents(submissionRow, emailRow);
 
 async function verifyEmailExists(email, pass) {
   console.log(email, pass)
@@ -174,8 +178,11 @@ module.exports = {
           await interaction.showModal(verificationmodal);
         }
       if(interaction.customId == "submissionmodal") {
-        console.log(interaction.fields.fields.get("armory").value)
-        if(regexTemplateFullLink.test(interaction.fields.fields.get("armory").value)) {
+        const email = interaction.fields.getTextInputValue("email")
+        const arm = interaction.fields.getTextInputValue("armory")
+        
+        console.log(interaction.fields.fields.get("armory").value, email, regexTemplateFullLink.test(arm))
+        if(regexTemplateFullLink.test(arm)) {
           bot.emit("submitReview", interaction)
         }
         else {

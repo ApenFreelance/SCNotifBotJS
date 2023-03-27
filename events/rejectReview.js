@@ -27,31 +27,24 @@ module.exports = {
             completedBy:interaction.user.id,
             completedAt: Date.now()
         })
+        let submissionPos = reviewInDB.dataValues.id
         const forSpread = [
             {
-              "range": `B${reviewInDB.id}`,
+              "range": `O${submissionPos}`, // Status
               "values": [
                 [
-                  reviewInDB.status
+                  reviewInDB.dataValues.status
                 ]
               ]
             },
             {
-              "range": `E${reviewInDB.id}`,
+              "range": `S${submissionPos}`,
               "values": [
                 [
-                  reviewInDB.completedAt
+                  reviewInDB.dataValues.completedAt //completed at
                 ]
               ]
-            },
-            {
-                "range": `F${reviewInDB.id}`,
-                "values": [
-                  [
-                    reviewInDB.completedBy
-                  ]
-                ]
-              }
+            }
           ]
           await main(forSpread)
         //await interaction.message.reply({content:`Rejected ${interaction.message.embeds[0].author.name}`, ephemeral:true})
