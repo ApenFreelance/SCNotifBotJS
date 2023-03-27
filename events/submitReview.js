@@ -231,7 +231,7 @@ module.exports = {
             .setStyle("Success")
             .setCustomId(`clip-${verifiedAccount.id}`))
 
-    await interaction.user.send({content:`Name your clip \`${verifiedAccount.id}\`, then send it to : https://link`, components:[linkingButton]})
+    //await interaction.user.send({content:`Name your clip \`${verifiedAccount.id}\`, then send it to : https://link`, components:[linkingButton]})
     await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
     await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
     let submissionPos = verifiedAccount.dataValues.id
