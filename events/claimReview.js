@@ -47,7 +47,7 @@ module.exports = {
                 claimedByTag:interaction.user.tag,
                 claimedAt:Date.now()
             })
-            console.log(reviewHistory.claimedAt, reviewHistory.dataValues.claimedAt, "THESE AER BOTH")
+            //console.log(reviewHistory.claimedAt, reviewHistory.dataValues.claimedAt, "THESE AER BOTH")
             let submissionPos = reviewHistory.dataValues.id
         const forSpread = [
                 {

@@ -79,7 +79,7 @@ async function getCharacterInfo(region, slug, characterName, wowClient, armoryLi
 
     console.log(`Cprofile: ${Cprofile.status}. [ ${Cprofile.statusText} ]`)
     const Cpvp = await wowClient.characterPVP({ realm: slug, name: characterName})
-    console.log(`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`, Cpvp.data)
+    console.log(`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`)
     //const media = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/character-media?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
     
     let twoVtwoRating= threeVthreeRating= tenVtenRating=  soloShuffleSpec1Rating=  soloShuffleSpec2Rating= soloShuffleSpec3Rating=  soloShuffleSpec4Rating = null
@@ -223,7 +223,7 @@ module.exports = {
       status:"Available",
       userTag:interaction.user.tag
     })
-    console.log(verifiedAccount)
+    //console.log(verifiedAccount)
     await interaction.user.send(`Name your clip \`${verifiedAccount.id}\`, then send it to : https://link`)
     await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
     await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
@@ -353,7 +353,7 @@ module.exports = {
         ]
       },
     ]
-    console.log(forSpread)
+    //console.log(forSpread)
     await main(forSpread)
       // do your stuff
   },
