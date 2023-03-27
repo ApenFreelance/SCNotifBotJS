@@ -63,7 +63,7 @@ module.exports = {
                   ]
                 }
               ]
-              console.log(forSpread)
+              
             await main(forSpread)
             await interaction.reply(`Set comment to\n\n\`\`\`\n ${interaction.fields.fields.get("feedback").value}\n\`\`\``)
 
@@ -85,7 +85,27 @@ module.exports = {
                 reviewRating:parseInt(ratingNumber)
                 
             })
-            
+            let submissionPos = history.dataValues.id
+            const forSpread = [
+                {
+                  "range": `U${submissionPos}`, //Rating number
+                  "values": [
+                    [
+                      history.dataValues.reviewRating
+                    ]
+                  ]
+                },
+                {
+                  "range": `V${submissionPos}`, // Rating Comment
+                  "values": [
+                    [
+                      history.dataValues.reviewRatingComment
+                    ]
+                  ]
+                }
+              ]
+             
+            await main(forSpread)
             await interaction.showModal(createRatingModal(submissionNumber, ratingNumber))
             await interaction.user.send(`Set the rating to ${ratingNumber}`)
         }
