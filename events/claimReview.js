@@ -43,7 +43,8 @@ module.exports = {
         
         await reviewHistory.update({
                 status:"Claimed",
-                claimedBy:interaction.user.id,
+                claimedByID:interaction.user.id,
+                claimedByTag:interaction.user.tag,
                 claimedAt:Date.now()
             })
             console.log(reviewHistory.claimedAt, reviewHistory.dataValues.claimedAt, "THESE AER BOTH")
