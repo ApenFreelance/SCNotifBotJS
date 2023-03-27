@@ -44,25 +44,6 @@ module.exports = {
             await history.update({
                 reviewRatingComment:interaction.fields.fields.get("feedback").value
                 })
-            await interaction.reply(`Set comment to\n\n\`\`\`\n ${interaction.fields.fields.get("feedback").value}\n\`\`\``)
-
-        }
-        if(type == "button") {
-            let ratingNumber = interaction.customId.replace("rating","")
-            let submissionNumber = ratingNumber.slice(2)
-            ratingNumber = ratingNumber.replace(/(-\d+)/, "")
-
-            createRatingModal(submissionNumber)
-            console.log(submissionNumber)
-            const history = await ReviewHistory.findOne({
-                where:{
-                    id: submissionNumber
-                }
-            })
-            await history.update({
-                reviewRating:parseInt(ratingNumber)
-                
-            })
             let submissionPos = history.dataValues.id
             const forSpread = [
                 {
@@ -84,6 +65,27 @@ module.exports = {
               ]
               console.log(forSpread)
             await main(forSpread)
+            await interaction.reply(`Set comment to\n\n\`\`\`\n ${interaction.fields.fields.get("feedback").value}\n\`\`\``)
+
+
+        }
+        if(type == "button") {
+            let ratingNumber = interaction.customId.replace("rating","")
+            let submissionNumber = ratingNumber.slice(2)
+            ratingNumber = ratingNumber.replace(/(-\d+)/, "")
+
+            createRatingModal(submissionNumber)
+            console.log(submissionNumber)
+            const history = await ReviewHistory.findOne({
+                where:{
+                    id: submissionNumber
+                }
+            })
+            await history.update({
+                reviewRating:parseInt(ratingNumber)
+                
+            })
+            
             await interaction.showModal(createRatingModal(submissionNumber, ratingNumber))
             await interaction.user.send(`Set the rating to ${ratingNumber}`)
         }
