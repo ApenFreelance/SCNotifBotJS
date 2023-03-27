@@ -65,7 +65,7 @@ module.exports = {
             let submissionPos = history.dataValues.id
             const forSpread = [
                 {
-                  "range": `H${submissionPos}`, //Rating number
+                  "range": `U${submissionPos}`, //Rating number
                   "values": [
                     [
                       history.dataValues.reviewRating
@@ -73,7 +73,7 @@ module.exports = {
                   ]
                 },
                 {
-                  "range": `I${submissionPos}`, // Rating Comment
+                  "range": `V${submissionPos}`, // Rating Comment
                   "values": [
                     [
                       history.dataValues.reviewRatingComment
