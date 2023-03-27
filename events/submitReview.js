@@ -73,7 +73,7 @@ async function createWaitingForReviewMessage(interaction, charInfo, verifiedAcco
       await submissionChannel.send({embeds:[waitingForReviewEmbed], components:[waitingForReviewRow]  })
   }
 
-async function getCharacterInfo(region, slug, characterName, wowClient) {
+async function getCharacterInfo(region, slug, characterName, wowClient, armoryLink) {
     const Cprofile = await wowClient.characterProfile({ realm: slug, name: characterName })
     //console.log(Cprofile.data)
 
@@ -140,6 +140,7 @@ async function getCharacterInfo(region, slug, characterName, wowClient) {
   }
 
   let wowChar = await WoWCharacters.create({
+    armoryLink:armoryLink,
     characterName:Cprofile.data.name,
     characterRegion:region,
     slug:slug,
@@ -180,7 +181,7 @@ module.exports = {
       token: '', // optional
     })
     
-    const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient).catch(err=> { console.log("failed to get character info: ", err)})
+    const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory")).catch(err=> { console.log("failed to get character info: ", err)})
 /*     console.log("region: ", link[1])
     console.log("slug: ", link[2])
     console.log("name: ", link[3])
