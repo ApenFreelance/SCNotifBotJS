@@ -1,7 +1,7 @@
 const { EmbedBuilder, ButtonBuilder, PermissionsBitField, ActionRowBuilder } = require("discord.js");
 const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
-const categoryId = "1085409586997108746"
+const categoryId = "1089996542087278682"
 function updateEmbed(user, embed) {
     console.log(embed)
     const updatedEmbed = new EmbedBuilder()

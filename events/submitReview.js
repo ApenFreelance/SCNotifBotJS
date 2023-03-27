@@ -19,7 +19,7 @@ const testLink = "https://worldofwarcraft.blizzard.com/en-gb/character/eu/tarren
 
 async function createWaitingForReviewMessage(interaction, charInfo, verifiedAccount) {
   
-  const submissionChannel = await bot.channels.fetch("1084873371797434438")
+  const submissionChannel = await bot.channels.fetch("1089997649245126818")
   const maxLengt = 60
   
   let description = `
