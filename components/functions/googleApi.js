@@ -29,7 +29,7 @@ async function main(data) {
     try {
       const response = (await service.spreadsheets.values.batchUpdate(request)).data;
       // TODO: Change code below to process the `response` object:
-      console.log(JSON.stringify(response, null, 2));
+      //console.log(JSON.stringify(response, null, 2));
     } catch (err) {
       console.error(err);
     }

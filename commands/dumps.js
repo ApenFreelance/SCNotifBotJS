@@ -30,9 +30,9 @@ module.exports = {
                     
     async execute(interaction) {
         let game = interaction.options.getString('game');
-        let newDump = interaction.options.getStrings('newdump');
+        let newDump = interaction.options.getString('newdump');
         let oldDump = interaction.options.getString('olddump');
-        const logChannelServer = interaction.guild.channels.fetch("1024961321768329249").catch(err => console.log(err))
+        //const logChannelServer = interaction.guild.channels.fetch("1024961321768329249").catch(err => console.log(err))
         await interaction.deferReply({ ephemeral: true })
         if(game == null) {
             
