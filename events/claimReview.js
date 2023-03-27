@@ -107,9 +107,14 @@ module.exports = {
             ],
             
         }).catch(err => interaction.editReply({content:err, ephemeral:true}))
-        
+        const linkingButton = new ActionRowBuilder()
+            .addComponents(
+              new ButtonBuilder()
+                  .setLabel('I have done this')
+                  .setStyle("Success")
+                  .setCustomId(`clip-${submissionNumber}-review`))
         await interaction.message.delete()
-        await newChannel.send({content:"Please upload your clipLink named as your ticket number: https://link"})
+        await interaction.user.send({content:"Please upload your clipLink named as your ticket number: https://link", components:[linkingButton]})
         //await interaction.message.edit({embeds:updateEmbed(interaction.user, interaction.message.embeds[0].data), components:updateButtons(newChannel)})
        
         // do your stuff

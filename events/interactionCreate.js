@@ -209,6 +209,9 @@ module.exports = {
         if(interaction.customId.startsWith("reviewratingmodal")) {
           bot.emit("rateReview", interaction, "modal")
         }
+        if(interaction.customId.startsWith("clip-")) {
+          bot.emit("mediaCollection", interaction)
+        }
 
       } catch (err) {
         if(err.toString().startsWith("TypeError: Cannot read properties of undefined (reading 'startsWith')")) {
