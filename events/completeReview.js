@@ -72,7 +72,7 @@ module.exports = {
           }
         ]
         await main(forSpread)
-        await interaction.user.send(`Name your clip \`${reviewInDB.dataValues.id}\`, then send it to : https://link`)
+        //await interaction.user.send(`Name your clip \`${reviewInDB.dataValues.id}\`, then send it to : https://link`)
         const user = await interaction.guild.members.fetch(reviewInDB.userID)
         //await interaction.message.reply({content:`Completed ${interaction.message.embeds[0].author.name}`})
         await user.send({content:"Your review has been completed.\n\n\nHow would you rate this review?", components:createReviewButtons(submissionNumber)}).catch(err => {
