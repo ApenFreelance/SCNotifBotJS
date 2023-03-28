@@ -1,6 +1,7 @@
 const { google } = require("googleapis");
 const {GoogleAuth} = require('google-auth-library');
 async function main(data) {
+  console.log("updating spreadsheet")
   const auth = new GoogleAuth({
     keyFile: "credentials.json", //the key file
 
