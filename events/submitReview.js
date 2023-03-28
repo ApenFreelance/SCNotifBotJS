@@ -17,61 +17,6 @@ const linkTemplate = "https://worldofwarcraft.blizzard.com/{lang}/character/{reg
 
 const testLink = "https://worldofwarcraft.blizzard.com/en-gb/character/eu/tarren-mill/blizo/pve/raids"
 
-async function createWaitingForReviewMessage(interaction, charInfo, verifiedAccount) {
-  
-  const submissionChannel = await bot.channels.fetch("1089997649245126818")
-  const maxLengt = 60
-  
-  let description = `
-  Name: **${charInfo.dataValues.characterName}** 
-  Class: **${charInfo.dataValues.characterClass}**
-  Region: **${charInfo.dataValues.characterRegion}**`
-
-  if(charInfo.dataValues.twoVtwoRating != null) {
-    let n = `\n\n__2v2:${noBreakSpace.repeat()}**${charInfo.dataValues.twoVtwoRating}**__`.length
-    description+=`\n\n__2v2:${noBreakSpace.repeat(65-n)}**${charInfo.dataValues.twoVtwoRating}**__`
-  }
-  if(charInfo.dataValues.threeVthreeRating != null) {
-    let n = `\n\n__3v3:${noBreakSpace.repeat()}**${charInfo.dataValues.threeVthreeRating}**__`.length
-    description+=`\n\n__3v3:${noBreakSpace.repeat(65-n)}**${charInfo.dataValues.threeVthreeRating}**__`
-  }
-  if(charInfo.dataValues.soloShuffleSpec1Rating != null&& charInfo.dataValues.soloShuffleSpec1Rating!= undefined) {
-    let n = `\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][0]}:${noBreakSpace.repeat()}**${charInfo.dataValues.soloShuffleSpec1Rating}**__`.length
-    description+=`\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][0]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.dataValues.soloShuffleSpec1Rating}**__`
-  }
-  if(charInfo.dataValues.soloShuffleSpec2Rating != null&& charInfo.dataValues.soloShuffleSpec2Rating!= undefined) {
-    let n = `\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][1]}:${noBreakSpace.repeat()}**${charInfo.dataValues.soloShuffleSpec2Rating}**__`.length
-    description+=`\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][1]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.dataValues.soloShuffleSpec2Rating}**__`
-  }
-  if(charInfo.dataValues.soloShuffleSpec3Rating != null&& charInfo.dataValues.soloShuffleSpec3Rating!= undefined) {
-    let n = `\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][2]}:${noBreakSpace.repeat()}**${charInfo.dataValues.soloShuffleSpec3Rating}**__`.length
-    description+=`\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][2]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.dataValues.soloShuffleSpec3Rating}**__`
-  }
-  if(charInfo.dataValues.soloShuffleSpec4Rating != null && charInfo.dataValues.soloShuffleSpec4Rating!= undefined) {
-    let n = `\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][3]}:${noBreakSpace.repeat()}**${charInfo.dataValues.soloShuffleSpec4Rating}**__`.length
-    description+=`\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][3]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.dataValues.soloShuffleSpec4Rating}**__`
-  }
-
-  const waitingForReviewEmbed = new EmbedBuilder()
-  .setTitle(`Submission ${verifiedAccount.dataValues.id}`)  
-  .setAuthor({ name: `${interaction.user.tag} ( ${interaction.user.id} )`, iconURL: interaction.member.displayAvatarURL(true)})
-    .setDescription(description)
-    //.setThumbnail(charInfo.characterImage)
-    //.setFooter({text:"This submission is unclaimed"})
-
-  const waitingForReviewRow = new ActionRowBuilder()
-    .addComponents(
-      new ButtonBuilder()
-        .setCustomId('claimsubmission')
-        .setLabel('Claim')
-        .setStyle("Success"),
-      new ButtonBuilder()
-        .setCustomId('rejectsubmission')
-        .setLabel('Reject')
-        .setStyle("Danger")
-    );
-      await submissionChannel.send({embeds:[waitingForReviewEmbed], components:[waitingForReviewRow]  })
-  }
 
 async function getCharacterInfo(region, slug, characterName, wowClient, armoryLink) {
     const Cprofile = await wowClient.characterProfile({ realm: slug, name: characterName })
@@ -192,32 +137,37 @@ module.exports = {
     console.log("name: ", link[3])
     console.log(wowChar, "wow") */
     //await getCharacterInfo(link[1], link[2], link[3], "warrior", interaction)
-
+    if(!isVerifiedByRole(interaction)) {
+      await interaction.user.send({content:"Please make sure you have been verified.", ephemeral:true})
+      return
+    }
    
     //console.log(verifiedAccount, created)
     let [verifiedAccount, created] = await ReviewHistory.findOrCreate({ 
       where:{ userID: interaction.user.id }, 
-      defaults:{  status:"Available", 
+      defaults:{  status:"SentToUser", 
       userEmail:interaction.fields.getTextInputValue("email"),
-      userTag:interaction.user.tag  }, 
+      userTag:interaction.user.tag,
+      charIdOnSubmission:wowChar.id  }, 
       order: [['CreatedAt', 'DESC']]})
+
+    let linkingButton = new ActionRowBuilder()
+      .addComponents(
+        new ButtonBuilder()
+            .setLabel('I have done this')
+            .setStyle("Success")
+            .setCustomId(`clip-${verifiedAccount.id}`))
     
     
-    if(!isVerifiedByRole(interaction)) {
-      await interaction.reply({content:"Please make sure you have been verified.", ephemeral:true})
-      return
-    }
     if(created) { // if a new entry is created there is no reason to check the rest
-      createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
-      await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
+      await interaction.user.send({content:`VoD Review ID: **${verifiedAccount.id}**\n\nThank you for requesting a free Skill Capped VoD Review\n\nFor us to process your ticket, please ensure the name of the clip you upload matches the ID at the top of this message - this means you should upload a file named **${verifiedAccount.id}**\n\nUpload your clip here: https://www.dropbox.com/request_edison/j45mpngIwOopNvH8akE\n\nWe recommend you use https://obsproject.com/ to record your gameplay.\n\nIf your submission is accepted, a ticket will be created in the SkillCappedWoWGuides Discord server and you will be tagged once the review has been completed and uploaded`, components:[linkingButton]})
       return
     }
     
     
 
     if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
-      console.log(verifiedAccount.createdAt)
-      await interaction.reply({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
+      await interaction.user.send({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
       return
     }
     
@@ -225,11 +175,12 @@ module.exports = {
     verifiedAccount = await ReviewHistory.create({
       userEmail:interaction.fields.getTextInputValue("email"),
       userID:interaction.user.id,
-      status:"Available",
-      userTag:interaction.user.tag
+      status:"SentToUser",
+      userTag:interaction.user.tag,
+      charIdOnSubmission:wowChar.id
     })
     //console.log(verifiedAccount)
-    const linkingButton = new ActionRowBuilder()
+    linkingButton = new ActionRowBuilder()
       .addComponents(
         new ButtonBuilder()
             .setLabel('I have done this')
@@ -237,13 +188,13 @@ module.exports = {
             .setCustomId(`clip-${verifiedAccount.id}`))
 
     await interaction.user.send({content:`VoD Review ID: **${verifiedAccount.id}**\n\nThank you for requesting a free Skill Capped VoD Review\n\nFor us to process your ticket, please ensure the name of the clip you upload matches the ID at the top of this message - this means you should upload a file named **${verifiedAccount.id}**\n\nUpload your clip here: https://www.dropbox.com/request_edison/j45mpngIwOopNvH8akE\n\nWe recommend you use https://obsproject.com/ to record your gameplay.\n\nIf your submission is accepted, a ticket will be created in the SkillCappedWoWGuides Discord server and you will be tagged once the review has been completed and uploaded`, components:[linkingButton]})
-    await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
-    await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
+    //await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
+    //await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
     let submissionPos = verifiedAccount.dataValues.id
     const forSpread = [
       //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
       {
-        "range": `O${submissionPos}`, //Ticket created
+        "range": `O${submissionPos}`, //Ticket status
         "values": [
           [
             verifiedAccount.dataValues.status
@@ -291,7 +242,7 @@ module.exports = {
         ]
       },
       {
-        "range": `F${submissionPos}`, // User Mail
+        "range": `F${submissionPos}`, // User Clip
         "values": [
           [
             "WIP: cliplink"
