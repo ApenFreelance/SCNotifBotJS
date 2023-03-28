@@ -7,6 +7,7 @@ module.exports = class ReviewHistory extends Model {
          userEmail: { type: DataTypes.STRING},
          userID: { type: DataTypes.STRING },
          userTag: { type: DataTypes.STRING },
+         charIdOnSubmission: {type: DataTypes.INTEGER},
          clipLink: {type: DataTypes.STRING },
          claimedByID: {type: DataTypes.STRING},
          claimedByTag: {type: DataTypes.STRING},
@@ -19,7 +20,8 @@ module.exports = class ReviewHistory extends Model {
          reviewRatingComment: {type: DataTypes.STRING}
         }, {
             tableName: "ReviewHistory",
-            timestamps:true,
+            updatedAt:false,
+            createdAt:true,
             sequelize
         });
     }
