@@ -191,6 +191,7 @@ module.exports = {
     //await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
     //await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
     let submissionPos = verifiedAccount.dataValues.id
+    console.log(submissionPos, "SUBMISSION POS")
     const forSpread = [
       //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
       {
