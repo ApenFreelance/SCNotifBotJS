@@ -221,7 +221,7 @@ async function createEmbed(uploads, game, interaction)  {
                 continue
             }
             console.log(data[game].logChannelID.toString())
-            let logChannel = await bot.channels.fetch(data[game].roleDict[tag].channelid.toString()).catch(err => {
+            let videoChannel = await bot.channels.fetch(data[game].roleDict[tag].channelid.toString()).catch(err => {
                 if(err.toString().startsWith("DiscordAPIError[10003]: Unknown Channel")){
                     console.log(err)
                     console.log("erred")
@@ -230,7 +230,7 @@ async function createEmbed(uploads, game, interaction)  {
                 }
             })
             
-            await logChannel.send(`${logChannel}, ${tag}`)
+            await videoChannel.send(`<@&${data[game].roleDict[tag].id}>`)
             breakdown[tag].forEach(video => {
                 
             let videoEmbed = new EmbedBuilder()
