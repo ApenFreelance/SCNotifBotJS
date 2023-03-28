@@ -187,6 +187,7 @@ module.exports = {
         console.log(interaction.fields.fields.get("armory").value, email, regexTemplateFullLink.test(arm))
         if(regexTemplateFullLink.test(arm)) {
           bot.emit("submitReview", interaction)
+          await interaction.reply({content:"Processing request!", ephemeral:true})
         }
         else {
           await interaction.reply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
@@ -212,9 +213,9 @@ module.exports = {
         if(interaction.customId.startsWith("reviewratingmodal")) {
           bot.emit("rateReview", interaction, "modal")
         }
-       /*  if(interaction.customId.startsWith("clip-")) {
+        if(interaction.customId.startsWith("clip-")) {
           bot.emit("mediaCollection", interaction)
-        } */
+        }
 
       } catch (err) {
         if(err.toString().startsWith("TypeError: Cannot read properties of undefined (reading 'startsWith')")) {
