@@ -7,72 +7,72 @@
     "roleDict": {
       "All Classes": {
         "id": "1042505315326898236",
-        "channelid": "1029817668083130459",
+        "channelid": "1042502515293438053",
         "img": "https://media.discordapp.net/attachments/991013102688555069/994302850580631622/unknown.png"
       },
       "DK": {
         "id": "545374754950086656",
-        "channelid": "1029817668083130459",
+        "channelid": "1042502832596729906",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037086131134668900/unknown.png"
       },
       "Demon Hunter": {
-        "id": "545374756816289794",
+        "id": "994063638660907109",
         "channelid": "1029817598491242556",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037086456537174046/unknown.png"
       },
       "Druid": {
         "id": "545374771026853889",
-        "channelid": "1029817668083130459",
+        "channelid": "1042502946455302284",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087043651649619/unknown.png"
       },
       "Evoker": {
         "id": "1036692434068983858",
-        "channelid": "1029817668083130459",
+        "channelid": "1042504633857347634",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087043651649619/unknown.png"
       },
       "Hunter": {
         "id": "545374762403233832",
-        "channelid": "1029817668083130459",
+        "channelid": "1042503029011775528",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087249097052180/unknown.png"
       },
       "Mage": {
         "id": "545374758473302019",
-        "channelid": "1029817668083130459",
+        "channelid": "1042503069629427723",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087323407527996/unknown.png"
       },
       "Monk": {
         "id": "545374785454997509",
-        "channelid": "1029817668083130459",
+        "channelid": "1042502998879912006",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087436632756345/unknown.png"
       },
       "Paladin": {
         "id": "545374776781438986",
-        "channelid": "1029817668083130459",
+        "channelid": "1042503122863542412",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087546867466270/unknown.png"
       },
       "Priest": {
         "id": "545374779050295296",
-        "channelid": "1029817668083130459",
+        "channelid": "1042503158661926933",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087630334099506/unknown.png"
       },
       "Rogue": {
         "id": "545374701544013826",
-        "channelid": "1029817668083130459",
+        "channelid": "1042503354112286832",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087715356844032/unknown.png"
       },
       "Shaman": {
         "id": "545374752500482053",
-        "channelid": "1029817668083130459",
+        "channelid": "1042503390187495454",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087788627132426/unknown.png"
       },
       "Warlock": {
         "id": "545374760939421710",
-        "channelid": "1029817668083130459",
+        "channelid": "1042503415709843567",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087889999265862/unknown.png"
       },
       "Warrior": {
         "id": "545374692903485440",
-        "channelid": "1029817668083130459",
+        "channelid": "1042503442532405391",
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087977064648745/unknown.png"
       }
     }
@@ -85,12 +85,12 @@
     "roleDict": {
       "All Classes": {
         "id": 995049041429790730,
-        "channelid": 978414879604113400,
-        "img": ""
+        "channelid": 1041517370025455746,
+        "img": "https://media.discordapp.net/attachments/991013102688555069/994302850580631622/unknown.png"
       },
       "DK": {
         "id": 545374754950086656,
-        "channelid": 994063573242351700,
+        "channelid": 994063573242351696,
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037086131134668900/unknown.png"
       },
       "Demon Hunter": {
@@ -100,17 +100,17 @@
       },
       "Druid": {
         "id": 545374771026853889,
-        "channelid": 994063899617931400,
+        "channelid": 994063899617931335,
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087043651649619/unknown.png"
       },
       "Hunter": {
         "id": 545374762403233832,
-        "channelid": 994064056791072800,
+        "channelid": 994064056791072768,
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087249097052180/unknown.png"
       },
       "Mage": {
         "id": 545374758473302019,
-        "channelid": 994064534912381000,
+        "channelid": 994064534912380998,
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087323407527996/unknown.png"
       },
       "Monk": {
@@ -120,32 +120,32 @@
       },
       "Paladin": {
         "id": 545374776781438986,
-        "channelid": 994064784490238100,
+        "channelid": 994064784490238053,
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087546867466270/unknown.png"
       },
       "Priest": {
         "id": 545374779050295296,
-        "channelid": 994064892095119400,
+        "channelid": 994064892095119370,
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087630334099506/unknown.png"
       },
       "Rogue": {
         "id": 545374701544013826,
-        "channelid": 994065023762694100,
+        "channelid": 994065023762694166,
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087715356844032/unknown.png"
       },
       "Shaman": {
         "id": 545374752500482053,
-        "channelid": 994065205573189600,
+        "channelid": 994065205573189662,
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087788627132426/unknown.png"
       },
       "Warlock": {
         "id": 545374760939421710,
-        "channelid": 994065301148799000,
+        "channelid": 994065301148799017,
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087889999265862/unknown.png"
       },
       "Warrior": {
         "id": 545374692903485440,
-        "channelid": 994065408338448400,
+        "channelid": 994065408338448414,
         "img": "https://media.discordapp.net/attachments/1024961321768329249/1037087977064648745/unknown.png"
       }
     }
