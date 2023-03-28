@@ -29,6 +29,9 @@ module.exports = {
             .setDescription('the old dump it uses to compare')),
                     
     async execute(interaction) {
+      try {
+
+      
         let game = interaction.options.getString('game');
         let newDump = interaction.options.getString('newdump');
         let oldDump = interaction.options.getString('olddump');
@@ -110,7 +113,9 @@ module.exports = {
         
         
         
-    }
+    } catch (err){
+    console.log("failed somewhere: \n", err, "\n\n")
+  }}
 };
 
 async function checkForChanges(newDumpString, oldDumpString, game, interaction) {
