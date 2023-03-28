@@ -79,12 +79,14 @@ async function getCharacterInfo(region, slug, characterName, wowClient, armoryLi
 
     console.log(`Cprofile: ${Cprofile.status}. [ ${Cprofile.statusText} ]`)
     const Cpvp = await wowClient.characterPVP({ realm: slug, name: characterName})
-    console.log(`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`)
+    console.log(`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`, Cpvp.data)
     //const media = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/character-media?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
     
     let twoVtwoRating= threeVthreeRating= tenVtenRating=  soloShuffleSpec1Rating=  soloShuffleSpec2Rating= soloShuffleSpec3Rating=  soloShuffleSpec4Rating = null
   
-    
+  try {
+
+  
   
   for(const bracket of Cpvp.data.brackets) {
     try {
@@ -137,6 +139,9 @@ async function getCharacterInfo(region, slug, characterName, wowClient, armoryLi
     }
   }
     
+  } }
+  catch {
+    console.log("User most likely has no rank history")
   }
 
   let wowChar = await WoWCharacters.create({
@@ -210,11 +215,11 @@ module.exports = {
     
     
 
-/*     if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
+    if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
       console.log(verifiedAccount.createdAt)
       await interaction.reply({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
       return
-    } */
+    }
     
     // if none of the ones apply, create new entry
     verifiedAccount = await ReviewHistory.create({

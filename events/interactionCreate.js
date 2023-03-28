@@ -116,6 +116,9 @@ module.exports = {
     name: 'interactionCreate',
     once: false,
     async execute(interaction) {
+      try {
+
+      
       if (interaction.isCommand()) {
         const command = interaction.client.commands.get(interaction.commandName);
         if (command) {
@@ -224,6 +227,8 @@ module.exports = {
 
 
         
-    }}  
+    } catch {
+      console.log("Failed somewhere during interaction")
+    }} }
     
     
