@@ -164,135 +164,135 @@ module.exports = {
     if(created) { // if a new entry is created there is no reason to check the rest
       await interaction.user.send({content:`VoD Review ID: **${verifiedAccount.id}**\n\nThank you for requesting a free Skill Capped VoD Review\n\nFor us to process your ticket, please ensure the name of the clip you upload matches the ID at the top of this message - this means you should upload a file named **${verifiedAccount.id}**\n\nUpload your clip here: https://www.dropbox.com/request_edison/j45mpngIwOopNvH8akE\n\nWe recommend you use https://obsproject.com/ to record your gameplay.\n\nIf your submission is accepted, a ticket will be created in the SkillCappedWoWGuides Discord server and you will be tagged once the review has been completed and uploaded`, components:[linkingButton]})
       //await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
-    let submissionPos = verifiedAccount.dataValues.id
-    
-    const forSpread = [
-      //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
-      {
-        "range": `O${submissionPos}`, //Ticket status
-        "values": [
-          [
-            verifiedAccount.dataValues.status
+      let submissionPos = verifiedAccount.dataValues.id
+      
+      const forSpread = [
+        //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
+        {
+          "range": `O${submissionPos}`, //Ticket status
+          "values": [
+            [
+              verifiedAccount.dataValues.status
+            ]
           ]
-        ]
-      },
-      //BELOW THIS IS REVIEW HISTORY
-      {
-        "range": `A${submissionPos}`, //Ticket created
-        "values": [
-          [
-            verifiedAccount.dataValues.createdAt
+        },
+        //BELOW THIS IS REVIEW HISTORY
+        {
+          "range": `A${submissionPos}`, //Ticket created
+          "values": [
+            [
+              verifiedAccount.dataValues.createdAt
+            ]
           ]
-        ]
-      },
-      {
-        "range": `B${submissionPos}`, //Ticket ID
-        "values": [
-          [
-            verifiedAccount.dataValues.id
+        },
+        {
+          "range": `B${submissionPos}`, //Ticket ID
+          "values": [
+            [
+              verifiedAccount.dataValues.id
+            ]
           ]
-        ]
-      },
-      {
-        "range": `C${submissionPos}`, // User ID
-        "values": [
-          [
-            verifiedAccount.dataValues.userID
+        },
+        {
+          "range": `C${submissionPos}`, // User ID
+          "values": [
+            [
+              verifiedAccount.dataValues.userID
+            ]
           ]
-        ]
-      },
-      {
-        "range": `D${submissionPos}`, // User Tag
-        "values": [
-          [
-            verifiedAccount.dataValues.userTag
+        },
+        {
+          "range": `D${submissionPos}`, // User Tag
+          "values": [
+            [
+              verifiedAccount.dataValues.userTag
+            ]
           ]
-        ]
-      },{
-        "range": `E${submissionPos}`, // User Mail
-        "values": [
-          [
-            verifiedAccount.dataValues.userEmail
+        },{
+          "range": `E${submissionPos}`, // User Mail
+          "values": [
+            [
+              verifiedAccount.dataValues.userEmail
+            ]
           ]
-        ]
-      },
-      {
-        "range": `F${submissionPos}`, // User Clip
-        "values": [
-          [
-            "WIP: cliplink"
-            //verifiedAccount.dataValues.userEmail
+        },
+        {
+          "range": `F${submissionPos}`, // User Clip
+          "values": [
+            [
+              "WIP: cliplink"
+              //verifiedAccount.dataValues.userEmail
+            ]
           ]
-        ]
-      },
-      // BELOW IS ALL FROM WOWCHARACTER AND NOT REVIEWHISTORY
-      {
-        "range": `G${submissionPos}`, // Armory Link
-        "values": [
-          [
-            wowChar.dataValues.armoryLink 
+        },
+        // BELOW IS ALL FROM WOWCHARACTER AND NOT REVIEWHISTORY
+        {
+          "range": `G${submissionPos}`, // Armory Link
+          "values": [
+            [
+              wowChar.dataValues.armoryLink 
+            ]
           ]
-        ]
-      },
-      {
-        "range": `H${submissionPos}`, // Character class
-        "values": [
-          [
-            wowChar.dataValues.characterClass
+        },
+        {
+          "range": `H${submissionPos}`, // Character class
+          "values": [
+            [
+              wowChar.dataValues.characterClass
+            ]
           ]
-        ]
-      },
-      {
-        "range": `I${submissionPos}`, // 2v2
-        "values": [
-          [
-            wowChar.dataValues.twoVtwoRating
+        },
+        {
+          "range": `I${submissionPos}`, // 2v2
+          "values": [
+            [
+              wowChar.dataValues.twoVtwoRating
+            ]
           ]
-        ]
-      },
-      {
-        "range": `J${submissionPos}`, // 3v3
-        "values": [
-          [
-            wowChar.dataValues.threeVthreeRating
+        },
+        {
+          "range": `J${submissionPos}`, // 3v3
+          "values": [
+            [
+              wowChar.dataValues.threeVthreeRating
+            ]
           ]
-        ]
-      },
-      {
-        "range": `K${submissionPos}`, // Solo1
-        "values": [
-          [
-            wowChar.dataValues.soloShuffleSpec1Rating
+        },
+        {
+          "range": `K${submissionPos}`, // Solo1
+          "values": [
+            [
+              wowChar.dataValues.soloShuffleSpec1Rating
+            ]
           ]
-        ]
-      },
-      {
-        "range": `L${submissionPos}`, // Solo2
-        "values": [
-          [
-            wowChar.dataValues.soloShuffleSpec2Rating 
+        },
+        {
+          "range": `L${submissionPos}`, // Solo2
+          "values": [
+            [
+              wowChar.dataValues.soloShuffleSpec2Rating 
+            ]
           ]
-        ]
-      },
-      {
-        "range": `M${submissionPos}`, // Solo3
-        "values": [
-          [
-            wowChar.dataValues.soloShuffleSpec3Rating
+        },
+        {
+          "range": `M${submissionPos}`, // Solo3
+          "values": [
+            [
+              wowChar.dataValues.soloShuffleSpec3Rating
+            ]
           ]
-        ]
-      },
-      {
-        "range": `N${submissionPos}`, // Solo4
-        "values": [
-          [
-            wowChar.dataValues.soloShuffleSpec4Rating
+        },
+        {
+          "range": `N${submissionPos}`, // Solo4
+          "values": [
+            [
+              wowChar.dataValues.soloShuffleSpec4Rating
+            ]
           ]
-        ]
-      },
-    ]
+        },
+      ]
     //console.log(forSpread)
-    await main(forSpread)
+      await main(forSpread)
       
       return
     }
