@@ -187,7 +187,7 @@ module.exports = {
         console.log(interaction.fields.fields.get("armory").value, email, regexTemplateFullLink.test(arm))
         if(regexTemplateFullLink.test(arm)) {
           bot.emit("submitReview", interaction)
-          await interaction.reply({content:"Processing request!", ephemeral:true})
+          await interaction.reply({content:"Processing request! This will continue in your DM's", ephemeral:true})
         }
         else {
           await interaction.reply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
