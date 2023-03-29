@@ -24,7 +24,7 @@ async function getCharacterInfo(region, slug, characterName, wowClient, armoryLi
 
     console.log(`Cprofile: ${Cprofile.status}. [ ${Cprofile.statusText} ]`)
     const Cpvp = await wowClient.characterPVP({ realm: slug, name: characterName})
-    console.log(`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`, Cpvp.data)
+    console.log(`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`)
     //const media = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/character-media?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
     
     let twoVtwoRating= threeVthreeRating= tenVtenRating=  soloShuffleSpec1Rating=  soloShuffleSpec2Rating= soloShuffleSpec3Rating=  soloShuffleSpec4Rating = null
@@ -120,9 +120,13 @@ module.exports = {
   name: 'submitReview',
   once: false,
   async execute(interaction) {  
-    
-    let link = interaction.fields.getTextInputValue("armory").replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
+    let arm = interaction.fields.getTextInputValue("armory")
+
+    let link = decodeURI(arm).replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
     //let link = interaction.fields.fields.armory.value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
+   /*  console.log("region: ", link[1])
+    console.log("slug: ", link[2])
+    console.log("name: ", link[3]) */
     const wowClient = await blizzard.wow.createInstance({
       key: process.env.BCID,
       secret: process.env.BCS,
@@ -132,10 +136,8 @@ module.exports = {
     })
     
     const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory")).catch(err=> { console.log("failed to get character info: ", err)})
-/*     console.log("region: ", link[1])
-    console.log("slug: ", link[2])
-    console.log("name: ", link[3])
-    console.log(wowChar, "wow") */
+    
+    //console.log(wowChar, "wow")
     //await getCharacterInfo(link[1], link[2], link[3], "warrior", interaction)
     if(!isVerifiedByRole(interaction)) {
       await interaction.user.send({content:"Please make sure you have been verified.", ephemeral:true})
@@ -160,10 +162,10 @@ module.exports = {
     
     
     if(created) { // if a new entry is created there is no reason to check the rest
-      await interaction.user.send({content:`VoD Review ID: **${verifiedAccount.id}**\n\nThank you for requesting a free Skill Capped VoD Review\n\nFor us to process your ticket, please ensure the name of the clip you upload matches the ID at the top of this message - this means you should upload a file named **${verifiedAccount.id}**\n\nUpload your clip here: https://www.dropbox.com/request_edison/j45mpngIwOopNvH8akE8\n\nWe recommend you use https://obsproject.com/ to record your gameplay.\n\nIf your submission is accepted, a ticket will be created in the SkillCappedWoWGuides Discord server and you will be tagged once the review has been completed and uploaded`, components:[linkingButton]})
+      await interaction.user.send({content:`VoD Review ID: **${verifiedAccount.id}**\n\nThank you for requesting a free Skill Capped VoD Review\n\nFor us to process your ticket, please ensure the name of the clip you upload matches the ID at the top of this message - this means you should upload a file named **${verifiedAccount.id}**\n\nUpload your clip here: https://www.dropbox.com/request_edison/j45mpngIwOopNvH8akE\n\nWe recommend you use https://obsproject.com/ to record your gameplay.\n\nIf your submission is accepted, a ticket will be created in the SkillCappedWoWGuides Discord server and you will be tagged once the review has been completed and uploaded`, components:[linkingButton]})
       //await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
     let submissionPos = verifiedAccount.dataValues.id
-    console.log(submissionPos, "SUBMISSION POS")
+    
     const forSpread = [
       //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
       {
@@ -318,7 +320,7 @@ module.exports = {
             .setStyle("Success")
             .setCustomId(`clip-${verifiedAccount.id}`))
 
-            await interaction.user.send({content:`VoD Review ID: **${verifiedAccount.id}**\n\nThank you for requesting a free Skill Capped VoD Review\n\nFor us to process your ticket, please ensure the name of the clip you upload matches the ID at the top of this message - this means you should upload a file named **${verifiedAccount.id}**\n\nUpload your clip here: https://www.dropbox.com/request_edison/j45mpngIwOopNvH8akE8\n\nWe recommend you use https://obsproject.com/ to record your gameplay.\n\nIf your submission is accepted, a ticket will be created in the SkillCappedWoWGuides Discord server and you will be tagged once the review has been completed and uploaded`, components:[linkingButton]})
+            await interaction.user.send({content:`VoD Review ID: **${verifiedAccount.id}**\n\nThank you for requesting a free Skill Capped VoD Review\n\nFor us to process your ticket, please ensure the name of the clip you upload matches the ID at the top of this message - this means you should upload a file named **${verifiedAccount.id}**\n\nUpload your clip here: https://www.dropbox.com/request_edison/j45mpngIwOopNvH8akE\n\nWe recommend you use https://obsproject.com/ to record your gameplay.\n\nIf your submission is accepted, a ticket will be created in the SkillCappedWoWGuides Discord server and you will be tagged once the review has been completed and uploaded`, components:[linkingButton]})
     //await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
     //await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
     let submissionPos = verifiedAccount.dataValues.id
