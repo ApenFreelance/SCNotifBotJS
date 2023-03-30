@@ -13,8 +13,6 @@ const ReviewHistory = require("../models/ReviewHistory");
 //const logChannelServer = bot.channels.fetch("1024961321768329249").catch(err => console.log(err))
 
 
-
-
 const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers]});
 module.exports = bot;
 bot.commands = new Collection();
@@ -22,7 +20,9 @@ process.on('unhandledRejection', error => {
 	console.error('Unhandled promise rejection:', error);
     //logChannelServer.send()
 });
-
+process.on("uncaughtException", error => {
+    console.error('uncaught excemption : ', error);
+})
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
@@ -50,10 +50,10 @@ for (const file of eventFiles) {
 
 
 
+//bot.rest.on("restDebug", console.log)
 
 
-
-
+bot.rest.on('rateLimited', console.log)
 
 
 bot.on("ready", async () => {
