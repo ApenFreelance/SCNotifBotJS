@@ -1,4 +1,5 @@
 const { EmbedBuilder, ButtonBuilder, PermissionsBitField, ActionRowBuilder } = require("discord.js");
+const { createWaitingForReviewMessage } = require("../components/functions/createWaitingForReview");
 const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
 const categoryId = "1089996542087278682"
@@ -107,6 +108,8 @@ module.exports = {
             ],
             
         }).catch(err => interaction.editReply({content:err, ephemeral:true}))
+        
+        await newChannel.send({content:`<@${interaction.user.id}> <@${reviewHistory.dataValues.userID}>`,embeds:[interaction.message.embeds[0]]})
         const linkingButton = new ActionRowBuilder()
             .addComponents(
               new ButtonBuilder()
