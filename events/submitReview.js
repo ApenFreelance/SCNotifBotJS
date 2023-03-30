@@ -159,8 +159,14 @@ module.exports = {
       order: [['CreatedAt', 'DESC']]})
     
     if(created) { // if a new entry is created there is no reason to check the rest
+      try {
+
+      
       await  interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
       await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, wowServer)
+      } catch (err) {
+        console.log("Failed when responding or creating message for review for NEW user", err)
+      }
       let submissionPos = verifiedAccount.dataValues.id
       
       const forSpread = [
