@@ -9,21 +9,31 @@ const bot = require('../src/botMain');
 
 
 const submissionModal = new ModalBuilder()
-.setCustomId('submissionmodal')
-.setTitle('Submission Modal');
-const emailInput = new TextInputBuilder()
-  .setCustomId('email')
-  .setLabel("What is your skill-capped email?")
-  .setStyle(TextInputStyle.Short);
-  
-const armoryInput = new TextInputBuilder()
-  .setCustomId('armory')    
-  .setLabel("Please link your armory.") 
-  .setStyle(TextInputStyle.Short);
+  .setCustomId('submissionmodal')
+  .setTitle('Submission Modal');
+    const ytInput = new TextInputBuilder()
+    .setCustomId('ytlink')
+    .setLabel("UNLISTED YOUTUBE LINK:")
+    .setStyle(TextInputStyle.Short);
+    const armoryInput = new TextInputBuilder()
+      .setCustomId('armory')    
+      .setLabel("ARMORY LINK:") 
+      .setStyle(TextInputStyle.Short);
+    const emailInput = new TextInputBuilder()
+      .setCustomId('email')
+      .setLabel("SKILL-CAPPED EMAIL:")
+      .setStyle(TextInputStyle.Short);
+    const improvementInput = new TextInputBuilder()
+      .setCustomId('improvementinput')
+      .setLabel("What are you looking to focus on and improve?")
+      .setStyle(TextInputStyle.Paragraph);
+    
+  const ytRow = new ActionRowBuilder().addComponents(ytInput);
+  const submissionRow = new ActionRowBuilder().addComponents(armoryInput);
+  const emailRow = new ActionRowBuilder().addComponents(emailInput);
+  const improvementRow = new ActionRowBuilder().addComponents(improvementInput);
 
-const submissionRow = new ActionRowBuilder().addComponents(armoryInput);
-const emailRow = new ActionRowBuilder().addComponents(emailInput);
-submissionModal.addComponents(submissionRow, emailRow);
+  submissionModal.addComponents(ytRow, submissionRow, emailRow, improvementRow);
 
 async function verifyEmailExists(email, pass) {
   console.log(email, pass)
@@ -181,13 +191,14 @@ module.exports = {
           await interaction.showModal(verificationmodal);
         }
       if(interaction.customId == "submissionmodal") {
+        await interaction.reply({content:"Processing...", ephemeral:true})
         const email = interaction.fields.getTextInputValue("email")
         const arm = interaction.fields.getTextInputValue("armory")
         
         console.log(interaction.fields.fields.get("armory").value, email, regexTemplateFullLink.test(arm))
         if(regexTemplateFullLink.test(arm)) {
           bot.emit("submitReview", interaction)
-          await interaction.reply({content:"Processing request! This will continue in your DM's", ephemeral:true})
+          
         }
         else {
           await interaction.reply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
