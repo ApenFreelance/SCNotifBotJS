@@ -144,7 +144,7 @@ module.exports = {
     //console.log(wowChar, "wow")
     //await getCharacterInfo(link[1], link[2], link[3], "warrior", interaction)
     if(!isVerifiedByRole(interaction)) {
-      await interaction.user.send({content:"Please make sure you have been verified.", ephemeral:true})
+      await interaction.editReply({content:"Please make sure you have been verified.", ephemeral:true})
       return
     }
    
@@ -163,7 +163,7 @@ module.exports = {
 
       
       await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
-      await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, wowServer)
+      await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer)
       } catch (err) {
         console.log("Failed when responding or creating message for review for NEW user", err)
       }
@@ -303,7 +303,7 @@ module.exports = {
     
 
     if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
-      await interaction.user.send({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
+      await interaction.editReply({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
       return
     }
     

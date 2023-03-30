@@ -7,9 +7,11 @@ const noBreakSpace = "\u00A0"
 
 async function createWaitingForReviewMessage(interaction, charInfo, verifiedAccount, improvementInput, currentGuildId, channel = "1089997649245126818") {
     const server = await bot.guilds.fetch(currentGuildId)//.name//.fetch(interaction.user.id)
-    const member = await server.members.fetch(interaction.user.id)
     
+    const member = await server.members.fetch(interaction.user.id)
+
     const submissionChannel = await bot.channels.fetch(channel)
+
     const maxLengt = 60
     
     let description = `
