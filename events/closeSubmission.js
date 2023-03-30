@@ -32,9 +32,9 @@ module.exports = {
         })
         //console.log(reviewInDB)
         await interaction.channel.permissionOverwrites.delete(reviewInDB.dataValues.userID).catch(e => console.log(e)); 
-        await interaction.reply({content:"Are you done?", components:[lastRow]})
+        //await interaction.reply({content:"Are you done?", components:[lastRow]})
 
-        
+
         await interaction.channel.edit({name: `closed-${submissionNr}`})
         //console.log(interaction.channel)
         await reviewInDB.update({
