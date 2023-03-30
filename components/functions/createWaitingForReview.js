@@ -17,7 +17,7 @@ async function createWaitingForReviewMessage(interaction, charInfo, verifiedAcco
     let description = `
     E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${verifiedAccount.dataValues.userEmail}**
     Armory:\u00A0\u00A0\u00A0\u00A0**[${charInfo.dataValues.characterName}](${charInfo.dataValues.armoryLink})**
-    Item level:**${charInfo.dataValues.armorLevel}**
+    Item level:\u00A0**${charInfo.dataValues.armorLevel}**
     Class:\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0**${charInfo.dataValues.characterClass}**
     Region:\u00A0\u00A0\u00A0\u00A0**${charInfo.dataValues.characterRegion}**`
   
