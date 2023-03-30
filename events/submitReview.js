@@ -295,11 +295,11 @@ module.exports = {
     }
     
     
-/* 
+
     if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
       await interaction.user.send({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
       return
-    } */
+    }
     
     // if none of the ones apply, create new entry
     verifiedAccount = await ReviewHistory.create({
