@@ -121,7 +121,7 @@ module.exports = {
         }).catch(err => interaction.editReply({content:err, ephemeral:true}))
         
         
-        const presetMessage = `<@${reviewHistory.dataValues.userID}> Welcome to your VoD review channel.\nYour <@&970784560914788352> will be respond with your uploaded review ASAP.\n\nTo close this ticket, react with 🔒`
+        const presetMessage = `<@${interaction.user.id}><@${reviewHistory.dataValues.userID}> Welcome to your VoD review channel.\nYour <@&970784560914788352> will be respond with your uploaded review ASAP.\n\nTo close this ticket, react with 🔒`
 
 
         await newChannel.send({content:presetMessage,embeds:[interaction.message.embeds[0]], components:[lockRow]})
