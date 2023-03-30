@@ -10,6 +10,8 @@ const WoWCharacters = require('../models/WoWCharacters');
 const bot = require('../src/botMain');
 const classes = require("../classes.json");
 const { data } = require('../commands/dumps');
+const wowServer = "294958471953252353"
+const { createWaitingForReviewMessage } = require("../components/functions/createWaitingForReview.js");
 const accessToken = process.env.accessToken
 const regexTemplateFullLink = "/(https):\/\/(worldofwarcraft\.blizzard\.com\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/[\w_-]+)/"
 
@@ -119,8 +121,10 @@ function isVerifiedByRole(interaction) {
 module.exports = {
   name: 'submitReview',
   once: false,
-  async execute(interaction) {  
+  async execute(interaction) { 
+    interaction = interaction 
     let arm = interaction.fields.getTextInputValue("armory")
+    let improvement = interaction.fields.getTextInputValue("improvementinput")
 
     let link = decodeURI(arm).replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
     //let link = interaction.fields.fields.armory.value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
@@ -147,23 +151,16 @@ module.exports = {
     //console.log(verifiedAccount, created)
     let [verifiedAccount, created] = await ReviewHistory.findOrCreate({ 
       where:{ userID: interaction.user.id }, 
-      defaults:{  status:"SentToUser", 
+      defaults:{  status:"Available", 
       userEmail:interaction.fields.getTextInputValue("email"),
       userTag:interaction.user.tag,
-      charIdOnSubmission:wowChar.id  }, 
+      charIdOnSubmission:wowChar.id,
+      clipLink: interaction.fields.getTextInputValue("ytlink")}, 
       order: [['CreatedAt', 'DESC']]})
-
-    let linkingButton = new ActionRowBuilder()
-      .addComponents(
-        new ButtonBuilder()
-            .setLabel('I have done this')
-            .setStyle("Success")
-            .setCustomId(`clip-${verifiedAccount.id}`))
-    
     
     if(created) { // if a new entry is created there is no reason to check the rest
-      await interaction.user.send({content:`VoD Review ID: **${verifiedAccount.id}**\n\nThank you for requesting a free Skill Capped VoD Review\n\nFor us to process your ticket, please ensure the name of the clip you upload matches the ID at the top of this message - this means you should upload a file named **${verifiedAccount.id}**\n\nUpload your clip here: https://www.dropbox.com/request_edison/j45mpngIwOopNvH8akE\n\nWe recommend you use https://obsproject.com/ to record your gameplay.\n\nIf your submission is accepted, a ticket will be created in the SkillCappedWoWGuides Discord server and you will be tagged once the review has been completed and uploaded`, components:[linkingButton]})
-      //await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
+      await  interaction.reply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
+      await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, wowServer)
       let submissionPos = verifiedAccount.dataValues.id
       
       const forSpread = [
@@ -298,19 +295,20 @@ module.exports = {
     }
     
     
-
+/* 
     if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
       await interaction.user.send({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
       return
-    }
+    } */
     
     // if none of the ones apply, create new entry
     verifiedAccount = await ReviewHistory.create({
       userEmail:interaction.fields.getTextInputValue("email"),
       userID:interaction.user.id,
-      status:"SentToUser",
+      status:"Available",
       userTag:interaction.user.tag,
-      charIdOnSubmission:wowChar.id
+      charIdOnSubmission:wowChar.id,
+      clipLink: interaction.fields.getTextInputValue("ytlink")
     })
     //console.log(verifiedAccount)
     linkingButton = new ActionRowBuilder()
@@ -319,10 +317,10 @@ module.exports = {
             .setLabel('I have done this')
             .setStyle("Success")
             .setCustomId(`clip-${verifiedAccount.id}`))
-
-            await interaction.user.send({content:`VoD Review ID: **${verifiedAccount.id}**\n\nThank you for requesting a free Skill Capped VoD Review\n\nFor us to process your ticket, please ensure the name of the clip you upload matches the ID at the top of this message - this means you should upload a file named **${verifiedAccount.id}**\n\nUpload your clip here: https://www.dropbox.com/request_edison/j45mpngIwOopNvH8akE\n\nWe recommend you use https://obsproject.com/ to record your gameplay.\n\nIf your submission is accepted, a ticket will be created in the SkillCappedWoWGuides Discord server and you will be tagged once the review has been completed and uploaded`, components:[linkingButton]})
-    //await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
-    //await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount)
+    
+    await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
+            //await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
+    await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer)
     let submissionPos = verifiedAccount.dataValues.id
     console.log(submissionPos, "SUBMISSION POS")
     const forSpread = [
@@ -379,7 +377,7 @@ module.exports = {
         "range": `F${submissionPos}`, // User Clip
         "values": [
           [
-            "WIP: cliplink"
+            verifiedAccount.dataValues.clipLink
             //verifiedAccount.dataValues.userEmail
           ]
         ]
@@ -458,7 +456,6 @@ module.exports = {
 
 
 const statuses = ["Reviewed", "Available", "Rejected", "Broken", "Claimed"]
-
 
 
 
