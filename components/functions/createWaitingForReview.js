@@ -46,7 +46,7 @@ async function createWaitingForReviewMessage(interaction, charInfo, verifiedAcco
     }
 
     description+=`\n\nClip to review: **${verifiedAccount.dataValues.clipLink}**`
-    description+=`\nWhat i want to improve: **${improvementInput}**`
+    description+=`\nWhat they want to improve on: **${improvementInput}**`
     const waitingForReviewEmbed = new EmbedBuilder()
     .setTitle(`Submission ${verifiedAccount.dataValues.id}`)  
     .setAuthor({ name: `${interaction.user.tag} ( ${interaction.user.id} )`, iconURL: member.displayAvatarURL(true)})
