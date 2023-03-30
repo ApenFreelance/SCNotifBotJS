@@ -10,7 +10,7 @@ module.exports = {
     name: 'messageCreate',
     once: false,
     async execute(message) {
-        console.log(message.author.id)
+        
         if((message.author.id == "142358733953957888"|| message.author.id == "443323751573225472") && message.content == "create vodreview button 1") {
             await message.delete().catch(err => console.log(err))
             await message.channel.send({content:"Click button to submit review", components:[row]}).catch(err => console.log(err))
