@@ -8,6 +8,18 @@ const SCverifV2 = require('../models/SCVerifV2');
 const bot = require('../src/botMain');
 
 
+
+const cm = new ModalBuilder()
+  .setCustomId('completesubmission')
+  .setTitle('Close submission');
+    const closeInput = new TextInputBuilder()
+    .setCustomId('reviewlink')
+    .setLabel("REVIEW LINK:")
+    .setStyle(TextInputStyle.Short);
+    const closeRow = new ActionRowBuilder().addComponents(closeInput);
+
+cm.addComponents(closeRow);
+
 const submissionModal = new ModalBuilder()
   .setCustomId('submissionmodal')
   .setTitle('Submission Modal');
@@ -221,12 +233,22 @@ module.exports = {
         if(/^rating\d-\d+/.test(interaction.customId)) {
           bot.emit("rateReview", interaction, "button")
         }
+        if(interaction.customId.startsWith("delete-")) {
+          await interaction.showModal(cm);
+        }
+        if(interaction.customId.startsWith("closesubmission-")) {
+          bot.emit("closeSubmission", interaction)
+        }
+        if(interaction.customId.startsWith("open-")) {
+          bot.emit("openReview", interaction)
+        }
         if(interaction.customId.startsWith("reviewratingmodal")) {
           bot.emit("rateReview", interaction, "modal")
         }
         if(interaction.customId.startsWith("clip-")) {
           bot.emit("mediaCollection", interaction)
         }
+        
 
       } catch (err) {
         if(err.toString().startsWith("TypeError: Cannot read properties of undefined (reading 'startsWith')")) {
