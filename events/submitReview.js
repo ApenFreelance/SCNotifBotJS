@@ -28,7 +28,7 @@ async function getCharacterInfo(region, slug, characterName, wowClient, armoryLi
     const Cpvp = await wowClient.characterPVP({ realm: slug, name: characterName})
     console.log(`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`)
     //const media = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/character-media?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
-    
+    console.log(Cprofile.data.equipped_item_level)
     let twoVtwoRating= threeVthreeRating= tenVtenRating=  soloShuffleSpec1Rating=  soloShuffleSpec2Rating= soloShuffleSpec3Rating=  soloShuffleSpec4Rating = null
   
   try {
@@ -96,7 +96,7 @@ async function getCharacterInfo(region, slug, characterName, wowClient, armoryLi
     characterName:Cprofile.data.name,
     characterRegion:region,
     slug:slug,
-    //characterRace:response.data.race.name,
+    armorLevel:Cprofile.data.equipped_item_level,
     characterClass:Cprofile.data.character_class.name,
     //characterImage:media.data.assets[1].value,
     //honorableKills:responseSummary.data.honorable_kills,

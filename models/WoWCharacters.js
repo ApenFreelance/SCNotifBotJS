@@ -15,8 +15,8 @@ module.exports = class WoWCharacters extends Model {
          characterRegion: {
             type: DataTypes.STRING
          },
-         characterRace: {
-            type: DataTypes.STRING
+         armorLevel: {
+            type: DataTypes.INTEGER
          },
          characterClass: {
             type: DataTypes.STRING

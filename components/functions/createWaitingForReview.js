@@ -15,10 +15,11 @@ async function createWaitingForReviewMessage(interaction, charInfo, verifiedAcco
     const maxLengt = 60
     
     let description = `
-    E-mail: **${verifiedAccount.dataValues.userEmail}**
-    Armory: **[${charInfo.dataValues.characterName}](${charInfo.dataValues.armoryLink})**
-    Class: **${charInfo.dataValues.characterClass}**
-    Region: **${charInfo.dataValues.characterRegion}**`
+    E-mail:    **${verifiedAccount.dataValues.userEmail}**
+    Armory:    **[${charInfo.dataValues.characterName}](${charInfo.dataValues.armoryLink})**
+    Item level:**${charInfo.dataValues.armorLevel}**
+    Class:     **${charInfo.dataValues.characterClass}**
+    Region:    **${charInfo.dataValues.characterRegion}**`
   
     if(charInfo.dataValues.twoVtwoRating != null) {
       let n = `\n\n__2v2:${noBreakSpace.repeat()}**${charInfo.dataValues.twoVtwoRating}**__`.length
