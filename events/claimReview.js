@@ -30,7 +30,12 @@ function updateButtons(channel) {
 }
 
 
-
+const lockRow = new ActionRowBuilder()
+        .addComponents(
+        new ButtonBuilder()
+            .setLabel('Close')
+            .setEmoji("🔒")
+            .setStyle("Secondary"))
 
 module.exports = {
     name: 'claimReview',
@@ -109,7 +114,7 @@ module.exports = {
             
         }).catch(err => interaction.editReply({content:err, ephemeral:true}))
         
-        await newChannel.send({content:`<@${interaction.user.id}> <@${reviewHistory.dataValues.userID}>`,embeds:[interaction.message.embeds[0]]})
+        await newChannel.send({content:`<@${interaction.user.id}> <@${reviewHistory.dataValues.userID}>`,embeds:[interaction.message.embeds[0]], components:[lockRow]})
         const linkingButton = new ActionRowBuilder()
             .addComponents(
               new ButtonBuilder()
