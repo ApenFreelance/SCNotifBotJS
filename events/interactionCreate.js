@@ -30,6 +30,7 @@ const submissionModal = new ModalBuilder()
     const armoryInput = new TextInputBuilder()
       .setCustomId('armory')    
       .setLabel("ARMORY LINK:") 
+      .setPlaceholder('https://worldofwarcraft.blizzard.com/en-gb/character/eu/ravencrest/mýstíc')
       .setStyle(TextInputStyle.Short);
     const emailInput = new TextInputBuilder()
       .setCustomId('email')
@@ -261,8 +262,9 @@ module.exports = {
 
 
         
-    } catch {
-      console.log("Failed somewhere during interaction")
+    } catch (err) {
+      console.log("Failed somewhere during interaction : ", err)
+      await interaction.editReply({content:"Something went wrong, please contact staff", ephemeral:true})
     }} }
     
     
