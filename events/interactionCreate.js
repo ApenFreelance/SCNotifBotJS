@@ -30,6 +30,7 @@ const submissionModal = new ModalBuilder()
     const armoryInput = new TextInputBuilder()
       .setCustomId('armory')    
       .setLabel("ARMORY LINK:") 
+      .setPlaceholder('https://worldofwarcraft.blizzard.com/en-gb/character/eu/ravencrest/mýstíc')
       .setStyle(TextInputStyle.Short);
     const emailInput = new TextInputBuilder()
       .setCustomId('email')
