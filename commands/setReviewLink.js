@@ -11,7 +11,7 @@ module.exports = {
             option
             .setName('reviewlink')
             .setDescription('Set the link to the review')
-            .required(true)),
+            .setRequired(true)),
                     
     async execute(interaction) {
         try {
