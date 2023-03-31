@@ -263,7 +263,7 @@ module.exports = {
         
     } catch (err) {
       console.log("Failed somewhere during interaction : ", err)
-      await interaction.reply({content:"Something went wrong, please contact staff", ephemeral:true})
+      await interaction.editReply({content:"Something went wrong, please contact staff", ephemeral:true})
     }} }
     
     
