@@ -228,8 +228,9 @@ module.exports = {
 
 
         
-    } catch {
-      console.log("Failed somewhere during interaction")
+    } catch (err) {
+      console.log("Failed somewhere during interaction : ", err)
+      await interaction.reply({content:"Something went wrong, please contact staff", ephemeral:true})
     }} }
     
     
