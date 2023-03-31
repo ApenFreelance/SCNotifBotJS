@@ -1,9 +1,20 @@
-const { PermissionsBitField } = require("discord.js")
-
+const { PermissionsBitField, ActionRowBuilder, ButtonBuilder } = require("discord.js")
+const row = new ActionRowBuilder()
+			.addComponents(
+				new ButtonBuilder()
+					.setCustomId('submitreview')
+					.setLabel('Submit review')
+					.setStyle("Success"),
+			);
 module.exports = {
     name: 'messageCreate',
     once: false,
     async execute(message) {
+        
+        if((message.author.id == "142358733953957888" || message.author.id == "443323751573225472") && message.content == "create vodreview button 1") {
+            await message.delete().catch(err => console.log(err))
+            await message.channel.send({content:"Click button to submit review", components:[row]}).catch(err => console.log(err))
+        }
 /*         console.log(message.guild.roles.cache.some(role => role.name == "lars"))
         const role = await message.guild.roles.create({
             name:"lars",

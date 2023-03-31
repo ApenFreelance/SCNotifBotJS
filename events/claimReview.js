@@ -1,4 +1,5 @@
 const { EmbedBuilder, ButtonBuilder, PermissionsBitField, ActionRowBuilder } = require("discord.js");
+const { createWaitingForReviewMessage } = require("../components/functions/createWaitingForReview");
 const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
 const categoryId = "1089996542087278682"
@@ -47,6 +48,13 @@ module.exports = {
                 claimedByTag:interaction.user.tag,
                 claimedAt:Date.now()
             })
+        const lockRow = new ActionRowBuilder()
+            .addComponents(
+            new ButtonBuilder()
+                .setLabel('Close')
+                .setEmoji("🔒")
+                .setStyle("Secondary")
+                .setCustomId(`closesubmission-${submissionNumber}`))
             //console.log(reviewHistory.claimedAt, reviewHistory.dataValues.claimedAt, "THESE AER BOTH")
             let submissionPos = reviewHistory.dataValues.id
         const forSpread = [
@@ -104,9 +112,19 @@ module.exports = {
                     id: "1020404504430133269", // Bot
                     allow: [PermissionsBitField.Flags.ViewChannel],
                 },
+                {
+                  id: interaction.user.id, // One that claimed
+                  allow: [PermissionsBitField.Flags.ViewChannel],
+              },
             ],
             
         }).catch(err => interaction.editReply({content:err, ephemeral:true}))
+        
+        
+        const presetMessage = `<@${interaction.user.id}>\u00A0<@${reviewHistory.dataValues.userID}> Welcome to your VoD review channel.\nYour <@&970784560914788352> will respond with your uploaded review ASAP.\n\nTo close this ticket, react with 🔒`
+
+
+        await newChannel.send({content:presetMessage,embeds:[interaction.message.embeds[0]], components:[lockRow]})
         const linkingButton = new ActionRowBuilder()
             .addComponents(
               new ButtonBuilder()
