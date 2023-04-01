@@ -133,7 +133,7 @@ async function giveRoleToUser(interaction) {
 }
 
 
-const regexTemplateFullLink = /(https):\/\/(worldofwarcraft\.blizzard\.com\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/.+)/
+const regexTemplateFullLink = /(https):\/\/((worldofwarcraft\.blizzard\.com||worldofwarcraft.com)\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/.+)/
 
 module.exports = {
     name: 'interactionCreate',
@@ -263,7 +263,7 @@ module.exports = {
 
         
     } catch (err) {
-      console.log("Failed somewhere during interaction : ", err)
+      console.log("Failed somewhere during interaction : ", err, interaction.user.tag)
       await interaction.editReply({content:"Something went wrong, please contact staff", ephemeral:true})
     }} }
     
