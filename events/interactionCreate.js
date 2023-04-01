@@ -228,14 +228,27 @@ module.exports = {
         if(interaction.customId == "rejectsubmission") {
           bot.emit("rejectReview", interaction)
         }
-        if(interaction.customId == "completesubmission") {
-          bot.emit("completeReview", interaction)
+         if(interaction.customId == "completesubmission") {
+          let reviewlink = interaction.fields.getTextInputValue("reviewlink")
+          
+          const forSpread = [
+            {
+            "range": `T${submissionPos}`, //Rating number
+            "values": [
+                [
+                reviewlink
+                ]
+            ]
+            }
+        ]
+
+          await main(forSpread)
         }
         if(/^rating\d-\d+/.test(interaction.customId)) {
           bot.emit("rateReview", interaction, "button")
         }
         if(interaction.customId.startsWith("delete-")) {
-          await interaction.showModal(cm);
+          bot.emit("completeReview", interaction)
         }
         if(interaction.customId.startsWith("closesubmission-")) {
           bot.emit("closeSubmission", interaction)

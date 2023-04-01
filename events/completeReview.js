@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, TextInputStyle, ModalBuilder, TextInputBuilder } = require("discord.js");
 const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
 
@@ -11,21 +11,15 @@ module.exports = {
     name: 'completeReview',
     once: false,
     async execute(interaction) { 
-      let reviewlink = null
-        try {
-          reviewlink = interaction.fields.getTextInputValue("reviewlink")
-        } catch(err) {
-          console.log("failed to set reviewLink")
-        }
-        console.log(reviewlink)
+
         //const embedAuthor = interaction.message.embeds[0].author.name.match(/\d{18}/)
         //const user = await interaction.guild.members.fetch(embedAuthor[0])
         let submissionNumber
         try {
-          submissionNumber = interaction.channel.name.replace("closed-", "")
+          submissionNumber = interaction.channel.name.replace("closed-", "").replace("review-", "")
         } catch(err) {
           console.log(err)
-          submissionNumber = interaction.channel.name.replace("review-", "")
+          
         }
 
         //const channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
@@ -35,6 +29,12 @@ module.exports = {
                 id:submissionNumber
             },
             order: [['CreatedAt', 'DESC']]})
+
+        if(reviewInDB.dataValues.reviewLink == null) {
+          
+          return
+        }
+
 
         await reviewInDB.update({
             status:"Completed",
