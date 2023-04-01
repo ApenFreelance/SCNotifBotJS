@@ -228,7 +228,7 @@ module.exports = {
         if(interaction.customId == "rejectsubmission") {
           bot.emit("rejectReview", interaction)
         }
-         if(interaction.customId == "completesubmission") {
+         if(interaction.customId.startsWith("completesubmission")) {
           
           let reviewlink = interaction.fields.getTextInputValue("reviewlink").catch(err => console.log("Failed with text", err))
           
