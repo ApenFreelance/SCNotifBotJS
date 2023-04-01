@@ -1,7 +1,7 @@
 const { ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle } = require("discord.js");
 async function completeSubmissionEmbed (submissionModal) {
     const cm = new ModalBuilder()
-    .setCustomId(`completesubmission-${usb}`)
+    .setCustomId(`completesubmission-${submissionModal}`)
     .setTitle('Close submission');
         const closeInput = new TextInputBuilder()
         .setCustomId('reviewlink')

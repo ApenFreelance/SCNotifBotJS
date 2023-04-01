@@ -230,11 +230,11 @@ module.exports = {
         }
          if(interaction.customId == "completesubmission") {
           
-          let reviewlink = interaction.fields.getTextInputValue("reviewlink").cathch(err, console.log("Failed with text", reviewlink))
+          let reviewlink = interaction.fields.getTextInputValue("reviewlink").catch(err => console.log("Failed with text", err))
           
           const forSpread = [
             {
-            "range": `T${submissionPos}`, //Rating number
+            "range": `T${interaction.customId.replace("completesubmission-", "")}`, //Rating number
             "values": [
                 [
                 reviewlink

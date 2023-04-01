@@ -3,6 +3,8 @@ const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
 
 const { createReviewButtons } = require("../components/functions/createReviewButtons");
+const { checkIfHasReviewLink } = require("../components/functions/checkIfHasReviewLink");
+const { completeSubmissionEmbed } = require("../components/modals/reviewLinkModal");
 
 
 
@@ -11,7 +13,7 @@ module.exports = {
     name: 'completeReview',
     once: false,
     async execute(interaction) { 
-
+      const channel = null
         //const embedAuthor = interaction.message.embeds[0].author.name.match(/\d{18}/)
         //const user = await interaction.guild.members.fetch(embedAuthor[0])
         let submissionNumber
@@ -22,17 +24,18 @@ module.exports = {
           
         }
         try {
-          const channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
-          await channel.delete()
+         channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
+
         } catch(err) {
           console.log(err, "failed on review portion")
+          try {
+            channel = interaction.guild.channels.cache.find(channel => channel.name == `closed-${submissionNumber}`);
+  
+          } catch(err) {
+            console.log(err, "failed. crit")
+          }
         }
-        try {
-          const channel = interaction.guild.channels.cache.find(channel => channel.name == `closed-${submissionNumber}`);
-          await channel.delete()
-        } catch(err) {
-          console.log(err, "failed. crit")
-        }
+        
         
         
         //console.log(ticketChannel, `review-${submissionNumber}`)
@@ -43,7 +46,7 @@ module.exports = {
             order: [['CreatedAt', 'DESC']]})
 
         if(reviewInDB.dataValues.reviewLink == null) {
-          
+          await completeSubmissionEmbed(reviewInDB.dataValues.id)
           return
         }
 
