@@ -13,7 +13,7 @@ module.exports = {
     name: 'completeReview',
     once: false,
     async execute(interaction) { 
-      const channel = null
+      let channel = null
         //const embedAuthor = interaction.message.embeds[0].author.name.match(/\d{18}/)
         //const user = await interaction.guild.members.fetch(embedAuthor[0])
         let submissionNumber
