@@ -214,7 +214,7 @@ module.exports = {
           
         }
         else {
-          await interaction.reply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
+          await interaction.editReply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
         }
       }
 
