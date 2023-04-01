@@ -25,13 +25,13 @@ module.exports = {
           const channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
           await channel.delete()
         } catch(err) {
-          console.log(err)
+          console.log(err, "failed on review portion")
         }
         try {
           const channel = interaction.guild.channels.cache.find(channel => channel.name == `closed-${submissionNumber}`);
           await channel.delete()
         } catch(err) {
-          console.log(err)
+          console.log(err, "failed. crit")
         }
         
         
