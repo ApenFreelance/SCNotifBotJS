@@ -1,5 +1,5 @@
 const { ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle } = require("discord.js");
-async function completeSubmissionEmbed (submissionModal) {
+async function completeSubmissionEmbed (interaction, submissionModal) {
     const cm = new ModalBuilder()
     .setCustomId(`completesubmission-${submissionModal}`)
     .setTitle('Close submission');
@@ -10,6 +10,8 @@ async function completeSubmissionEmbed (submissionModal) {
         const closeRow = new ActionRowBuilder().addComponents(closeInput);
 
     cm.addComponents(closeRow);
+    await interaction.showModal(cm);
+    
  
 }
 

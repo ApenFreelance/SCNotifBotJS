@@ -46,7 +46,7 @@ module.exports = {
             order: [['CreatedAt', 'DESC']]})
 
         if(reviewInDB.dataValues.reviewLink == null) {
-          await completeSubmissionEmbed(reviewInDB.dataValues.id)
+          await completeSubmissionEmbed(interaction, reviewInDB.dataValues.id)
           return
         }
 
@@ -54,8 +54,7 @@ module.exports = {
         await reviewInDB.update({
             status:"Completed",
             completedBy:interaction.user.id,
-            completedAt: Date.now(),
-            reviewLink:reviewlink
+            completedAt: Date.now()
         })
         let submissionPos = reviewInDB.dataValues.id
         const forSpread = [

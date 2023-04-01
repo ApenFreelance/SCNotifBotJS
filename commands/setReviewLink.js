@@ -23,7 +23,15 @@ module.exports = {
             
             
             let submissionPos = interaction.channel.name.replace("closed-", "").replace("review-", "")
-           
+            const r = await ReviewHistory.findOne({
+                where:{
+                    id:submissionPos
+                }
+            })
+
+            await r.update({
+                reviewLink:reviewLink
+            })
             
             const forSpread = [
                 {

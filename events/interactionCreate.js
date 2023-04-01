@@ -6,6 +6,8 @@ const Sequelize = require('sequelize');
 const SCverifiedAccountDB = require('../models/SCverifiedAccountDB');
 const SCverifV2 = require('../models/SCVerifV2');
 const bot = require('../src/botMain');
+const { main } = require('../components/functions/googleApi');
+const ReviewHistory = require('../models/ReviewHistory');
 
 
 
@@ -230,11 +232,20 @@ module.exports = {
         }
          if(interaction.customId.startsWith("completesubmission")) {
           
-          let reviewlink = interaction.fields.getTextInputValue("reviewlink").catch(err => console.log("Failed with text", err))
-          
+          let reviewlink = interaction.fields.getTextInputValue("reviewlink")
+          console.log(reviewlink, interaction.customId.replace("completesubmission-", ""))
+
+          const h = await ReviewHistory.findOne({
+            where: {
+              id:interaction.customId.replace("completesubmission-", "")
+            }
+          })
+          await h.update({
+            reviewLink:reviewlink
+          })
           const forSpread = [
             {
-            "range": `T${interaction.customId.replace("completesubmission-", "")}`, //Rating number
+            "range": `T${interaction.customId.replace("completesubmission-", "")}`, //Review link
             "values": [
                 [
                 reviewlink
@@ -244,6 +255,7 @@ module.exports = {
         ]
 
           await main(forSpread)
+          await interaction.reply({content:"Updated the review link", ephemeral:true})
         }
         if(/^rating\d-\d+/.test(interaction.customId)) {
           bot.emit("rateReview", interaction, "button")
