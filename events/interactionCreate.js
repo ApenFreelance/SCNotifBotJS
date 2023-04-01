@@ -229,7 +229,8 @@ module.exports = {
           bot.emit("rejectReview", interaction)
         }
          if(interaction.customId == "completesubmission") {
-          let reviewlink = interaction.fields.getTextInputValue("reviewlink")
+          
+          let reviewlink = interaction.fields.getTextInputValue("reviewlink").cathch(err, console.log("Failed with text", reviewlink))
           
           const forSpread = [
             {

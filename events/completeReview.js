@@ -21,8 +21,20 @@ module.exports = {
           console.log(err)
           
         }
-
-        //const channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
+        try {
+          const channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
+          await channel.delete()
+        } catch(err) {
+          console.log(err)
+        }
+        try {
+          const channel = interaction.guild.channels.cache.find(channel => channel.name == `closed-${submissionNumber}`);
+          await channel.delete()
+        } catch(err) {
+          console.log(err)
+        }
+        
+        
         //console.log(ticketChannel, `review-${submissionNumber}`)
         const reviewInDB = await ReviewHistory.findOne({
             where:{
