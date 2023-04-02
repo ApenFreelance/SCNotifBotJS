@@ -22,7 +22,7 @@ module.exports = {
             return
         }
 
-        bot.emit("completeReview", interaction, interaction.channel)
+        bot.emit("completeReview", interaction)
         
         
     },

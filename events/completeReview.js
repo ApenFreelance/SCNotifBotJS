@@ -1,8 +1,10 @@
-const { ActionRowBuilder, ButtonBuilder } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, TextInputStyle, ModalBuilder, TextInputBuilder } = require("discord.js");
 const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
 
 const { createReviewButtons } = require("../components/functions/createReviewButtons");
+const { checkIfHasReviewLink } = require("../components/functions/checkIfHasReviewLink");
+const { completeSubmissionEmbed } = require("../components/modals/reviewLinkModal");
 
 
 
@@ -11,24 +13,31 @@ module.exports = {
     name: 'completeReview',
     once: false,
     async execute(interaction) { 
-      let reviewlink = null
-        try {
-          reviewlink = interaction.fields.getTextInputValue("reviewlink")
-        } catch(err) {
-          console.log("failed to set reviewLink")
-        }
-        console.log(reviewlink)
+      let channel = null
         //const embedAuthor = interaction.message.embeds[0].author.name.match(/\d{18}/)
         //const user = await interaction.guild.members.fetch(embedAuthor[0])
         let submissionNumber
         try {
-          submissionNumber = interaction.channel.name.replace("closed-", "")
+          submissionNumber = interaction.channel.name.replace("closed-", "").replace("review-", "")
         } catch(err) {
           console.log(err)
-          submissionNumber = interaction.channel.name.replace("review-", "")
+          
         }
+        try {
+         channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
 
-        //const channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
+        } catch(err) {
+          console.log(err, "failed on review portion")
+          try {
+            channel = interaction.guild.channels.cache.find(channel => channel.name == `closed-${submissionNumber}`);
+  
+          } catch(err) {
+            console.log(err, "failed. crit")
+          }
+        }
+        
+        
+        
         //console.log(ticketChannel, `review-${submissionNumber}`)
         const reviewInDB = await ReviewHistory.findOne({
             where:{
@@ -36,11 +45,16 @@ module.exports = {
             },
             order: [['CreatedAt', 'DESC']]})
 
+        if(reviewInDB.dataValues.reviewLink == null) {
+          await completeSubmissionEmbed(interaction, reviewInDB.dataValues.id)
+          return
+        }
+
+
         await reviewInDB.update({
             status:"Completed",
             completedBy:interaction.user.id,
-            completedAt: Date.now(),
-            reviewLink:reviewlink
+            completedAt: Date.now()
         })
         let submissionPos = reviewInDB.dataValues.id
         const forSpread = [

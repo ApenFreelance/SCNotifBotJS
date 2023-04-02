@@ -42,7 +42,7 @@ module.exports = {
                 }
             })
             await history.update({
-                reviewRatingComment:interaction.fields.fields.get("feedback").value
+                reviewRatingComment:"Given"
                 })
             let submissionPos = history.dataValues.id
             const forSpread = [
@@ -58,7 +58,7 @@ module.exports = {
                   "range": `V${submissionPos}`, // Rating Comment
                   "values": [
                     [
-                      history.dataValues.reviewRatingComment
+                      interaction.fields.fields.get("feedback").value
                     ]
                   ]
                 }
@@ -92,14 +92,6 @@ module.exports = {
                   "values": [
                     [
                       history.dataValues.reviewRating
-                    ]
-                  ]
-                },
-                {
-                  "range": `V${submissionPos}`, // Rating Comment
-                  "values": [
-                    [
-                      history.dataValues.reviewRatingComment
                     ]
                   ]
                 }

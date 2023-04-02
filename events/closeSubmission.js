@@ -13,12 +13,13 @@ module.exports = {
     async execute(interaction) {   
         const submissionNr = interaction.customId.replace("closesubmission-", "") 
         console.log(submissionNr, "s")
+        
         const lastRow = new ActionRowBuilder()
         .addComponents(
-            new ButtonBuilder()
+            /* new ButtonBuilder()
                 .setCustomId(`open-${submissionNr}`)
                 .setLabel('Open')
-                .setStyle("Success"),
+                .setStyle("Success"), */
             new ButtonBuilder()
                 .setCustomId(`delete-${submissionNr}`)
                 .setLabel('Delete')
@@ -30,12 +31,16 @@ module.exports = {
             },
             order: [['CreatedAt', 'DESC']]
         })
-        //console.log(reviewInDB)
+
         await interaction.channel.permissionOverwrites.delete(reviewInDB.dataValues.userID).catch(e => console.log(e)); 
-        await interaction.reply({content:"Review closed!", ephemereal:true})
-
-
+        await interaction.reply({content:"Review closed!",components:[lastRow]})
         await interaction.channel.edit({name: `closed-${submissionNr}`})
+    
+        //console.log(reviewInDB)
+        
+
+
+        
         //console.log(interaction.channel)
         await reviewInDB.update({
             status:"Closed"

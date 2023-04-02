@@ -6,6 +6,8 @@ const Sequelize = require('sequelize');
 const SCverifiedAccountDB = require('../models/SCverifiedAccountDB');
 const SCverifV2 = require('../models/SCVerifV2');
 const bot = require('../src/botMain');
+const { main } = require('../components/functions/googleApi');
+const ReviewHistory = require('../models/ReviewHistory');
 
 
 
@@ -133,7 +135,7 @@ async function giveRoleToUser(interaction) {
 }
 
 
-const regexTemplateFullLink = /(https):\/\/(worldofwarcraft\.blizzard\.com\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/.+)/
+const regexTemplateFullLink = /(https):\/\/((worldofwarcraft\.blizzard\.com||worldofwarcraft\.com)\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/.+)/
 
 module.exports = {
     name: 'interactionCreate',
@@ -214,7 +216,7 @@ module.exports = {
           
         }
         else {
-          await interaction.reply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
+          await interaction.editReply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
         }
       }
 
@@ -228,14 +230,38 @@ module.exports = {
         if(interaction.customId == "rejectsubmission") {
           bot.emit("rejectReview", interaction)
         }
-        if(interaction.customId == "completesubmission") {
-          bot.emit("completeReview", interaction)
+         if(interaction.customId.startsWith("completesubmission")) {
+          
+          let reviewlink = interaction.fields.getTextInputValue("reviewlink")
+          console.log(reviewlink, interaction.customId.replace("completesubmission-", ""))
+
+          const h = await ReviewHistory.findOne({
+            where: {
+              id:interaction.customId.replace("completesubmission-", "")
+            }
+          })
+          await h.update({
+            reviewLink:reviewlink
+          })
+          const forSpread = [
+            {
+            "range": `T${interaction.customId.replace("completesubmission-", "")}`, //Review link
+            "values": [
+                [
+                reviewlink
+                ]
+            ]
+            }
+        ]
+
+          await main(forSpread)
+          await interaction.reply({content:"Updated the review link", ephemeral:true})
         }
         if(/^rating\d-\d+/.test(interaction.customId)) {
           bot.emit("rateReview", interaction, "button")
         }
         if(interaction.customId.startsWith("delete-")) {
-          await interaction.showModal(cm);
+          bot.emit("completeReview", interaction)
         }
         if(interaction.customId.startsWith("closesubmission-")) {
           bot.emit("closeSubmission", interaction)
@@ -264,7 +290,7 @@ module.exports = {
 
         
     } catch (err) {
-      console.log("Failed somewhere during interaction : ", err)
+      console.log("Failed somewhere during interaction : ", err, interaction.user.tag)
       await interaction.editReply({content:"Something went wrong, please contact staff", ephemeral:true})
     }} }
     
