@@ -126,7 +126,7 @@ module.exports = {
     let arm = interaction.fields.getTextInputValue("armory")
     let improvement = interaction.fields.getTextInputValue("improvementinput")
 
-    let link = decodeURI(arm).replace("https://worldofwarcraft.com", "").replace("https://worldofwarcraft.blizzard.com", "").replace("/character/", "/").split("/")
+    let link = decodeURI(arm).replace("https://worldofwarcraft.com/", "").replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
     //let link = interaction.fields.fields.armory.value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
     console.log("region: ", link[1])
     console.log("slug: ", link[2])
