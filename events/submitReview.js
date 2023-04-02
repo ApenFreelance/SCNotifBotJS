@@ -129,9 +129,7 @@ module.exports = {
 
       let link = decodeURI(arm).replace("https://worldofwarcraft.com/", "").replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
       //let link = interaction.fields.fields.armory.value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
-      console.log("region: ", link[1])
-      console.log("slug: ", link[2])
-      console.log("name: ", link[3])
+      
       const wowClient = await blizzard.wow.createInstance({
         key: process.env.BCID,
         secret: process.env.BCS,
@@ -141,6 +139,9 @@ module.exports = {
       }).catch(err => {
         console.log(err) 
         interaction.editReply({content:"Something went wrong when searching for WoW Character. Please contact staff", ephemeral:true})
+        console.log("region: ", link[1])
+        console.log("slug: ", link[2])
+        console.log("name: ", link[3])
       })
       
       const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory")).catch(err=> { console.log("failed to get character info: ", err)})
