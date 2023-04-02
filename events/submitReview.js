@@ -142,6 +142,7 @@ module.exports = {
         console.log("region: ", link[1])
         console.log("slug: ", link[2])
         console.log("name: ", link[3])
+        return
       })
       
       const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory")).catch(err=> { console.log("failed to get character info: ", err)})
