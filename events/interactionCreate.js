@@ -281,7 +281,8 @@ module.exports = {
         if(err.toString().startsWith("TypeError: Cannot read properties of undefined (reading 'startsWith')")) {
           console.log("Not review related")
         } else {
-        console.log(err) }
+          await interaction.editReply({content:"Something went wrong, please contact staff", ephemeral:true})
+          console.log(err) }
       }
         
 

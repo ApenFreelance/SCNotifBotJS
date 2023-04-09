@@ -122,53 +122,219 @@ module.exports = {
   name: 'submitReview',
   once: false,
   async execute(interaction) { 
-    interaction = interaction 
-    let arm = interaction.fields.getTextInputValue("armory")
-    let improvement = interaction.fields.getTextInputValue("improvementinput")
+    try {
+      interaction = interaction 
+      let arm = interaction.fields.getTextInputValue("armory")
+      let improvement = interaction.fields.getTextInputValue("improvementinput")
 
-    let link = decodeURI(arm).replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
-    //let link = interaction.fields.fields.armory.value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
-   /*  console.log("region: ", link[1])
-    console.log("slug: ", link[2])
-    console.log("name: ", link[3]) */
-    const wowClient = await blizzard.wow.createInstance({
-      key: process.env.BCID,
-      secret: process.env.BCS,
-      origin: link[1], // optional
-      locale: 'en_US', // optional
-      token: '', // optional
-    })
+      let link = decodeURI(arm).replace("https://worldofwarcraft.com/", "").replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
+      //let link = interaction.fields.fields.armory.value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
+      
+      const wowClient = await blizzard.wow.createInstance({
+        key: process.env.BCID,
+        secret: process.env.BCS,
+        origin: link[1], // optional
+        locale: 'en_US', // optional
+        token: '', // optional
+      }).catch(err => {
+        console.log(err) 
+        interaction.editReply({content:"Something went wrong when searching for WoW Character. Please contact staff", ephemeral:true})
+        console.log("region: ", link[1])
+        console.log("slug: ", link[2])
+        console.log("name: ", link[3])
+        return
+      })
+      
+      const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory")).catch(err=> { console.log("failed to get character info: ", err)})
+      
+      //console.log(wowChar, "wow")
+      //await getCharacterInfo(link[1], link[2], link[3], "warrior", interaction)
+      if(!isVerifiedByRole(interaction)) {
+        await interaction.editReply({content:"Please make sure you have been verified.", ephemeral:true})
+        return
+      }
     
-    const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory")).catch(err=> { console.log("failed to get character info: ", err)})
-    
-    //console.log(wowChar, "wow")
-    //await getCharacterInfo(link[1], link[2], link[3], "warrior", interaction)
-    if(!isVerifiedByRole(interaction)) {
-      await interaction.editReply({content:"Please make sure you have been verified.", ephemeral:true})
-      return
-    }
-   
-    //console.log(verifiedAccount, created)
-    let [verifiedAccount, created] = await ReviewHistory.findOrCreate({ 
-      where:{ userID: interaction.user.id }, 
-      defaults:{  status:"Available", 
-      userEmail:interaction.fields.getTextInputValue("email"),
-      userTag:interaction.user.tag,
-      charIdOnSubmission:wowChar.id,
-      clipLink: interaction.fields.getTextInputValue("ytlink")}, 
-      order: [['CreatedAt', 'DESC']]})
-    
-    if(created) { // if a new entry is created there is no reason to check the rest
-      try {
+      //console.log(verifiedAccount, created)
+      let [verifiedAccount, created] = await ReviewHistory.findOrCreate({ 
+        where:{ userID: interaction.user.id }, 
+        defaults:{  status:"Available", 
+        userEmail:interaction.fields.getTextInputValue("email"),
+        userTag:interaction.user.tag,
+        charIdOnSubmission:wowChar.id,
+        clipLink: interaction.fields.getTextInputValue("ytlink")}, 
+        order: [['CreatedAt', 'DESC']]})
+      
+      if(created) { // if a new entry is created there is no reason to check the rest
+        try {
 
+        
+        await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
+        await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer)
+        } catch (err) {
+          console.log("Failed when responding or creating message for review for NEW user", err)
+        }
+        let submissionPos = verifiedAccount.dataValues.id
+        
+        const forSpread = [
+          //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
+          {
+            "range": `O${submissionPos}`, //Ticket status
+            "values": [
+              [
+                verifiedAccount.dataValues.status
+              ]
+            ]
+          },
+          //BELOW THIS IS REVIEW HISTORY
+          {
+            "range": `A${submissionPos}`, //Ticket created
+            "values": [
+              [
+                verifiedAccount.dataValues.createdAt
+              ]
+            ]
+          },
+          {
+            "range": `B${submissionPos}`, //Ticket ID
+            "values": [
+              [
+                verifiedAccount.dataValues.id
+              ]
+            ]
+          },
+          {
+            "range": `C${submissionPos}`, // User ID
+            "values": [
+              [
+                verifiedAccount.dataValues.userID
+              ]
+            ]
+          },
+          {
+            "range": `D${submissionPos}`, // User Tag
+            "values": [
+              [
+                verifiedAccount.dataValues.userTag
+              ]
+            ]
+          },{
+            "range": `E${submissionPos}`, // User Mail
+            "values": [
+              [
+                verifiedAccount.dataValues.userEmail
+              ]
+            ]
+          },
+          {
+            "range": `F${submissionPos}`, // User Clip
+            "values": [
+              [
+                "WIP: cliplink"
+                //verifiedAccount.dataValues.userEmail
+              ]
+            ]
+          },
+          // BELOW IS ALL FROM WOWCHARACTER AND NOT REVIEWHISTORY
+          {
+            "range": `G${submissionPos}`, // Armory Link
+            "values": [
+              [
+                wowChar.dataValues.armoryLink 
+              ]
+            ]
+          },
+          {
+            "range": `H${submissionPos}`, // Character class
+            "values": [
+              [
+                wowChar.dataValues.characterClass
+              ]
+            ]
+          },
+          {
+            "range": `I${submissionPos}`, // 2v2
+            "values": [
+              [
+                wowChar.dataValues.twoVtwoRating
+              ]
+            ]
+          },
+          {
+            "range": `J${submissionPos}`, // 3v3
+            "values": [
+              [
+                wowChar.dataValues.threeVthreeRating
+              ]
+            ]
+          },
+          {
+            "range": `K${submissionPos}`, // Solo1
+            "values": [
+              [
+                wowChar.dataValues.soloShuffleSpec1Rating
+              ]
+            ]
+          },
+          {
+            "range": `L${submissionPos}`, // Solo2
+            "values": [
+              [
+                wowChar.dataValues.soloShuffleSpec2Rating 
+              ]
+            ]
+          },
+          {
+            "range": `M${submissionPos}`, // Solo3
+            "values": [
+              [
+                wowChar.dataValues.soloShuffleSpec3Rating
+              ]
+            ]
+          },
+          {
+            "range": `N${submissionPos}`, // Solo4
+            "values": [
+              [
+                wowChar.dataValues.soloShuffleSpec4Rating
+              ]
+            ]
+          },
+        ]
+      //console.log(forSpread)
+        await main(forSpread)
+        
+        return
+      }
+      
+      
+
+      if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
+        await interaction.editReply({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
+        return
+      }
+      
+      // if none of the ones apply, create new entry
+      verifiedAccount = await ReviewHistory.create({
+        userEmail:interaction.fields.getTextInputValue("email"),
+        userID:interaction.user.id,
+        status:"Available",
+        userTag:interaction.user.tag,
+        charIdOnSubmission:wowChar.id,
+        clipLink: interaction.fields.getTextInputValue("ytlink")
+      })
+      //console.log(verifiedAccount)
+      linkingButton = new ActionRowBuilder()
+        .addComponents(
+          new ButtonBuilder()
+              .setLabel('I have done this')
+              .setStyle("Success")
+              .setCustomId(`clip-${verifiedAccount.id}`))
       
       await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
+              //await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
       await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer)
-      } catch (err) {
-        console.log("Failed when responding or creating message for review for NEW user", err)
-      }
       let submissionPos = verifiedAccount.dataValues.id
-      
+      console.log(submissionPos, "SUBMISSION POS")
       const forSpread = [
         //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
         {
@@ -223,7 +389,7 @@ module.exports = {
           "range": `F${submissionPos}`, // User Clip
           "values": [
             [
-              "WIP: cliplink"
+              verifiedAccount.dataValues.clipLink
               //verifiedAccount.dataValues.userEmail
             ]
           ]
@@ -294,170 +460,14 @@ module.exports = {
           ]
         },
       ]
-    //console.log(forSpread)
+      //console.log(forSpread)
       await main(forSpread)
-      
-      return
+        // do your stuff
+    } catch {
+      await interaction.editReply({content:"Something went wrong when submitting. Please contact staff", ephemeral:true})
     }
-    
-    
 
-    if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
-      await interaction.editReply({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
-      return
-    }
-    
-    // if none of the ones apply, create new entry
-    verifiedAccount = await ReviewHistory.create({
-      userEmail:interaction.fields.getTextInputValue("email"),
-      userID:interaction.user.id,
-      status:"Available",
-      userTag:interaction.user.tag,
-      charIdOnSubmission:wowChar.id,
-      clipLink: interaction.fields.getTextInputValue("ytlink")
-    })
-    //console.log(verifiedAccount)
-    linkingButton = new ActionRowBuilder()
-      .addComponents(
-        new ButtonBuilder()
-            .setLabel('I have done this')
-            .setStyle("Success")
-            .setCustomId(`clip-${verifiedAccount.id}`))
-    
-    await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
-            //await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
-    await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer)
-    let submissionPos = verifiedAccount.dataValues.id
-    console.log(submissionPos, "SUBMISSION POS")
-    const forSpread = [
-      //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
-      {
-        "range": `O${submissionPos}`, //Ticket status
-        "values": [
-          [
-            verifiedAccount.dataValues.status
-          ]
-        ]
-      },
-      //BELOW THIS IS REVIEW HISTORY
-      {
-        "range": `A${submissionPos}`, //Ticket created
-        "values": [
-          [
-            verifiedAccount.dataValues.createdAt
-          ]
-        ]
-      },
-      {
-        "range": `B${submissionPos}`, //Ticket ID
-        "values": [
-          [
-            verifiedAccount.dataValues.id
-          ]
-        ]
-      },
-      {
-        "range": `C${submissionPos}`, // User ID
-        "values": [
-          [
-            verifiedAccount.dataValues.userID
-          ]
-        ]
-      },
-      {
-        "range": `D${submissionPos}`, // User Tag
-        "values": [
-          [
-            verifiedAccount.dataValues.userTag
-          ]
-        ]
-      },{
-        "range": `E${submissionPos}`, // User Mail
-        "values": [
-          [
-            verifiedAccount.dataValues.userEmail
-          ]
-        ]
-      },
-      {
-        "range": `F${submissionPos}`, // User Clip
-        "values": [
-          [
-            verifiedAccount.dataValues.clipLink
-            //verifiedAccount.dataValues.userEmail
-          ]
-        ]
-      },
-      // BELOW IS ALL FROM WOWCHARACTER AND NOT REVIEWHISTORY
-      {
-        "range": `G${submissionPos}`, // Armory Link
-        "values": [
-          [
-            wowChar.dataValues.armoryLink 
-          ]
-        ]
-      },
-      {
-        "range": `H${submissionPos}`, // Character class
-        "values": [
-          [
-            wowChar.dataValues.characterClass
-          ]
-        ]
-      },
-      {
-        "range": `I${submissionPos}`, // 2v2
-        "values": [
-          [
-            wowChar.dataValues.twoVtwoRating
-          ]
-        ]
-      },
-      {
-        "range": `J${submissionPos}`, // 3v3
-        "values": [
-          [
-            wowChar.dataValues.threeVthreeRating
-          ]
-        ]
-      },
-      {
-        "range": `K${submissionPos}`, // Solo1
-        "values": [
-          [
-            wowChar.dataValues.soloShuffleSpec1Rating
-          ]
-        ]
-      },
-      {
-        "range": `L${submissionPos}`, // Solo2
-        "values": [
-          [
-            wowChar.dataValues.soloShuffleSpec2Rating 
-          ]
-        ]
-      },
-      {
-        "range": `M${submissionPos}`, // Solo3
-        "values": [
-          [
-            wowChar.dataValues.soloShuffleSpec3Rating
-          ]
-        ]
-      },
-      {
-        "range": `N${submissionPos}`, // Solo4
-        "values": [
-          [
-            wowChar.dataValues.soloShuffleSpec4Rating
-          ]
-        ]
-      },
-    ]
-    //console.log(forSpread)
-    await main(forSpread)
-      // do your stuff
-  },
+}
 };
 
 
