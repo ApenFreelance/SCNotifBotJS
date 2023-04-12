@@ -117,6 +117,219 @@ function isVerifiedByRole(interaction) {
   
 }
 
+function nullOnError(value){
+  try {
+    value
+  } catch(err) {
+    return null
+  }
+  return value
+}
+
+
+
+function forSpread(verifiedAccount, wowChar, submissionPos, arm, name) {
+  
+  if (wowChar == null) {
+    return [
+      //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
+      {
+        "range": `O${submissionPos}`, //Ticket status
+        "values": [
+          [
+            verifiedAccount.dataValues.status
+          ]
+        ]
+      },
+      //BELOW THIS IS REVIEW HISTORY
+      {
+        "range": `A${submissionPos}`, //Ticket created
+        "values": [
+          [
+            verifiedAccount.dataValues.createdAt
+          ]
+        ]
+      },
+      {
+        "range": `B${submissionPos}`, //Ticket ID
+        "values": [
+          [
+            verifiedAccount.dataValues.id
+          ]
+        ]
+      },
+      {
+        "range": `C${submissionPos}`, // User ID
+        "values": [
+          [
+            verifiedAccount.dataValues.userID
+          ]
+        ]
+      },
+      {
+        "range": `D${submissionPos}`, // User Tag
+        "values": [
+          [
+            verifiedAccount.dataValues.userTag
+          ]
+        ]
+      },{
+        "range": `E${submissionPos}`, // User Mail
+        "values": [
+          [
+            verifiedAccount.dataValues.userEmail
+          ]
+        ]
+      },
+      {
+        "range": `F${submissionPos}`, // User Clip
+        "values": [
+          [
+            "Clip link not given yet"
+            //verifiedAccount.dataValues.userEmail
+          ]
+        ]
+      },
+      // BELOW IS ALL FROM WOWCHARACTER AND NOT REVIEWHISTORY
+      {
+        "range": `G${submissionPos}`, // Armory Link
+        "values": [
+          [
+            arm
+          ]
+        ]
+      },
+    ]
+  }
+  
+  return [
+    //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
+    {
+      "range": `O${submissionPos}`, //Ticket status
+      "values": [
+        [
+          verifiedAccount.dataValues.status
+        ]
+      ]
+    },
+    //BELOW THIS IS REVIEW HISTORY
+    {
+      "range": `A${submissionPos}`, //Ticket created
+      "values": [
+        [
+          verifiedAccount.dataValues.createdAt
+        ]
+      ]
+    },
+    {
+      "range": `B${submissionPos}`, //Ticket ID
+      "values": [
+        [
+          verifiedAccount.dataValues.id
+        ]
+      ]
+    },
+    {
+      "range": `C${submissionPos}`, // User ID
+      "values": [
+        [
+          verifiedAccount.dataValues.userID
+        ]
+      ]
+    },
+    {
+      "range": `D${submissionPos}`, // User Tag
+      "values": [
+        [
+          verifiedAccount.dataValues.userTag
+        ]
+      ]
+    },{
+      "range": `E${submissionPos}`, // User Mail
+      "values": [
+        [
+          verifiedAccount.dataValues.userEmail
+        ]
+      ]
+    },
+    {
+      "range": `F${submissionPos}`, // User Clip
+      "values": [
+        [
+          "Clip link not given yet"
+          //verifiedAccount.dataValues.userEmail
+        ]
+      ]
+    },
+    // BELOW IS ALL FROM WOWCHARACTER AND NOT REVIEWHISTORY
+    {
+      "range": `G${submissionPos}`, // Armory Link
+      "values": [
+        [
+          wowChar.dataValues.armoryLink 
+        ]
+      ]
+    },
+    {
+      "range": `H${submissionPos}`, // Character class
+      "values": [
+        [
+          wowChar.dataValues.characterClass
+        ]
+      ]
+    },
+    {
+      "range": `I${submissionPos}`, // 2v2
+      "values": [
+        [
+          wowChar.dataValues.twoVtwoRating
+        ]
+      ]
+    },
+    {
+      "range": `J${submissionPos}`, // 3v3
+      "values": [
+        [
+          wowChar.dataValues.threeVthreeRating
+        ]
+      ]
+    },
+    {
+      "range": `K${submissionPos}`, // Solo1
+      "values": [
+        [
+          wowChar.dataValues.soloShuffleSpec1Rating
+        ]
+      ]
+    },
+    {
+      "range": `L${submissionPos}`, // Solo2
+      "values": [
+        [
+          wowChar.dataValues.soloShuffleSpec2Rating 
+        ]
+      ]
+    },
+    {
+      "range": `M${submissionPos}`, // Solo3
+      "values": [
+        [
+          wowChar.dataValues.soloShuffleSpec3Rating
+        ]
+      ]
+    },
+    {
+      "range": `N${submissionPos}`, // Solo4
+      "values": [
+        [
+          wowChar.dataValues.soloShuffleSpec4Rating
+        ]
+      ]
+    },
+  ]
+}
+
+
 module.exports = {
   name: 'submitReview',
   once: false,
@@ -147,7 +360,11 @@ module.exports = {
       try {
         wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory"))
       }catch(err){
-        console.log("failed to get character info: ", err)
+        if(!err.response.status == 404){
+          console.log("failed to get character info: ", err)
+        }
+        wowChar = null
+        console.log("Failed to get char, because char doesnt exist or couldnt be found")
       }
       
       //console.log(wowChar, "wow")
@@ -178,133 +395,8 @@ module.exports = {
         }
         let submissionPos = verifiedAccount.dataValues.id
         
-        const forSpread = [
-          //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
-          {
-            "range": `O${submissionPos}`, //Ticket status
-            "values": [
-              [
-                verifiedAccount.dataValues.status
-              ]
-            ]
-          },
-          //BELOW THIS IS REVIEW HISTORY
-          {
-            "range": `A${submissionPos}`, //Ticket created
-            "values": [
-              [
-                verifiedAccount.dataValues.createdAt
-              ]
-            ]
-          },
-          {
-            "range": `B${submissionPos}`, //Ticket ID
-            "values": [
-              [
-                verifiedAccount.dataValues.id
-              ]
-            ]
-          },
-          {
-            "range": `C${submissionPos}`, // User ID
-            "values": [
-              [
-                verifiedAccount.dataValues.userID
-              ]
-            ]
-          },
-          {
-            "range": `D${submissionPos}`, // User Tag
-            "values": [
-              [
-                verifiedAccount.dataValues.userTag
-              ]
-            ]
-          },{
-            "range": `E${submissionPos}`, // User Mail
-            "values": [
-              [
-                verifiedAccount.dataValues.userEmail
-              ]
-            ]
-          },
-          {
-            "range": `F${submissionPos}`, // User Clip
-            "values": [
-              [
-                "WIP: cliplink"
-                //verifiedAccount.dataValues.userEmail
-              ]
-            ]
-          },
-          // BELOW IS ALL FROM WOWCHARACTER AND NOT REVIEWHISTORY
-          {
-            "range": `G${submissionPos}`, // Armory Link
-            "values": [
-              [
-                wowChar.dataValues.armoryLink 
-              ]
-            ]
-          },
-          {
-            "range": `H${submissionPos}`, // Character class
-            "values": [
-              [
-                wowChar.dataValues.characterClass
-              ]
-            ]
-          },
-          {
-            "range": `I${submissionPos}`, // 2v2
-            "values": [
-              [
-                wowChar.dataValues.twoVtwoRating
-              ]
-            ]
-          },
-          {
-            "range": `J${submissionPos}`, // 3v3
-            "values": [
-              [
-                wowChar.dataValues.threeVthreeRating
-              ]
-            ]
-          },
-          {
-            "range": `K${submissionPos}`, // Solo1
-            "values": [
-              [
-                wowChar.dataValues.soloShuffleSpec1Rating
-              ]
-            ]
-          },
-          {
-            "range": `L${submissionPos}`, // Solo2
-            "values": [
-              [
-                wowChar.dataValues.soloShuffleSpec2Rating 
-              ]
-            ]
-          },
-          {
-            "range": `M${submissionPos}`, // Solo3
-            "values": [
-              [
-                wowChar.dataValues.soloShuffleSpec3Rating
-              ]
-            ]
-          },
-          {
-            "range": `N${submissionPos}`, // Solo4
-            "values": [
-              [
-                wowChar.dataValues.soloShuffleSpec4Rating
-              ]
-            ]
-          },
-        ]
       //console.log(forSpread)
-        await main(forSpread)
+        await main(forSpread(verifiedAccount, wowChar, submissionPos, arm, link[3]))
         
         return
       }
@@ -343,133 +435,8 @@ module.exports = {
       await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer, arm, link[3])
       let submissionPos = verifiedAccount.dataValues.id
       console.log(submissionPos, "SUBMISSION POS")
-      const forSpread = [
-        //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
-        {
-          "range": `O${submissionPos}`, //Ticket status
-          "values": [
-            [
-              verifiedAccount.dataValues.status
-            ]
-          ]
-        },
-        //BELOW THIS IS REVIEW HISTORY
-        {
-          "range": `A${submissionPos}`, //Ticket created
-          "values": [
-            [
-              verifiedAccount.dataValues.createdAt
-            ]
-          ]
-        },
-        {
-          "range": `B${submissionPos}`, //Ticket ID
-          "values": [
-            [
-              verifiedAccount.dataValues.id
-            ]
-          ]
-        },
-        {
-          "range": `C${submissionPos}`, // User ID
-          "values": [
-            [
-              verifiedAccount.dataValues.userID
-            ]
-          ]
-        },
-        {
-          "range": `D${submissionPos}`, // User Tag
-          "values": [
-            [
-              verifiedAccount.dataValues.userTag
-            ]
-          ]
-        },{
-          "range": `E${submissionPos}`, // User Mail
-          "values": [
-            [
-              verifiedAccount.dataValues.userEmail
-            ]
-          ]
-        },
-        {
-          "range": `F${submissionPos}`, // User Clip
-          "values": [
-            [
-              verifiedAccount.dataValues.clipLink
-              //verifiedAccount.dataValues.userEmail
-            ]
-          ]
-        },
-        // BELOW IS ALL FROM WOWCHARACTER AND NOT REVIEWHISTORY
-        {
-          "range": `G${submissionPos}`, // Armory Link
-          "values": [
-            [
-              wowChar.dataValues.armoryLink 
-            ]
-          ]
-        },
-        {
-          "range": `H${submissionPos}`, // Character class
-          "values": [
-            [
-              wowChar.dataValues.characterClass
-            ]
-          ]
-        },
-        {
-          "range": `I${submissionPos}`, // 2v2
-          "values": [
-            [
-              wowChar.dataValues.twoVtwoRating
-            ]
-          ]
-        },
-        {
-          "range": `J${submissionPos}`, // 3v3
-          "values": [
-            [
-              wowChar.dataValues.threeVthreeRating
-            ]
-          ]
-        },
-        {
-          "range": `K${submissionPos}`, // Solo1
-          "values": [
-            [
-              wowChar.dataValues.soloShuffleSpec1Rating
-            ]
-          ]
-        },
-        {
-          "range": `L${submissionPos}`, // Solo2
-          "values": [
-            [
-              wowChar.dataValues.soloShuffleSpec2Rating 
-            ]
-          ]
-        },
-        {
-          "range": `M${submissionPos}`, // Solo3
-          "values": [
-            [
-              wowChar.dataValues.soloShuffleSpec3Rating
-            ]
-          ]
-        },
-        {
-          "range": `N${submissionPos}`, // Solo4
-          "values": [
-            [
-              wowChar.dataValues.soloShuffleSpec4Rating
-            ]
-          ]
-        },
-      ]
       //console.log(forSpread)
-      await main(forSpread)
+      await main(forSpread(verifiedAccount, wowChar, submissionPos, arm, link[3]))
         // do your stuff
     } catch {
       await interaction.editReply({content:"Something went wrong when submitting. Please contact staff", ephemeral:true})
