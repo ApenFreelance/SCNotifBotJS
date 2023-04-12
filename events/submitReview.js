@@ -81,7 +81,7 @@ async function getCharacterInfo(region, slug, characterName, wowClient, armoryLi
       console.log("This role does not exist in classes, or class is lacking subclass")
     }
     else {
-      console.log(err)
+      console.log(err, "Error when checking classes")
     }
   }
     
@@ -143,7 +143,7 @@ module.exports = {
         console.log("name: ", link[3])
       })
       
-      const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory")).catch(err=> { console.log("failed to get character info: ", err)})
+      const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory")).catch(err=> { console.log("failed to get character info: ", err); wowChar = null})
       
       //console.log(wowChar, "wow")
       //await getCharacterInfo(link[1], link[2], link[3], "warrior", interaction)
@@ -166,7 +166,7 @@ module.exports = {
 
         
         await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
-        await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer)
+        await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer, arm, link[1])
         } catch (err) {
           console.log("Failed when responding or creating message for review for NEW user", err)
           await interaction.editReply({content:`Something went wrong registering new user.`, ephemeral:true})
@@ -335,7 +335,7 @@ module.exports = {
       
       await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
               //await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
-      await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer)
+      await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer, arm, link[1])
       let submissionPos = verifiedAccount.dataValues.id
       console.log(submissionPos, "SUBMISSION POS")
       const forSpread = [

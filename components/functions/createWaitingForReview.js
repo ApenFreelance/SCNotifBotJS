@@ -5,17 +5,25 @@ const noBreakSpace = "\u00A0"
 
 
 
-async function createWaitingForReviewMessage(interaction, charInfo, verifiedAccount, improvementInput, currentGuildId, channel = "1089997649245126818") {
-  console.log(charInfo)
+async function createWaitingForReviewMessage(interaction, charInfo, verifiedAccount, improvementInput, currentGuildId, channel = "1089997649245126818", inputArmory, inputName) {
+    
     const server = await bot.guilds.fetch(currentGuildId)//.name//.fetch(interaction.user.id)
     
     const member = await server.members.fetch(interaction.user.id)
 
     const submissionChannel = await bot.channels.fetch(channel)
-
+    let description = null
     const maxLengt = 60
-    
-    let description = `
+    if(charInfo == null) {
+      description = `
+      E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${verifiedAccount.dataValues.userEmail}**
+      Armory:\u00A0\u00A0\u00A0\u00A0**[${inputName}](${inputArmory})**
+
+      **Failed to get data from Blizzard**
+      `
+    } else {
+
+    description = `
     E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${verifiedAccount.dataValues.userEmail}**
     Armory:\u00A0\u00A0\u00A0\u00A0**[${charInfo.dataValues.characterName}](${charInfo.dataValues.armoryLink})**
     Item level:\u00A0**${charInfo.dataValues.armorLevel}**
@@ -46,6 +54,7 @@ async function createWaitingForReviewMessage(interaction, charInfo, verifiedAcco
       let n = `\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][3]}:${noBreakSpace.repeat()}**${charInfo.dataValues.soloShuffleSpec4Rating}**__`.length
       description+=`\n\n__Shuffle ${classes[charInfo.dataValues.characterClass][3]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.dataValues.soloShuffleSpec4Rating}**__`
     }
+  }
 
     description+=`\n\nClip to review: **${verifiedAccount.dataValues.clipLink}**`
     description+=`\nWhat they want to improve on: **${improvementInput}**`
