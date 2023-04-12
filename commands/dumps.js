@@ -5,7 +5,7 @@ const bot = require('../src/botMain');
 
 
 
-
+const jsonLocation = "./gameData.json"
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -35,87 +35,86 @@ module.exports = {
         let game = interaction.options.getString('game');
         let newDump = interaction.options.getString('newdump');
         let oldDump = interaction.options.getString('olddump');
+
         //const logChannelServer = interaction.guild.channels.fetch("1024961321768329249").catch(err => console.log(err))
         await interaction.deferReply({ ephemeral: true })
         if(game == null) {
-            
-            fs.readFile("./gameData.json", "utf-8", function(err, gameData){  
-                gameData = JSON.parse(gameData)
-               
-                let dumpList = {}
-                
-                for(const game in gameData) {
+        
+          fs.readFile(jsonLocation, "utf-8", function(err, gameData){  
+              gameData = JSON.parse(gameData)
+              
+              let dumpList = {}
+              
+              for(const game in gameData) {
                   try {
-                    dumpList[game] = gameData[game].lastDump
+                  dumpList[game] = gameData[game].lastDump
                   }    
                   catch (err) {
-                    console.log(err)
+                  console.log(err)
                   }
-                }
-                let dumpListString = JSON.stringify(dumpList).replaceAll(",", "\n\n").replace("{", "").replace("}", "").replaceAll('"', '`')
-                
-                
-                let videoEmbed = new EmbedBuilder()
-                    .setTitle("Current dumps")  
-                    .setDescription(dumpListString)
-            
-            
-               
-                
-                interaction.editReply({embeds:[videoEmbed],  ephemeral: true })
-                
-            })
-            return
+              }
+              let dumpListString = JSON.stringify(dumpList).replaceAll(",", "\n\n").replace("{", "").replace("}", "").replaceAll('"', '`')
+              
+              
+              let videoEmbed = new EmbedBuilder()
+                  .setTitle("Current dumps")  
+                  .setDescription(dumpListString)
+          
+          
+              
+              
+              interaction.editReply({embeds:[videoEmbed],  ephemeral: true })
+              
+          })
+          return
       
-        }
+      }
       
-        if(newDump != null) {
-          fs.readFile("./gameData.json", "utf-8", function(err, gameData){  
-            gameData = JSON.parse(gameData)
-            
-            
+      if(newDump != null) {
+          fs.readFile(jsonLocation, "utf-8", function(err, gameData){  
+          gameData = JSON.parse(gameData)
+          let lastDump = gameData[game].lastDump
+          gameData[game].lastDump = newDump
               try {
-                
-                updatedDump = newDump
-                fs.writeFile("./gameData.json", JSON.stringify(gameData, null, 2), (err) => {
+              fs.writeFile(jsonLocation, JSON.stringify(gameData, null, 2), (err) => {
                   if (err)
-                    console.log(err);
+                  console.log(err);
                   else {
-                    console.log("File written successfully\n");
-                    
-                    
+                  console.log("File written successfully\n");
+                  
+                  
                   }})
                   try{
-                    console.log("trying to set dump")
-                    if(oldDump == null) { 
-                        oldDump = updatedDump
-                        console.log("No oldDump provided, using stored")}
+                  console.log("trying to set dump")
+                  if(oldDump == null) { 
+                      oldDump = lastDump
+                      console.log("No oldDump provided, using stored")}
                   } catch (err) {
-                    console.log(err)
+                  console.log(err)
                   }
                   try {
                     console.log("checking for changes")
-                      checkForChanges(newDump, oldDump, game, interaction)
+                    checkForChanges(newDump, oldDump, game, interaction)
                   } catch(err) {
                       console.log(err)
                   }
               }    
               catch (err) {
-                console.log(err)
+              console.log(err)
               }
-            })
-            
-            
-           
-            
-          }
-
-        
-        
-        
-    } catch (err){
-    console.log("failed somewhere: \n", err, "\n\n")
-  }}
+          })
+          
+          
+             
+              
+            }
+  
+          
+          
+          
+      } catch (err){
+      console.log("failed somewhere: \n", err, "\n\n")
+    }}
 };
 
 async function checkForChanges(newDumpString, oldDumpString, game, interaction) {
