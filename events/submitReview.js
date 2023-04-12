@@ -143,7 +143,7 @@ module.exports = {
         console.log("name: ", link[3])
       })
       
-      const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory")).catch(err=> { console.log("failed to get character info: ", err); wowChar = null})
+      const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory")).catch(err=> { console.log("failed to get character info: ", err); return null})
       
       //console.log(wowChar, "wow")
       //await getCharacterInfo(link[1], link[2], link[3], "warrior", interaction)
