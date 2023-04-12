@@ -28,7 +28,6 @@ async function getCharacterInfo(region, slug, characterName, wowClient, armoryLi
     const Cpvp = await wowClient.characterPVP({ realm: slug, name: characterName})
     console.log(`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`)
     //const media = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/character-media?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
-    console.log(Cprofile.data.equipped_item_level)
     let twoVtwoRating= threeVthreeRating= tenVtenRating=  soloShuffleSpec1Rating=  soloShuffleSpec2Rating= soloShuffleSpec3Rating=  soloShuffleSpec4Rating = null
   
   try {
@@ -138,11 +137,10 @@ module.exports = {
         token: '', // optional
       }).catch(err => {
         console.log(err) 
-        interaction.editReply({content:"Something went wrong when searching for WoW Character. Please contact staff", ephemeral:true})
+        interaction.editReply({content:"Failed to get character info, continuing", ephemeral:true})
         console.log("region: ", link[1])
         console.log("slug: ", link[2])
         console.log("name: ", link[3])
-        return
       })
       
       const wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory")).catch(err=> { console.log("failed to get character info: ", err)})
@@ -160,7 +158,6 @@ module.exports = {
         defaults:{  status:"Available", 
         userEmail:interaction.fields.getTextInputValue("email"),
         userTag:interaction.user.tag,
-        charIdOnSubmission:wowChar.id,
         clipLink: interaction.fields.getTextInputValue("ytlink")}, 
         order: [['CreatedAt', 'DESC']]})
       
@@ -172,6 +169,7 @@ module.exports = {
         await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer)
         } catch (err) {
           console.log("Failed when responding or creating message for review for NEW user", err)
+          await interaction.editReply({content:`Something went wrong registering new user.`, ephemeral:true})
         }
         let submissionPos = verifiedAccount.dataValues.id
         
@@ -319,8 +317,13 @@ module.exports = {
         userID:interaction.user.id,
         status:"Available",
         userTag:interaction.user.tag,
-        charIdOnSubmission:wowChar.id,
         clipLink: interaction.fields.getTextInputValue("ytlink")
+      })
+
+      await verifiedAccount.update({
+        charIdOnSubmission:wowChar.id
+      }).catch(err => {
+        console.log("No charId found")
       })
       //console.log(verifiedAccount)
       linkingButton = new ActionRowBuilder()
