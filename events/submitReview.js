@@ -128,7 +128,7 @@ function nullOnError(value){
 
 
 
-function forSpread(verifiedAccount, wowChar, submissionPos, arm, name) {
+function forSpread(verifiedAccount, wowChar, submissionPos, arm, name, clipLink) {
   
   if (wowChar == null) {
     return [
@@ -256,7 +256,7 @@ function forSpread(verifiedAccount, wowChar, submissionPos, arm, name) {
       "range": `F${submissionPos}`, // User Clip
       "values": [
         [
-          "Clip link not given yet"
+          clipLink
           //verifiedAccount.dataValues.userEmail
         ]
       ]
@@ -388,7 +388,7 @@ module.exports = {
 
         
         await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
-        await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer, arm, link[3])
+        await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer, arm, link[3], interaction.fields.getTextInputValue("ytlink"))
         } catch (err) {
           console.log("Failed when responding or creating message for review for NEW user", err)
           await interaction.editReply({content:`Something went wrong registering new user.`, ephemeral:true})
@@ -432,7 +432,7 @@ module.exports = {
       
       await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
               //await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
-      await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer, arm, link[3])
+      await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer, arm, link[3], interaction.fields.getTextInputValue("ytlink"))
       let submissionPos = verifiedAccount.dataValues.id
       console.log(submissionPos, "SUBMISSION POS")
       //console.log(forSpread)
