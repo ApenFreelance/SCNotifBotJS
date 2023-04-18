@@ -185,7 +185,7 @@ function forSpread(verifiedAccount, wowChar, submissionPos, arm, name) {
         "range": `F${submissionPos}`, // User Clip
         "values": [
           [
-            "Clip link not given yet"
+            verifiedAccount.dataValues.clipLink
             //verifiedAccount.dataValues.userEmail
           ]
         ]
