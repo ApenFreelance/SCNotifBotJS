@@ -387,9 +387,10 @@ module.exports = {
         try {
 
         
-        await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
         await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer, arm, link[3])
-        } catch (err) {
+        await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
+        
+      } catch (err) {
           console.log("Failed when responding or creating message for review for NEW user", err)
           await interaction.editReply({content:`Something went wrong registering new user.`, ephemeral:true})
         }
