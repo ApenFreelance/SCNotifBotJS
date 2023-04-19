@@ -96,6 +96,7 @@ module.exports = {
               await main(forSpread)
         let newChannel
         try {
+          console.log(interaction.guild.id, reviewHistory.userID, interaction.user.id)
           newChannel = await interaction.guild.channels.create({
             parent:categoryId,
             name:`review-${submissionNumber}`,
@@ -121,7 +122,7 @@ module.exports = {
         })
         } catch(err) {
           console.log(err)
-          await interaction.reply("Failed to create channel")
+          await interaction.reply({content:"Failed to create channel", ephemeral:true})
           return
         }
         
