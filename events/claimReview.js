@@ -94,9 +94,9 @@ module.exports = {
                   }
               ]
               await main(forSpread)
-        
-        await interaction.reply({content:"Submission Claimed", ephemeral:true})
-        const newChannel = await interaction.guild.channels.create({
+        let newChannel
+        try {
+          newChannel = await interaction.guild.channels.create({
             parent:categoryId,
             name:`review-${submissionNumber}`,
             permissionOverwrites: [
@@ -118,8 +118,14 @@ module.exports = {
               },
             ],
             
-        }).catch(err => interaction.editReply({content:err, ephemeral:true}))
+        })
+        } catch(err) {
+          console.log(err)
+          await interaction.reply("Failed to create channel")
+          return
+        }
         
+        await interaction.reply({content:"Submission Claimed", ephemeral:true})
         
         const presetMessage = `<@${interaction.user.id}>\u00A0<@${reviewHistory.dataValues.userID}> Welcome to your VoD review channel.\nYour <@&970784560914788352> will respond with your uploaded review ASAP.\n\nTo close this ticket, react with 🔒`
 
