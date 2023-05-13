@@ -112,9 +112,12 @@ async function getCharacterInfo(region, slug, characterName, wowClient, armoryLi
   }
 
 function isVerifiedByRole(interaction) {
-  return interaction.member.roles.cache.some(role => role.name === '🧨 Skill Capped Member')
+  if(interaction.member.roles.cache.some(role => role.name === '🧨 Skill Capped Member') ||
+  interaction.member.roles.cache.some(role => role.name === '💙Premium Member')){
+    return true
+  }
   //return interaction.member.roles[0] == '🧨 Skill Capped Member'
-  
+  return false
 }
 
 function nullOnError(value){
