@@ -106,7 +106,7 @@ module.exports = {
                     deny: [PermissionsBitField.Flags.ViewChannel],
                 },
                 {
-                    id: reviewHistory.userID, // Ticket owner
+                    id: reviewHistory.dataValues.userID, // Ticket owner
                     allow: [PermissionsBitField.Flags.ViewChannel],
                 },
                 {
@@ -120,13 +120,39 @@ module.exports = {
             ],
             
         })
+        await interaction.reply({content:"Submission Claimed", ephemeral:true})
         } catch(err) {
           console.log(err)
-          await interaction.reply({content:"Failed to create channel", ephemeral:true})
-          return
+          try {
+            newChannel = await interaction.guild.channels.create({
+              parent:categoryId,
+              name:`review-${submissionNumber}`,
+              permissionOverwrites: [
+                  {
+                      id: interaction.guild.id, // everyone in server (not admin)
+                      deny: [PermissionsBitField.Flags.ViewChannel],
+                  },
+                  {
+                      id: "1020404504430133269", // Bot
+                      allow: [PermissionsBitField.Flags.ViewChannel],
+                  },
+                  {
+                    id: interaction.user.id, // One that claimed
+                    allow: [PermissionsBitField.Flags.ViewChannel],
+                },
+              ],
+              
+          })
+          await interaction.reply({content:"Submission Claimed, but user was not added!", ephemeral:true})
+          } catch(err){
+            console.log(err)
+            await interaction.reply({content:"Failed to create channel twice", ephemeral:true})
+            return
+          }
+          
         }
         
-        await interaction.reply({content:"Submission Claimed", ephemeral:true})
+        
         
         const presetMessage = `<@${interaction.user.id}>\u00A0<@${reviewHistory.dataValues.userID}> Welcome to your VoD review channel.\nYour <@&970784560914788352> will respond with your uploaded review ASAP.\n\nTo close this ticket, react with 🔒`
 
