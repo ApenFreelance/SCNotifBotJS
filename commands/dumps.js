@@ -18,8 +18,6 @@ module.exports = {
             .setName('game')
             .setDescription('the game you wish to update')
             .addChoices(
-				{ name: 'wow', value: 'wow' },
-				{ name: 'wrath', value: 'wrath' },
         { name: 'valorant', value: 'valorant'}
 			))
         .addStringOption(option =>
@@ -74,10 +72,7 @@ module.exports = {
       }
       
       if(newDump != null) {
-        if(game == "valorant") {
-          parseDump(newDump, oldDump, "valorant", bot)
-          return
-        }
+          console.log("Command ran for :", game)
           fs.readFile(jsonLocation, "utf-8", function(err, gameData){  
           gameData = JSON.parse(gameData)
           let lastDump = gameData[game].lastDump
@@ -101,6 +96,11 @@ module.exports = {
                   }
                   try {
                     console.log("checking for changes")
+                    if(game == "valorant") {
+                      console.log(newDump)
+                      parseDump(newDump, oldDump, "valorant", bot)
+                      return
+                    }
                     checkForChanges(newDump, oldDump, game, interaction)
                   } catch(err) {
                       console.log(err)
