@@ -1,11 +1,13 @@
-const { default: axios } = require('axios');
+const axios = require('axios')
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, EmbedBuilder } = require('discord.js');
 const fs = require("fs");
 const bot = require('../src/botMain');
 
-
+const { parseDump } = require('../components/functions/valorantDumps');
 
 const jsonLocation = "./gameData.json"
+
+
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -18,6 +20,7 @@ module.exports = {
             .addChoices(
 				{ name: 'wow', value: 'wow' },
 				{ name: 'wrath', value: 'wrath' },
+        { name: 'valorant', value: 'valorant'}
 			))
         .addStringOption(option =>
             option
@@ -71,6 +74,10 @@ module.exports = {
       }
       
       if(newDump != null) {
+        if(game == "valorant") {
+          parseDump(newDump, oldDump, "valorant", bot)
+          return
+        }
           fs.readFile(jsonLocation, "utf-8", function(err, gameData){  
           gameData = JSON.parse(gameData)
           let lastDump = gameData[game].lastDump
@@ -80,7 +87,7 @@ module.exports = {
                   if (err)
                   console.log(err);
                   else {
-                  console.log("File written successfully\n");
+                    console.log("File written successfully\n");
                   
                   
                   }})
@@ -130,24 +137,21 @@ async function checkForChanges(newDumpString, oldDumpString, game, interaction) 
       oldVideos.push(video.title)
     })
 
-
+    
     Object.values(newDump.videos).forEach(vid => {
 
-    
-    
-   
       if(!oldVideos.includes(vid.title)) {
-        
+        //console.log(vid.title)
         updateObject[vid.title] = {"courseTitle": null,"courseuuid":null,"videoTitle":vid.title, "videouuid": vid.uuid,"link":null,"tag": null,"tId": vid.tId}
         for(const video in updateObject) {
-          //console.log(updateObject[video].videouuid, "video")
+            //console.log(updateObject[video].videouuid, "video")
            for(const course in newDump.videosToCourses) {
             
             
             //console.log(newDump.videosToCourses[course].chapters)
       
             if(newDump.videosToCourses[course].chapters[0].vids.find(item => item.uuid == updateObject[video].videouuid) != undefined ) {
-              
+              //console.log(newDumpm.videosToCourses[course])
               updateObject[video].courseTitle = course
             }
   
@@ -184,7 +188,8 @@ async function createEmbed(uploads, game, interaction)  {
     
     let breakdown = {}
     let failed = []
-    fs.readFile("./gameData.json", "utf-8", function(err, data) {
+    fs.readFile(jsonLocation, "utf-8", function(err, data) {
+
       data = JSON.parse(data)
       Object.keys(data[game].roleDict).forEach(tags => {
         breakdown[tags] = []
