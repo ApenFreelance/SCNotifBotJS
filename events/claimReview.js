@@ -115,7 +115,7 @@ module.exports = {
                 },
                 {
                   id: interaction.user.id, // One that claimed
-                  allow: [PermissionsBitField.Flags.ViewChannel],
+                  allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ManageChannels],
               },
             ],
             
