@@ -53,7 +53,8 @@ for (const file of eventFiles) {
 //bot.rest.on("restDebug", console.log)
 
 
-bot.rest.on('rateLimited', console.log)
+bot.rest.on('rateLimited', (data) => {
+    console.log(`[ RATE LIMIT ] ${data}`)})
 
 
 bot.on("ready", async () => {
