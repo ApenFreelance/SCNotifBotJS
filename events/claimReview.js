@@ -143,7 +143,12 @@ module.exports = {
               ],
               
           })
-          await interaction.reply({content:"Submission Claimed, but user was not added!", ephemeral:true})
+          try {
+            await newChannel.permissionOverwrites.edit(reviewHistory.dataValues.userID, { ViewChannel: true });
+          } catch(err) {
+            await interaction.reply({content:"Submission Claimed, but user was not added!", ephemeral:true})
+          }
+          await interaction.reply({content:"Submission Claimed and user was added after failing once!", ephemeral:true})
           } catch(err){
             console.log(err)
             await interaction.reply({content:"Failed to create channel twice", ephemeral:true})
