@@ -80,18 +80,23 @@ async function parseDump(newDumpString, oldDumpString, game, bot){
             if(whatAgent.length > 1 ) {
               console.log("[TOO MANY AGENTS]", video, whatAgent)
               failed[video] = uploads[video]
-              continue;
+              break;
             }
               breakdown[whatAgent[0][1]].push(uploads[video])
               break;
-            case "Maps":
-              breakdown["Maps"].push(uploads[video])
+            case "Mastermind":
+              breakdown["Mastermind"].push(uploads[video])
               break;
             
             default:
               if(video.includes("Radiant Earpiece")) {
                 breakdown["Radiant Earpiece"].push(uploads[video])
-                continue;
+                break;
+              }
+              else if(video.toLowerCase().includes("mastermind")) {
+                breakdown["Mastermind"].push(uploads[video])
+                break;
+                
               }
               breakdown["All Videos"].push(uploads[video])
               break;
