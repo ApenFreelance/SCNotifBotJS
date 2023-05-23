@@ -111,7 +111,7 @@ module.exports = {
                 },
                 {
                     id: "1020404504430133269", // Bot
-                    allow: [PermissionsBitField.Flags.ViewChannel],
+                    allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ManageChannels],
                 },
                 {
                   id: interaction.user.id, // One that claimed
