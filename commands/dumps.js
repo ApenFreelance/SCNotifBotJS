@@ -195,14 +195,15 @@ async function createEmbed(uploads, game, interaction)  {
         breakdown[tags] = []
       })
       for(const video in uploads){
-        Object.keys(data[game].roleDict).forEach(tags => {
+        for(tags of Object.keys(data[game].roleDict)) {
             try {
                 if(uploads[video].tag.includes(tags)) {
                   if(uploads[video].tag.includes("Demon Hunter")){
                     breakdown["Demon Hunter"].push(uploads[video])
-                    return
+                    break;
                   }
                     breakdown[tags].push(uploads[video])
+                    break;
                     
                   }
             } catch(err) {
@@ -213,10 +214,10 @@ async function createEmbed(uploads, game, interaction)  {
 
             }
           
-        })
+        }
   
       }
-        
+    console.log("THESE FAILED: ", failed)
     interaction.editReply({contents:`Will now attempt to post all videos.`, ephemeral:true})
     const forLoop = async _ => {
         console.log("start")
