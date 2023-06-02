@@ -198,6 +198,10 @@ async function createEmbed(uploads, game, interaction)  {
         Object.keys(data[game].roleDict).forEach(tags => {
             try {
                 if(uploads[video].tag.includes(tags)) {
+                  if(uploads[video].tag.includes("Demon Hunter")){
+                    breakdown["Demon Hunter"].push(uploads[video])
+                    return
+                  }
                     breakdown[tags].push(uploads[video])
                     
                   }
