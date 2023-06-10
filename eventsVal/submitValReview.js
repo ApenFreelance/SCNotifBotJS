@@ -6,8 +6,7 @@ const ValReviewHistory = require("../models/ValReviewHistory");
 module.exports = {
     name: 'submitValReview',
     once: false,
-    async execute(interaction, msg) { 
-		console.log(msg)
+    async execute(interaction) { 
     interaction = interaction;
     let trackerInput = interaction.fields.getTextInputValue("tracker");
     let improvement = interaction.fields.getTextInputValue("improvementinput");
@@ -20,9 +19,32 @@ module.exports = {
         userTag:interaction.user.tag,
         clipLink: interaction.fields.getTextInputValue("ytlink")}, 
         order: [['CreatedAt', 'DESC']]});
-    
+		if(created) { // if a new entry is created there is no reason to check the rest
+			try {
+				createValWaitingForReviewMessage(interaction, await getValorantinteraction(link[0].split("#"), interaction), verifiedAccount, improvement, interaction.guildId, trackerInput, link[0].split("#")[0], "1084873371797434438");
+				await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
+			
+		  } catch (err) {
+			  cLog(["Failed when responding or creating message for review for NEW user"], {guild:interaction.guild, subProcess:"Submission"})
+			  await interaction.editReply({content:`Something went wrong registering new user.`, ephemeral:true})
+			}
+			return
+		  }
+		  if((Date.now() - (2629743*1000)) <= verifiedAccount.createdAt) {  // 30 day reduction
+			await interaction.editReply({content:`You can send a new submission in <t:${(verifiedAccount.createdAt/1000) +2629743}:R> ( <t:${(verifiedAccount.createdAt/1000) +2629743}> )`, ephemeral:true})
+			return
+		  }
+		  
+		  // if none of the ones apply, create new entry
+		  verifiedAccount = await ValReviewHistory.create({
+			userEmail:interaction.fields.getTextInputValue("email"),
+			userID:interaction.user.id,
+			status:"Available",
+			userTag:interaction.user.tag,
+			clipLink: interaction.fields.getTextInputValue("ytlink")
+		  })
 	createValWaitingForReviewMessage(interaction, await getValorantinteraction(link[0].split("#"), interaction), verifiedAccount, improvement, interaction.guildId, trackerInput, link[0].split("#")[0], "1084873371797434438");
-	await msg.editReply({content:"Your submission has been created!", ephemeral:true})
+	await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
 }
 }
 
