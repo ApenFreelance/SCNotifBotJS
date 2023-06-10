@@ -6,7 +6,7 @@ const ValReviewHistory = require("../models/ValReviewHistory");
 module.exports = {
     name: 'submitValReview',
     once: false,
-    async execute(interaction) { 
+    async execute(interaction, msg) { 
     interaction = interaction;
     let trackerInput = interaction.fields.getTextInputValue("tracker");
     let improvement = interaction.fields.getTextInputValue("improvementinput");
@@ -21,7 +21,8 @@ module.exports = {
         order: [['CreatedAt', 'DESC']]});
     
 	createValWaitingForReviewMessage(interaction, await getValorantinteraction(link[0].split("#"), interaction), verifiedAccount, improvement, interaction.guildId, trackerInput, link[0].split("#")[0], "1084873371797434438");
-	}
+	await msg.editReply({content:"Your submission has been created!", ephemeral:true})
+}
 }
 
 
