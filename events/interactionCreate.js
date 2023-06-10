@@ -162,12 +162,13 @@ module.exports = {
         if (command) {
             try {
                 await command.execute(interaction);
-               
+               return
                 
             }
             catch (error) {
                 console.error(error);
                 await interaction.reply({ content: `${error}`, ephemeral: true });
+                return
             }
         }
     }
@@ -178,11 +179,11 @@ module.exports = {
       }
 
       if(interaction.customId == "submissionmodal") {
-        await interaction.reply({content:"Processing...", ephemeral:true})
+        let msg = await interaction.reply({content:"Processing...", ephemeral:true})
         const email = interaction.fields.getTextInputValue("email")
         const track = interaction.fields.getTextInputValue("tracker")
         if(regexValFullLink.test(track)) {
-          bot.emit("submitValReview", interaction)
+          bot.emit("submitValReview", interaction, msg)
           
         }
         else {
