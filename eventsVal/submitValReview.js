@@ -7,6 +7,7 @@ module.exports = {
     name: 'submitValReview',
     once: false,
     async execute(interaction, msg) { 
+		console.log(msg)
     interaction = interaction;
     let trackerInput = interaction.fields.getTextInputValue("tracker");
     let improvement = interaction.fields.getTextInputValue("improvementinput");
