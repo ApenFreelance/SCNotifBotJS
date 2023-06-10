@@ -1,6 +1,7 @@
 const { ButtonBuilder, ActionRowBuilder } = require("discord.js");
 const { createReviewButtons } = require("../components/functions/createReviewButtons");
-const ReviewHistory = require("../models/ReviewHistory");
+const ValReviewHistory = require("../models/ValReviewHistory");
+const { cLog } = require("../components/functions/cLog");
 
 
 
@@ -8,11 +9,11 @@ const ReviewHistory = require("../models/ReviewHistory");
 
 
 module.exports = {
-    name: 'closeSubmission',
+    name: 'closeValSubmission',
     once: false,
     async execute(interaction) {   
         const submissionNr = interaction.customId.replace("closesubmission-", "") 
-        console.log(submissionNr, "s")
+        cLog([`Closed review: ${submissionNr}`], {guild:interaction.guild, subProcess:"CloseValReview"})
         
         const lastRow = new ActionRowBuilder()
         .addComponents(
@@ -25,14 +26,14 @@ module.exports = {
                 .setLabel('Delete')
                 .setStyle("Danger"))
 
-        const reviewInDB = await ReviewHistory.findOne({
+        const reviewInDB = await ValReviewHistory.findOne({
             where:{
                 id:submissionNr
             },
             order: [['CreatedAt', 'DESC']]
         })
 
-        await interaction.channel.permissionOverwrites.delete(reviewInDB.dataValues.userID).catch(e => console.log(e)); 
+        await interaction.channel.permissionOverwrites.delete(reviewInDB.dataValues.userID).catch(e => cLog([e.name + " " + e.message], {guild:interaction.guild})); 
         await interaction.reply({content:"Review closed!",components:[lastRow]})
         await interaction.channel.edit({name: `closed-${submissionNr}`})
     
@@ -47,19 +48,19 @@ module.exports = {
         })
         const user = await interaction.guild.members.fetch(reviewInDB.dataValues.userID)
 
-        await user.send({content:"Your review has been completed.\n\n\nHow would you rate this review?", components:createReviewButtons(submissionNr, "")}).catch(err => {
+        await user.send({content:"Your review has been completed.\n\n\nHow would you rate this review?", components:createReviewButtons(submissionNr, "val")}).catch(err => {
             if(err.rawError.message == "Cannot send messages to this user") {
+                cLog(["Cannot send messages to this user", {guild:interaction.guild, subProcess:"Close Review"}])
                 interaction.channel.send(`${interaction.message.embeds[0].author.name} ( review-${submissionNr} ) most likely has their DM's off and could not be reached. Therefor channel has not been deleted.`)
                 return
             }
             else {
+                cLog(["Failed when messaging user", {guild:interaction.guild, subProcess:"Close Review"}])
                 interaction.channel.send(`Unknown error when rejecting ${interaction.message.embeds[0].author.name} ( review-${submissionNr} ), therefor channel has not been deleted.`)
                 return
             }
             
             })
-            
-       
-        // do your stuff
+
     },
 };

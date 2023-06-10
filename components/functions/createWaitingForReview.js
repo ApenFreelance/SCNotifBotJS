@@ -1,8 +1,8 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js")
 const bot = require("../../src/botMain")
 const classes = require("../../classes.json");
+const { cLog } = require("./cLog");
 const noBreakSpace = "\u00A0"
-
 
 
 async function createWaitingForReviewMessage(interaction, charInfo, verifiedAccount, improvementInput, currentGuildId, inputArmory, inputName, channel = "1089997649245126818") {
@@ -79,5 +79,54 @@ async function createWaitingForReviewMessage(interaction, charInfo, verifiedAcco
         await submissionChannel.send({embeds:[waitingForReviewEmbed], components:[waitingForReviewRow]  })
 }
   
+async function createValWaitingForReviewMessage(interaction, charInfo, verifiedAccount, improvementInput, currentGuildId, inputTrack, inputName, channel = "1089997649245126818") {
+  
+  const server = await bot.guilds.fetch(currentGuildId)//.name//.fetch(interaction.user.id)
+  
+  const member = await server.members.fetch(interaction.user.id)
 
-module.exports = { createWaitingForReviewMessage }
+  const submissionChannel = await bot.channels.fetch(channel)
+  let description = null
+  const maxLengt = 60
+  if(charInfo == null) {
+    description = `
+    E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${verifiedAccount.dataValues.userEmail}**
+    Tracker.gg:\u00A0\u00A0\u00A0\u00A0**[${inputName}](${inputTrack})**
+
+    **Failed to get data from API**
+    `
+  } else {
+
+  description = `
+  E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${verifiedAccount.dataValues.userEmail}**
+  Tracker.gg:\u00A0\u00A0\u00A0\u00A0**[${charInfo.accountData.data.data.name}](${inputTrack})**
+  Current Rank:\u00A0**${charInfo.MMRdata.data.data.current_data.currenttierpatched}**
+  All-time Rank:\u00A0**${charInfo.MMRdata.data.data.highest_rank.patched_tier}**
+  Elo:\u00A0\u00A0\u00A0\u00A0**${charInfo.MMRdata.data.data.current_data.elo}**`
+
+  
+}
+
+  description+=`\n\nClip to review: **${verifiedAccount.dataValues.clipLink}**`
+  description+=`\nWhat they want to improve on: **${improvementInput}**`
+  const waitingForReviewEmbed = new EmbedBuilder()
+    .setTitle(`Submission ${verifiedAccount.dataValues.id}`)  
+    .setAuthor({ name: `${interaction.user.tag} ( ${interaction.user.id} )`, iconURL: member.displayAvatarURL(true)})
+    .setDescription(description)
+    //.setThumbnail(charInfo.characterImage)
+    //.setFooter({text:"This submission is unclaimed"})
+
+  const waitingForReviewRow = new ActionRowBuilder()
+    .addComponents(
+      new ButtonBuilder()
+        .setCustomId('claimsubmission')
+        .setLabel('Claim')
+        .setStyle("Success"),
+      new ButtonBuilder()
+        .setCustomId('rejectsubmission')
+        .setLabel('Reject')
+        .setStyle("Danger")
+    );
+      await submissionChannel.send({embeds:[waitingForReviewEmbed], components:[waitingForReviewRow]  })
+}
+module.exports = { createWaitingForReviewMessage, createValWaitingForReviewMessage }

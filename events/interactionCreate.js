@@ -6,9 +6,11 @@ const Sequelize = require('sequelize');
 const SCverifiedAccountDB = require('../models/SCverifiedAccountDB');
 const SCverifV2 = require('../models/SCVerifV2');
 const bot = require('../src/botMain');
-const { main } = require('../components/functions/googleApi');
+//const { main } = require('../components/functions/googleApi');
 const ReviewHistory = require('../models/ReviewHistory');
-
+const ValReviewHistory = require('../models/ValReviewHistory');
+const { cLog } = require('../components/functions/cLog');
+require("dotenv").config({path: '../.env'});
 
 
 const cm = new ModalBuilder()
@@ -50,7 +52,18 @@ const submissionModal = new ModalBuilder()
 
   submissionModal.addComponents(ytRow, submissionRow, emailRow, improvementRow);
 
-async function verifyEmailExists(email, pass) {
+const valSubmissionModal =new ModalBuilder()
+.setCustomId('submissionmodal')
+.setTitle('Submission Modal');
+const trackerInput = new TextInputBuilder()
+      .setCustomId('tracker')    
+      .setLabel("TRACKER.GG LINK:") 
+      .setPlaceholder('https://tracker.gg/valorant/profile/riot/ApenJulius1%23EUW/overview')
+      .setStyle(TextInputStyle.Short);
+      const trackerRow = new ActionRowBuilder().addComponents(trackerInput);
+valSubmissionModal.addComponents(ytRow, trackerRow, emailRow, improvementRow)
+
+  async function verifyEmailExists(email, pass) {
   console.log(email, pass)
   let verifStatus = "Nothing changed"
   console.log("Verifying Email")
@@ -136,7 +149,7 @@ async function giveRoleToUser(interaction) {
 
 
 const regexTemplateFullLink = /(https):\/\/((worldofwarcraft\.blizzard\.com||worldofwarcraft\.com)\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/.+)/
-
+const regexValFullLink = /(https):\/\/(tracker\.gg\/valorant\/profile\/riot)\/.+/
 module.exports = {
     name: 'interactionCreate',
     once: false,
@@ -158,9 +171,66 @@ module.exports = {
             }
         }
     }
-    
-                    
 
+    if(interaction.guildId == process.env.valServerId) {// VAL SERVER ID 
+      if(interaction.customId == "submitreview") {
+        await interaction.showModal(valSubmissionModal);
+      }
+
+      if(interaction.customId == "submissionmodal") {
+        await interaction.reply({content:"Processing...", ephemeral:true})
+        const email = interaction.fields.getTextInputValue("email")
+        const track = interaction.fields.getTextInputValue("tracker")
+        if(regexValFullLink.test(track)) {
+          bot.emit("submitValReview", interaction)
+          
+        }
+        else {
+          await interaction.editReply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
+        }
+      }
+      if(interaction.customId == "claimsubmission") {
+        bot.emit("claimValReview", interaction)
+      }
+      if(interaction.customId == "rejectsubmission") {
+        bot.emit("rejectValReview", interaction)
+      }
+      if(interaction.customId.startsWith("closesubmission-")) {
+        bot.emit("closeValSubmission", interaction)
+      }
+      if(interaction.customId.startsWith("delete-")) {
+        bot.emit("completeValReview", interaction)
+      }
+      if(interaction.customId.startsWith("completesubmission")) {
+          
+        let reviewlink = interaction.fields.getTextInputValue("reviewlink")
+        cLog(["Updated link for " + interaction.customId.replace("completesubmission-", "") + " with modal"], {guild:interaction.guild})
+        const h = await ValReviewHistory.findOne({
+          where: {
+            id:interaction.customId.replace("completesubmission-", "")
+          }
+        })
+        await h.update({
+          reviewLink:reviewlink
+        })
+        await interaction.reply({content:"Updated the review link to "+ reviewlink, ephemeral:true})
+      }
+      return
+    }
+    if(/^valrating\d-\d+/.test(interaction.customId) ) {
+      bot.emit("rateValReview", interaction, "button")
+      return
+    }
+    if(interaction.customId.startsWith("valreviewratingmodal")) {
+      bot.emit("rateValReview", interaction, "modal")
+      return
+    }
+
+
+
+
+
+    // WOW server stuff
         if(interaction.customId == "verificationmodal") {
             const email = interaction.fields.getTextInputValue("email")
             const password = interaction.fields.getTextInputValue("password")
@@ -205,7 +275,7 @@ module.exports = {
           verificationmodal.addComponents(emailVerifRow, passVerifRow);
           await interaction.showModal(verificationmodal);
         }
-      if(interaction.customId == "submissionmodal") {
+        if(interaction.customId == "submissionmodal") {
         await interaction.reply({content:"Processing...", ephemeral:true})
         const email = interaction.fields.getTextInputValue("email")
         const arm = interaction.fields.getTextInputValue("armory")
@@ -219,6 +289,7 @@ module.exports = {
           await interaction.editReply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
         }
       }
+
 
       try {
         if(interaction.customId == "submitreview") {
@@ -275,7 +346,7 @@ module.exports = {
         if(interaction.customId.startsWith("clip-")) {
           bot.emit("mediaCollection", interaction)
         }
-        
+      
 
       } catch (err) {
         if(err.toString().startsWith("TypeError: Cannot read properties of undefined (reading 'startsWith')")) {
@@ -284,9 +355,7 @@ module.exports = {
           await interaction.editReply({content:"Something went wrong, please contact staff", ephemeral:true})
           console.log(err) }
       }
-        
-
-
+    
 
         
     } catch (err) {
