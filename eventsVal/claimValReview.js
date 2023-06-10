@@ -3,7 +3,7 @@ const { createValWaitingForReviewMessage } = require("../components/functions/cr
 
 const ValReviewHistory = require("../models/ValReviewHistory");
 const { cLog } = require("../components/functions/cLog");
-const categoryId = "1085409586997108746"
+const categoryId = "939791605685190686"
 
 
 
@@ -66,7 +66,7 @@ module.exports = {
         
         await interaction.reply({content:"Submission Claimed", ephemeral:true})
         cLog([`Submission ${submissionNumber} claimed`], {subProcess:"ClaimValReview", guild:interaction.guild})
-        const presetMessage = `<@${interaction.user.id}>\u00A0<@${reviewHistory.dataValues.userID}> Welcome to your VoD review channel.\nYour <@&970784560914788352> will respond with your uploaded review ASAP.\n\nTo close this ticket, react with 🔒`
+        const presetMessage = `<@${interaction.user.id}>\u00A0<@${reviewHistory.dataValues.userID}> Welcome to your VoD review channel.\nYour <@&932795289943826483> will respond with your uploaded review ASAP.\n\nTo close this ticket, react with 🔒`
 
 
         await newChannel.send({content:presetMessage,embeds:[interaction.message.embeds[0]], components:[lockRow]})

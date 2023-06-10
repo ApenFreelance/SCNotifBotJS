@@ -47,7 +47,7 @@ module.exports = {
         })
         const user = await interaction.guild.members.fetch(reviewInDB.dataValues.userID)
 
-        await user.send({content:"Your review has been completed.\n\n\nHow would you rate this review?", components:createReviewButtons(submissionNr)}).catch(err => {
+        await user.send({content:"Your review has been completed.\n\n\nHow would you rate this review?", components:createReviewButtons(submissionNr, "")}).catch(err => {
             if(err.rawError.message == "Cannot send messages to this user") {
                 interaction.channel.send(`${interaction.message.embeds[0].author.name} ( review-${submissionNr} ) most likely has their DM's off and could not be reached. Therefor channel has not been deleted.`)
                 return

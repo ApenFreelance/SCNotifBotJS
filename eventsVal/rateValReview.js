@@ -49,8 +49,8 @@ module.exports = {
                 reviewRatingComment:"Given"
                 })
                 const waiti = new EmbedBuilder()
-                .setAuthor({ name: `${interaction.user.tag} ( ${interaction.user.id} ) rated their review: ${history.reviewRating}`, iconURL: interaction.user.displayAvatarURL(true)})
-                .setDescription(`${interaction.fields.fields.get("feedback").value}`)
+                .setAuthor({ name: `${interaction.user.tag} ( ${interaction.user.id} )`, iconURL: interaction.user.displayAvatarURL(true)})
+                .setDescription(`${interaction.user.tag} rated their review: ${history.reviewRating}\n\n${interaction.fields.fields.get("feedback").value}`)
                 //.setThumbnail(charInfo.characterImage)
                 //.setFooter({text:"This submission is unclaimed"})
                 interaction.client.guilds.fetch("1024961321768329246").then(e => e.channels.fetch(c).then(s => s.send({embeds:[waiti]})))

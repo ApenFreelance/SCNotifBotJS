@@ -9,6 +9,8 @@ const WoWCharacters = require("../models/WoWCharacters");
 const characterHistory = require("../models/CharacterHistory");
 const SCverifV2 = require("../models/SCVerifV2");
 const ReviewHistory = require("../models/ReviewHistory");
+const ValReviewHistory = require("../models/ValReviewHistory");
+const { cLog } = require("../components/functions/cLog");
 
 //const logChannelServer = bot.channels.fetch("1024961321768329249").catch(err => console.log(err))
 
@@ -26,7 +28,7 @@ process.on("uncaughtException", error => {
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
-
+const eventValFiles = fs.readdirSync('./eventsVal').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
     const command = require(`../commands/${file}`);
     // Set a new item in the Collection
@@ -45,7 +47,14 @@ for (const file of eventFiles) {
         bot.on(event.name, (...args) => event.execute(...args));
     }
 }
-
+for (const file of eventValFiles) {
+    const event = require(`../eventsVal/${file}`);
+    if (event.once) {
+        bot.once(event.name, (...args) => event.execute(...args));
+    } else {
+        bot.on(event.name, (...args) => event.execute(...args));
+    }
+}
 
 
 
@@ -57,7 +66,8 @@ bot.rest.on('rateLimited', console.log)
 
 
 bot.on("ready", async () => {
-    console.log(`>>>>${bot.user.username} has logged in`)
+    //console.log(`>>>>${bot.user.username} has logged in`)
+    cLog([`${bot.user.username} has logged in`], {subProcess:"Start-up"})
     //SCverifiedAccountDB.init(db)
     //SCverifiedAccountDB.sync(db)
 
@@ -69,6 +79,8 @@ bot.on("ready", async () => {
     ReviewHistory.init(db)
     ReviewHistory.sync(db)
     
+    ValReviewHistory.init(db);
+    ValReviewHistory.sync(db);
     
 
     
