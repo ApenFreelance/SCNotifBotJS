@@ -179,11 +179,12 @@ module.exports = {
       }
 
       if(interaction.customId == "submissionmodal") {
-        let msg = await interaction.reply({content:"Processing...", ephemeral:true})
+        await interaction.reply({content:"Processing...", ephemeral:true})
+        
         const email = interaction.fields.getTextInputValue("email")
         const track = interaction.fields.getTextInputValue("tracker")
         if(regexValFullLink.test(track)) {
-          bot.emit("submitValReview", interaction, msg)
+          bot.emit("submitValReview", interaction)
           
         }
         else {
