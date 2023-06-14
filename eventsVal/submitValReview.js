@@ -21,7 +21,7 @@ module.exports = {
         order: [['CreatedAt', 'DESC']]});
 		if(created) { // if a new entry is created there is no reason to check the rest
 			try {
-				createValWaitingForReviewMessage(interaction, await getValorantinteraction(link[0].split("#"), interaction), verifiedAccount, improvement, interaction.guildId, trackerInput, link[0].split("#")[0], "1084873371797434438");
+				createValWaitingForReviewMessage(interaction, await getValorantinteraction(link[0].split("#"), interaction), verifiedAccount, improvement, interaction.guildId, trackerInput, link[0].split("#")[0], "1118571029963481088");
 				await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
 			
 		  } catch (err) {
@@ -43,7 +43,7 @@ module.exports = {
 			userTag:interaction.user.tag,
 			clipLink: interaction.fields.getTextInputValue("ytlink")
 		  })
-	createValWaitingForReviewMessage(interaction, await getValorantinteraction(link[0].split("#"), interaction), verifiedAccount, improvement, interaction.guildId, trackerInput, link[0].split("#")[0], "1084873371797434438");
+	createValWaitingForReviewMessage(interaction, await getValorantinteraction(link[0].split("#"), interaction), verifiedAccount, improvement, interaction.guildId, trackerInput, link[0].split("#")[0], "1118571029963481088");
 	await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
 }
 }
