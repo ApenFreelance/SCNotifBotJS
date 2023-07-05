@@ -46,7 +46,7 @@ module.exports = {
             })
             
             await history.update({
-                reviewRatingComment:"Given"
+                reviewRatingComment:interaction.fields.fields.get("feedback").value
                 })
                 const waiti = new EmbedBuilder()
                 .setAuthor({ name: `${interaction.user.tag} ( ${interaction.user.id} )`, iconURL: interaction.user.displayAvatarURL(true)})

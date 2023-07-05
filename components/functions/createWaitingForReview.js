@@ -79,8 +79,8 @@ async function createWaitingForReviewMessage(interaction, charInfo, verifiedAcco
         await submissionChannel.send({embeds:[waitingForReviewEmbed], components:[waitingForReviewRow]  })
 }
   
-async function createValWaitingForReviewMessage(interaction, charInfo, verifiedAccount, improvementInput, currentGuildId, inputTrack, inputName, channel = "1089997649245126818") {
-  
+async function createValWaitingForReviewMessage(interaction, charInfo, verifiedAccount, improvementInput, currentGuildId, inputTrack, inputName, channel = "1085409586997108746") {
+
   const server = await bot.guilds.fetch(currentGuildId)//.name//.fetch(interaction.user.id)
   
   const member = await server.members.fetch(interaction.user.id)
