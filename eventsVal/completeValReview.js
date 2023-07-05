@@ -6,7 +6,7 @@ const { createReviewButtons } = require("../components/functions/createReviewBut
 const { checkIfHasReviewLink } = require("../components/functions/checkIfHasReviewLink");
 const { completeSubmissionEmbed } = require("../components/modals/reviewLinkModal");
 const { cLog } = require("../components/functions/cLog");
-const { createTranscript, createHTMLfile, sendTranscript } = require("../components/functions/transcript");
+const { createTranscript, createHTMLfile, sendTranscript, addTranscriptToDB } = require("../components/functions/transcript");
 
 
 
@@ -23,7 +23,6 @@ module.exports = {
           submissionNumber = interaction.channel.name.replace("closed-", "").replace("review-", "")
         } catch(err) {
           console.log(err)
-          
         }
         channel = interaction.guild.channels.cache.find(channel => channel.name == `review-${submissionNumber}`);
 
@@ -57,23 +56,23 @@ module.exports = {
         try {
           await createTranscript(channel, reviewInDB)
           .then(transcript => {
+            addTranscriptToDB(reviewInDB, transcript)
             createHTMLfile(reviewInDB.dataValues, transcript)
             .then(filePath => {
-              sendTranscript(filePath, "1124046482337714256")
-              return filePath
-            }).then(filePath=>{
-              fs.unlink(filePath, (err => {
-                if (err) console.log(err);
-                else{
-                  cLog(["Succesfully deleted: "+ filePath], {guild:interaction.guild, subProcess:"Transcript"})
-                }
-              }))
+              sendTranscript(filePath, "943971066177552455").then(filePath=> {
+                fs.unlink(filePath, (err => {
+                  if (err) console.log(err);
+                  else{
+                    cLog(["Succesfully deleted: "+ filePath], {guild:interaction.guild, subProcess:"Transcript"})
+                  }
+                }))
+            })
             }
             )
           })
         }catch(err) {
             await interaction.reply({content:"Failed to create transcript: `"+ err+"`", ephemeral:true})
-            cLog(["Creating transcript for review: "+submissionNumber, err], {guild:interaction.guild, subProcess:"Transcript", oneLine:false})
+            cLog(["Failed at creating transcript for review: "+submissionNumber, err], {guild:interaction.guild, subProcess:"Transcript", oneLine:false})
             return
           }
         await interaction.reply({content:"Good job", ephemeral:true})

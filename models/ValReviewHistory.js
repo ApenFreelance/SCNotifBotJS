@@ -16,7 +16,9 @@ module.exports = class ValReviewHistory extends Model {
          completedAt: {type: DataTypes.DATE},
          reviewLink: { type: DataTypes.STRING },
          reviewRating: {type:DataTypes.INTEGER},
-         reviewRatingComment: {type: DataTypes.STRING}
+         reviewRatingComment: {type: DataTypes.TEXT},
+         transcript: {type: DataTypes.TEXT},
+         
         }, {
             tableName: "ValReviewHistory",
             updatedAt:false,
