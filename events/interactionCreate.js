@@ -154,6 +154,10 @@ module.exports = {
     name: 'interactionCreate',
     once: false,
     async execute(interaction) {
+      
+      
+
+
       try {
 
       
@@ -175,6 +179,10 @@ module.exports = {
 
     if(interaction.guildId == process.env.valServerId) {// VAL SERVER ID 
       if(interaction.customId == "submitreview") {
+        if (!message.member.roles.cache.some(role => role.name === '💎・Infinity+'|| role.name === '🌸・Server Booster')) {
+          await interaction.reply({content:"You need to be 💎・Infinity+ or 🌸・Server Booster", ephemeral:true})
+          return
+        }
         await interaction.showModal(valSubmissionModal);
       }
 
