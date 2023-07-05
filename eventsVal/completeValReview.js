@@ -37,8 +37,8 @@ module.exports = {
             },
             order: [['CreatedAt', 'DESC']]})
 
-        if(reviewInDB.dataValues.reviewLink == null) {
-          await completeSubmissionEmbed(interaction, reviewInDB.dataValues.id)
+        if(reviewInDB.reviewLink == null) {
+          await completeSubmissionEmbed(interaction, reviewInDB.id)
           return
         }
 
