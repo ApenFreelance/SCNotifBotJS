@@ -90,7 +90,6 @@ async function createValWaitingForReviewMessage(interaction, charInfo, verifiedA
   const maxLengt = 60
   if(charInfo == null) {
     description = `
-    E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${verifiedAccount.dataValues.userEmail}**
     Tracker.gg:\u00A0\u00A0\u00A0\u00A0**[${inputName}](${inputTrack})**
 
     **Failed to get data from API**
@@ -98,7 +97,6 @@ async function createValWaitingForReviewMessage(interaction, charInfo, verifiedA
   } else {
 
   description = `
-  E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${verifiedAccount.dataValues.userEmail}**
   Tracker.gg:\u00A0\u00A0\u00A0\u00A0**[${charInfo.accountData.data.data.name}](${inputTrack})**
   Current Rank:\u00A0**${charInfo.MMRdata.data.data.current_data.currenttierpatched}**
   All-time Rank:\u00A0**${charInfo.MMRdata.data.data.highest_rank.patched_tier}**
