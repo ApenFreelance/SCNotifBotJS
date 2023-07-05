@@ -22,7 +22,7 @@ function createValRatingModal(submissionNumber, ratingNumber) {
 }
 
 
-const c = "1084873371797434438"
+const c = "1125965279491543081"
 
 
 
@@ -53,7 +53,7 @@ module.exports = {
                 .setDescription(`${interaction.user.tag} rated their review: ${history.reviewRating}\n\n${interaction.fields.fields.get("feedback").value}`)
                 //.setThumbnail(charInfo.characterImage)
                 //.setFooter({text:"This submission is unclaimed"})
-                interaction.client.guilds.fetch("1024961321768329246").then(e => e.channels.fetch(c).then(s => s.send({embeds:[waiti]})))
+                interaction.client.guilds.fetch("855206452771684382").then(e => e.channels.fetch(c).then(s => s.send({embeds:[waiti]})))
             await interaction.reply(`Set comment to\n\n\`\`\`\n ${interaction.fields.fields.get("feedback").value}\n\`\`\``)
             cLog(["Text review given for: " + submissionNumber], {subProcess:"ReviewValRating"})
 
