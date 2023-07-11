@@ -4,6 +4,7 @@ const fs = require("fs");
 const bot = require('../src/botMain');
 
 const { parseDump } = require('../components/functions/valorantDumps');
+const { cLog } = require('../components/functions/cLog');
 
 const jsonLocation = "./gameData.json"
 
@@ -72,7 +73,7 @@ module.exports = {
       }
       
       if(newDump != null) {
-          console.log("Command ran for :", game)
+          cLog(["Command ran for :" + game], {guild:interaction.guildId, subProcess:"Dumps"})
           fs.readFile(jsonLocation, "utf-8", function(err, gameData){  
           gameData = JSON.parse(gameData)
           let lastDump = gameData[game].lastDump
@@ -80,24 +81,25 @@ module.exports = {
               try {
               fs.writeFile(jsonLocation, JSON.stringify(gameData, null, 2), (err) => {
                   if (err)
-                  console.log(err);
+                    cLog(["ERROR :" + err], {guild:interaction.guildId, subProcess:"Dumps"})
                   else {
-                    console.log("File written successfully\n");
-                  
-                  
+                    cLog(["Succesfully wrote file"], {guild:interaction.guildId, subProcess:"Dumps"})
+
                   }})
                   try{
-                  console.log("trying to set dump")
+                    cLog(["Trying to set dump"], {guild:interaction.guildId, subProcess:"Dumps"})
                   if(oldDump == null) { 
                       oldDump = lastDump
-                      console.log("No oldDump provided, using stored")}
+                      cLog(["No oldDump provided, using stored"], {guild:interaction.guildId, subProcess:"Dumps"})
+
+                    }
                   } catch (err) {
-                  console.log(err)
+                    cLog(["ERROR :" + err], {guild:interaction.guildId, subProcess:"Dumps"})
+                  
                   }
                   try {
                     console.log("checking for changes")
                     if(game == "valorant") {
-                      console.log(newDump)
                       parseDump(newDump, oldDump, "valorant", bot)
                       return
                     }
@@ -109,18 +111,11 @@ module.exports = {
               catch (err) {
               console.log(err)
               }
-          })
-          
-          
-             
-              
-            }
-  
-          
-          
-          
+          }) 
+        }   
       } catch (err){
-      console.log("failed somewhere: \n", err, "\n\n")
+      cLog(["Failed somewhere: \n"+ err+ "\n\n"], {guild:interaction.guildId, subProcess:"Dumps"})
+
     }}
 };
 
@@ -132,7 +127,8 @@ async function checkForChanges(newDumpString, oldDumpString, game, interaction) 
   
     let updateObject = {}
     let oldVideos = []
-    console.log("Sorting old videos")
+    cLog(["Sorting old videos"], {guild:interaction.guildId, subProcess:"Dumps"})
+
     Object.values(oldDump.videos).forEach(video =>{
       oldVideos.push(video.title)
     })
@@ -163,7 +159,7 @@ async function checkForChanges(newDumpString, oldDumpString, game, interaction) 
   
             updateObject[video].courseuuid = newDump.courses.find(item => item.title == updateObject[video].courseTitle).uuid
             if(newDump.courses.find(item => item.title == updateObject[video].courseTitle).tags[0] == null) {
-                console.log("tag was null from dump")
+                cLog(["Tag was null from dumps. Default 'All Classes'"], {guild:interaction.guildId, subProcess:"Dumps"})
                 updateObject[video].tag = "All Classes"
             } else {
             updateObject[video].tag = newDump.courses.find(item => item.title == updateObject[video].courseTitle).tags[0]
@@ -217,24 +213,23 @@ async function createEmbed(uploads, game, interaction)  {
         }
   
       }
-    console.log("THESE FAILED: ", failed)
+    cLog(["THESE FAILED: " + failed], {guild:interaction.guildId, subProcess:"Dumps"})
+
     interaction.editReply({contents:`Will now attempt to post all videos.`, ephemeral:true})
     const forLoop = async _ => {
-        console.log("start")
-        
-        
         for(const tag in breakdown) {
-            console.log(breakdown[tag].length, tag)
+
             if(breakdown[tag].length == 0) {
-                console.log("No videos uploaded for: ", tag)
+                cLog(["No videos uploaded for: " + tag], {guild:interaction.guildId, subProcess:"Dumps"})
                 continue
             }
+            cLog([breakdown[tag].length + " " + tag], {guild:interaction.guildId, subProcess:"Dumps"})
+
             //console.log(data[game].logChannelID.toString())
             let videoChannel = await bot.channels.fetch(data[game].roleDict[tag].channelid.toString()).catch(err => {
                 if(err.toString().startsWith("DiscordAPIError[10003]: Unknown Channel")){
-                    console.log(err)
-                    console.log("erred")
-                    //interaction.editReply({contents:`This channel does not exist in this server: ${tag} ( Set to: ${data[game].roleDict[tag].channelid.toString()})`, ephemeral:true})
+                  cLog([err], {guild:interaction.guildId, subProcess:"Dumps"})                    
+                   //interaction.editReply({contents:`This channel does not exist in this server: ${tag} ( Set to: ${data[game].roleDict[tag].channelid.toString()})`, ephemeral:true})
                     return
                 }
             })
@@ -262,10 +257,13 @@ async function createEmbed(uploads, game, interaction)  {
         
       }}
       forLoop()
-      console.log("done")
+      .then(() => {
+        cLog(["COMPLETED"], {guild:interaction.guildId, subProcess:"Dumps"})
+        interaction.editReply({contents:`Dump upload completed`, ephemeral:true})
+      })
      
     })
-    await interaction.editReply({contents:`Dump upload completed`, ephemeral:true}).catch(err => console.log(err))
+    //await interaction.editReply({contents:`Dump upload completed`, ephemeral:true}).catch(err => console.log(err))
     
   }
 
