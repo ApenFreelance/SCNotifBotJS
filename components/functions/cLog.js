@@ -27,7 +27,7 @@ function cLog(args=[], {guild= "System", oneLine= true, spacings=0, subProcess=n
     
 
     if(oneLine == true){
-        console.log(`[ ${game} ]${subProcess} ${args} ${"\n".repeat(spacings)}`);
+        console.log(`[ ${game} ]${subProcess} ${args.join(" ")} ${"\n".repeat(spacings)}`);
         return;
     } else {
         for(let i = 0; i < args.length; i++){
