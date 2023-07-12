@@ -63,7 +63,7 @@ for (const file of eventValFiles) {
 
 
 bot.rest.on('rateLimited', (data) => {
-    console.log(`[ RATE LIMIT ] ${data}`)})
+    console.log(`[ RATE LIMIT ]`)})
 
 
 bot.on("ready", async () => {
