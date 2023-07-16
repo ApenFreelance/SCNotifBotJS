@@ -1,5 +1,5 @@
 const colors = require('colors');
-const colorCodes = require("../../colorCodes.json")
+
 function cLog(args=[], {guild= "System", oneLine= true, spacings=0, subProcess=null}={}){
     let game
     if(guild == "System") {
