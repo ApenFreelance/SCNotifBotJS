@@ -20,8 +20,11 @@ async function getCorrectTable(guildId, tableGroup) {
             if(guildId === process.env.ValServerId) {
                 return ValReviewHistory
             }
-            if (guildId === process.env.WoWServerId) {
+            else if (guildId === process.env.WoWServerId) {
                 return ReviewHistory
+            }
+            else if(guildId === process.env.DevServerId) {
+                return ValReviewHistory
             }
         } catch(err) {
             cLog(["ERROR ", err], {guild:guildId, subProcess:"getCorrectTable"})

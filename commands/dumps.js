@@ -206,19 +206,13 @@ async function createEmbed(uploads, game, interaction)  {
                 console.log(err)
                 console.log(uploads[video])
                 failed.push(uploads[video])
-                
-
             }
-          
         }
-  
       }
     cLog(["THESE FAILED: " + failed], {guild:interaction.guildId, subProcess:"Dumps"})
-
     interaction.editReply({contents:`Will now attempt to post all videos.`, ephemeral:true})
     const forLoop = async _ => {
         for(const tag in breakdown) {
-
             if(breakdown[tag].length == 0) {
                 cLog(["No videos uploaded for: " + tag], {guild:interaction.guildId, subProcess:"Dumps"})
                 continue
