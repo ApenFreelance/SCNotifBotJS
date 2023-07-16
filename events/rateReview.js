@@ -42,7 +42,7 @@ module.exports = {
                 }
             })
             await history.update({
-                reviewRatingComment:"Given"
+                reviewRatingComment:interaction.fields.fields.get("feedback").value
                 })
             let submissionPos = history.dataValues.id
             const forSpread = [
