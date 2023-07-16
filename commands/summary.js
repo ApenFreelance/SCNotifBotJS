@@ -5,15 +5,6 @@ const { Op } = require('sequelize');
 
 
 
-const row = new ActionRowBuilder()
-			.addComponents(
-				new ButtonBuilder()
-					.setCustomId('submitreview')
-					.setLabel('Submit review')
-					.setStyle("Success"),
-			);
-
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('summary')
