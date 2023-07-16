@@ -1,7 +1,6 @@
 const { google } = require("googleapis");
 const {GoogleAuth} = require('google-auth-library');
 async function main(data) {
-  console.log("updating spreadsheet")
   const auth = new GoogleAuth({
     keyFile: "credentials.json", //the key file
 
@@ -69,7 +68,7 @@ async function batchUpdate(spreadsheetId, title, find, replacement) {
       console.log(`${findReplaceResponse.occurrencesChanged} replacements made.`);
       return response;
     } catch (err) {
-      // TODO (developer) - Handle exception
+      
       throw err;
     }
   }
