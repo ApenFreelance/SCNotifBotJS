@@ -69,7 +69,7 @@ async function getValorantinteraction(player, interaction, reviewInDB) {
 		cLog([MMRdata.data.errors[0].message], {guild:interaction.guild, subProcess:"MMRdata"});
 		return null
 	}
-	console.log(interaction.guildId, "e")
+
 	await updatePlayerStats(reviewInDB, {guild:interaction.guildId, MMRdata})
 	return {accountData, MMRdata}
 }

@@ -96,7 +96,7 @@ module.exports = {
               await main(forSpread)
         let newChannel
         try {
-          console.log(interaction.guild.id, reviewHistory.userID, interaction.user.id)
+          
           newChannel = await interaction.guild.channels.create({
             parent:categoryId,
             name:`review-${submissionNumber}`,
