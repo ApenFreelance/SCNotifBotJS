@@ -206,7 +206,7 @@ module.exports = {
         bot.emit("rejectValReview", interaction)
       }
       if(interaction.customId.startsWith("closesubmission-")) {
-        bot.emit("closeValSubmission", interaction)
+        bot.emit("closeSubmission", interaction)
       }
       if(interaction.customId.startsWith("delete-")) {
         bot.emit("completeValReview", interaction)
@@ -214,7 +214,7 @@ module.exports = {
       if(interaction.customId.startsWith("completesubmission")) {
           
         let reviewlink = interaction.fields.getTextInputValue("reviewlink")
-        cLog(["Updated link for " + interaction.customId.replace("completesubmission-", "") + " with modal"], {guild:interaction.guild})
+        cLog(["Review nr: ",interaction.customId.replace("completesubmission-", "")], {guild:interaction.guild, subProcess:"setReviewLink"})
         const h = await ValReviewHistory.findOne({
           where: {
             id:interaction.customId.replace("completesubmission-", "")
