@@ -1,4 +1,5 @@
 
+const { cLog } = require("../components/functions/cLog");
 const ValReviewHistory = require("../models/ValReviewHistory");
 
 module.exports = {
@@ -30,5 +31,7 @@ module.exports = {
         
         //await interaction.message.reply({content:`Rejected ${interaction.message.embeds[0].author.name}`, ephemeral:true})
         await interaction.message.delete()
+        cLog(["Successfully deleted submission"], {guild:interaction.guildId, subProcess:"Reject Submission"})
+
     },
 };

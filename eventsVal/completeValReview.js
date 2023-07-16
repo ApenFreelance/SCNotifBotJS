@@ -2,8 +2,6 @@ const { ActionRowBuilder, ButtonBuilder, TextInputStyle, ModalBuilder, TextInput
 
 const ValReviewHistory = require("../models/ValReviewHistory");
 const fs = require("fs")
-const { createReviewButtons } = require("../components/functions/createReviewButtons");
-const { checkIfHasReviewLink } = require("../components/functions/checkIfHasReviewLink");
 const { completeSubmissionEmbed } = require("../components/modals/reviewLinkModal");
 const { cLog } = require("../components/functions/cLog");
 const { createTranscript, createHTMLfile, sendTranscript, addTranscriptToDB } = require("../components/functions/transcript");
@@ -42,24 +40,19 @@ module.exports = {
           return
         }
 
-
         await reviewInDB.update({
             status:"Completed",
             completedBy:interaction.user.id,
             completedAt: Date.now()
         })
         
-       
-        //await interaction.user.send(`Name your clip \`${reviewInDB.dataValues.id}\`, then send it to : https://link`)
-        
-        //await interaction.message.reply({content:`Completed ${interaction.message.embeds[0].author.name}`})
         try {
           await createTranscript(channel, reviewInDB)
           .then(transcript => {
             addTranscriptToDB(reviewInDB, transcript)
             createHTMLfile(reviewInDB.dataValues, transcript)
             .then(filePath => {
-              sendTranscript(filePath, "943971066177552455").then(filePath=> {
+              sendTranscript(filePath, "1084873371797434438").then(filePath=> {
                 fs.unlink(filePath, (err => {
                   if (err) console.log(err);
                   else{

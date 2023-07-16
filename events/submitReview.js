@@ -11,7 +11,7 @@ const bot = require('../src/botMain');
 const classes = require("../classes.json");
 const { data } = require('../commands/dumps');
 const wowServer = "294958471953252353"
-const { createWaitingForReviewMessage } = require("../components/functions/createWaitingForReview.js");
+const { createWaitingForReviewMessage } = require("../components/actionRowComponents/createWaitingForReview.js");
 const accessToken = process.env.accessToken
 const regexTemplateFullLink = "/(https):\/\/(worldofwarcraft\.blizzard\.com\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/[\w_-]+)/"
 
@@ -339,13 +339,11 @@ module.exports = {
   async execute(interaction) { 
     try {
       let wowChar = null
-      
       interaction = interaction 
       let arm = interaction.fields.getTextInputValue("armory")
       let improvement = interaction.fields.getTextInputValue("improvementinput")
 
       let link = decodeURI(arm).replace("https://worldofwarcraft.com/", "").replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
-      //let link = interaction.fields.fields.armory.value.replace("https://worldofwarcraft.blizzard.com/", "").replace("/character/", "/").split("/")
       
       const wowClient = await blizzard.wow.createInstance({
         key: process.env.BCID,
