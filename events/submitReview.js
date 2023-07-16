@@ -1,33 +1,23 @@
 const {main } = require("../components/functions/googleApi.js")
 const blizzard = require('blizzard.js')
-const util = require('util')
-const axios = require('axios');
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const ReviewHistory = require('../models/ReviewHistory');
-const noBreakSpace = "\u00A0"
-const SCverifiedAccountDB = require('../models/SCverifiedAccountDB');
 const WoWCharacters = require('../models/WoWCharacters');
 const bot = require('../src/botMain');
 const classes = require("../classes.json");
-const { data } = require('../commands/dumps');
-const wowServer = "294958471953252353"
+require("dotenv").config()
 const { createWaitingForReviewMessage } = require("../components/actionRowComponents/createWaitingForReview.js");
+const { cLog } = require("../components/functions/cLog.js");
 const accessToken = process.env.accessToken
-const regexTemplateFullLink = "/(https):\/\/(worldofwarcraft\.blizzard\.com\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/[\w_-]+)/"
-
-const linkTemplate = "https://worldofwarcraft.blizzard.com/{lang}/character/{region}/{slug}/{char}/"
 
 const testLink = "https://worldofwarcraft.blizzard.com/en-gb/character/eu/tarren-mill/blizo/pve/raids"
 
 
-async function getCharacterInfo(region, slug, characterName, wowClient, armoryLink) {
+async function getCharacterInfo(region, slug, characterName, wowClient, armoryLink, guildId) {
     const Cprofile = await wowClient.characterProfile({ realm: slug, name: characterName })
-    //console.log(Cprofile.data)
-
-    console.log(`Cprofile: ${Cprofile.status}. [ ${Cprofile.statusText} ]`)
+  cLog([`Cprofile: ${Cprofile.status}. [ ${Cprofile.statusText} ]`], {guild:guildId, subProcess:"WoWChar"})
     const Cpvp = await wowClient.characterPVP({ realm: slug, name: characterName})
-    console.log(`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`)
-    //const media = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/character-media?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
+  cLog([`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`], {guild:guildId, subProcess:"WoWChar"})
     let twoVtwoRating= threeVthreeRating= tenVtenRating=  soloShuffleSpec1Rating=  soloShuffleSpec2Rating= soloShuffleSpec3Rating=  soloShuffleSpec4Rating = null
   
   try {
@@ -119,17 +109,6 @@ function isVerifiedByRole(interaction) {
   //return interaction.member.roles[0] == '🧨 Skill Capped Member'
   return false
 }
-
-function nullOnError(value){
-  try {
-    value
-  } catch(err) {
-    return null
-  }
-  return value
-}
-
-
 
 function forSpread(verifiedAccount, wowChar, submissionPos, arm, name) {
   
@@ -352,14 +331,14 @@ module.exports = {
         locale: 'en_US', // optional
         token: '', // optional
       }).catch(err => {
-        console.log(err) 
+        cLog([err], {guild:interaction.guild, subProcess:"CreateWoWInstance"})
         interaction.editReply({content:"Failed to get character info, continuing", ephemeral:true})
         console.log("region: ", link[1])
         console.log("slug: ", link[2])
         console.log("name: ", link[3])
       })
       try {
-        wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory"))
+        wowChar = await getCharacterInfo(link[1], link[2], link[3],  wowClient, interaction.fields.getTextInputValue("armory"), interaction.guild.id)
       }catch(err){
         if(!err.response.status == 404){
           console.log("failed to get character info: ", err)
@@ -367,9 +346,7 @@ module.exports = {
         wowChar = null
         console.log("Failed to get char, because char doesnt exist or couldnt be found")
       }
-      
-      //console.log(wowChar, "wow")
-      //await getCharacterInfo(link[1], link[2], link[3], "warrior", interaction)
+
       if(!isVerifiedByRole(interaction)) {
         await interaction.editReply({content:"Please make sure you have been verified.", ephemeral:true})
         return
@@ -388,7 +365,7 @@ module.exports = {
         try {
 
         
-        await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer, arm, link[3])
+        await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, process.env.WoWserverId, arm, link[3])
         await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
         
       } catch (err) {
@@ -434,10 +411,9 @@ module.exports = {
       
       
               //await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
-      await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, wowServer, arm, link[3])
+      await createWaitingForReviewMessage(interaction, wowChar, verifiedAccount, improvement, process.env.WoWserverId, arm, link[3])
       let submissionPos = verifiedAccount.dataValues.id
-      console.log(submissionPos, "SUBMISSION POS")
-      //console.log(forSpread)
+
       await main(forSpread(verifiedAccount, wowChar, submissionPos, arm, link[3]))
       await interaction.editReply({content:`Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`, ephemeral:true})
         // do your stuff
@@ -448,10 +424,6 @@ module.exports = {
 
 }
 };
-
-
-const statuses = ["Reviewed", "Available", "Rejected", "Broken", "Claimed"]
-
 
 
 
