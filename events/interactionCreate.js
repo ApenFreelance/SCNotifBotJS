@@ -68,20 +68,13 @@ module.exports = {
     name: 'interactionCreate',
     once: false,
     async execute(interaction) {
-      
-      
-
-
       try {
-
-      
       if (interaction.isCommand()) {
         const command = interaction.client.commands.get(interaction.commandName);
         if (command) {
             try {
                 await command.execute(interaction);
                return
-                
             }
             catch (error) {
                 console.error(error);
@@ -99,7 +92,6 @@ module.exports = {
         }
         await interaction.showModal(valSubmissionModal);
       }
-
       if(interaction.customId == "submissionmodal") {
         await interaction.reply({content:"Processing...", ephemeral:true})
         
@@ -107,7 +99,6 @@ module.exports = {
         const track = interaction.fields.getTextInputValue("tracker")
         if(regexValFullLink.test(track)) {
           bot.emit("submitValReview", interaction)
-          
         }
         else {
           await interaction.editReply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
@@ -126,7 +117,6 @@ module.exports = {
         bot.emit("completeValReview", interaction)
       }
       if(interaction.customId.startsWith("completesubmission")) {
-          
         let reviewlink = interaction.fields.getTextInputValue("reviewlink")
         cLog(["Review nr: ",interaction.customId.replace("completesubmission-", "")], {guild:interaction.guild, subProcess:"setReviewLink"})
         const h = await ValReviewHistory.findOne({
@@ -149,11 +139,6 @@ module.exports = {
       bot.emit("rateValReview", interaction, "modal")
       return
     }
-
-
-
-
-
     // WOW server stuff
         if(interaction.customId == "submissionmodal") {
         await interaction.reply({content:"Processing...", ephemeral:true})
