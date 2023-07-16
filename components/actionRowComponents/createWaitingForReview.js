@@ -1,7 +1,7 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js")
 const bot = require("../../src/botMain")
 const classes = require("../../classes.json");
-const { cLog } = require("./cLog");
+const { cLog } = require("../functions/cLog");
 const noBreakSpace = "\u00A0"
 
 
@@ -77,15 +77,14 @@ async function createWaitingForReviewMessage(interaction, charInfo, verifiedAcco
           .setStyle("Danger")
       );
         await submissionChannel.send({embeds:[waitingForReviewEmbed], components:[waitingForReviewRow]  })
+        cLog(["Successfully sent submission"], {guild:currentGuildId, subProcess:"CreateWaitingForReview"})
 }
   
 async function createValWaitingForReviewMessage(interaction, charInfo, verifiedAccount, improvementInput, currentGuildId, inputTrack, inputName, channel = "1085409586997108746") {
 
   const server = await bot.guilds.fetch(currentGuildId)//.name//.fetch(interaction.user.id)
-  
   const member = await server.members.fetch(interaction.user.id)
-
-  const submissionChannel = await bot.channels.fetch(channel)
+  const submissionChannel = await bot.channels.fetch("1084873371797434438")
   let description = null
   const maxLengt = 60
   if(charInfo == null) {
@@ -126,5 +125,6 @@ async function createValWaitingForReviewMessage(interaction, charInfo, verifiedA
         .setStyle("Danger")
     );
       await submissionChannel.send({embeds:[waitingForReviewEmbed], components:[waitingForReviewRow]  })
+      cLog(["Successfully sent submission"], {guild:currentGuildId, subProcess:"CreateWaitingForReview"})
 }
 module.exports = { createWaitingForReviewMessage, createValWaitingForReviewMessage }

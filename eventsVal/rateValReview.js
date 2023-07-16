@@ -49,13 +49,13 @@ module.exports = {
                 reviewRatingComment:interaction.fields.fields.get("feedback").value
                 })
                 const waiti = new EmbedBuilder()
-                .setAuthor({ name: `${interaction.user.tag} ( ${interaction.user.id} )`, iconURL: interaction.user.displayAvatarURL(true)})
+                .setAuthor({ name: `${interaction.user.username} ( ${interaction.user.id} )`, iconURL: interaction.user.displayAvatarURL(true)})
                 .setDescription(`${interaction.user.tag} rated their review: ${history.reviewRating}\n\n${interaction.fields.fields.get("feedback").value}`)
                 //.setThumbnail(charInfo.characterImage)
                 //.setFooter({text:"This submission is unclaimed"})
                 interaction.client.guilds.fetch("855206452771684382").then(e => e.channels.fetch(c).then(s => s.send({embeds:[waiti]})))
             await interaction.reply(`Set comment to\n\n\`\`\`\n ${interaction.fields.fields.get("feedback").value}\n\`\`\``)
-            cLog(["Text review given for: " + submissionNumber], {subProcess:"ReviewValRating"})
+            cLog(["Text review given for review nr: " + submissionNumber], {subProcess:"ReviewValRating"})
 
         }
         if(type == "button") {
@@ -72,7 +72,6 @@ module.exports = {
             })
             await history.update({
                 reviewRating:parseInt(ratingNumber)
-                
             })
             
             await interaction.showModal(createValRatingModal(submissionNumber, ratingNumber))

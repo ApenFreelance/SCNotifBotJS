@@ -20,7 +20,7 @@ module.exports = class ValReviewHistory extends Model {
          transcript: {type: DataTypes.TEXT},
          
         }, {
-            tableName: "ValReviewHistory",
+            tableName: "DevReviewHistory",
             updatedAt:false,
             createdAt:true,
             sequelize

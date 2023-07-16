@@ -1,5 +1,5 @@
 const { EmbedBuilder, ButtonBuilder, PermissionsBitField, ActionRowBuilder } = require("discord.js");
-const { createWaitingForReviewMessage } = require("../components/functions/createWaitingForReview");
+const { createWaitingForReviewMessage } = require("../components/actionRowComponents/createWaitingForReview");
 const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
 const categoryId = "1089996542087278682"
@@ -96,7 +96,7 @@ module.exports = {
               await main(forSpread)
         let newChannel
         try {
-          console.log(interaction.guild.id, reviewHistory.userID, interaction.user.id)
+          
           newChannel = await interaction.guild.channels.create({
             parent:categoryId,
             name:`review-${submissionNumber}`,

@@ -268,7 +268,7 @@ const wowClient = blizzard.wow.createInstance({
   token: '', // optional
 })
 
-parseDump("https://lol-content-dumps.s3.amazonaws.com/courses_v2/valorant/course_dump_1684120339425.json", "https://lol-content-dumps.s3.amazonaws.com/courses_v2/valorant/course_dump_1682641484587.json", "valorant")
+//parseDump("https://lol-content-dumps.s3.amazonaws.com/courses_v2/valorant/course_dump_1684120339425.json", "https://lol-content-dumps.s3.amazonaws.com/courses_v2/valorant/course_dump_1682641484587.json", "valorant")
 async function parseDump(newDumpString, oldDumpString, game){
   let newDump = await axios.get(newDumpString)
   let oldDump = await axios.get(oldDumpString)
@@ -427,3 +427,29 @@ async function parseDump(newDumpString, oldDumpString, game){
     //await interaction.editReply({contents:`Dump upload completed`, ephemeral:true}).catch(err => console.log(err))
     
   }
+
+
+
+function loopTest() {
+  let uploads = {"Hunter":[], "Demon Hunter":[], "Warrior":[], "Spice":[]}
+  let tagger = ["Hunter", "Demon Hunter", "Warrior"]
+  let breakdown= {"Hunter":[], "Demon Hunter":[], "Warrior":[], "Spice":[]}
+  for(video in uploads){
+    let i = 0
+    for(let tags of tagger) {
+      i++
+       console.log(video, "video", tags, "tags", i)
+       if(video == tags){
+        console.log("MaTch", video, tags)
+        
+        break
+       }
+      
+    }
+
+  }
+  console.log(breakdown)
+}
+
+
+loopTest()

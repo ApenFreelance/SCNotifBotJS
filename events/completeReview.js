@@ -1,9 +1,6 @@
 const { ActionRowBuilder, ButtonBuilder, TextInputStyle, ModalBuilder, TextInputBuilder } = require("discord.js");
 const { main } = require("../components/functions/googleApi");
 const ReviewHistory = require("../models/ReviewHistory");
-
-const { createReviewButtons } = require("../components/functions/createReviewButtons");
-const { checkIfHasReviewLink } = require("../components/functions/checkIfHasReviewLink");
 const { completeSubmissionEmbed } = require("../components/modals/reviewLinkModal");
 
 
@@ -14,8 +11,6 @@ module.exports = {
     once: false,
     async execute(interaction) { 
       let channel = null
-        //const embedAuthor = interaction.message.embeds[0].author.name.match(/\d{18}/)
-        //const user = await interaction.guild.members.fetch(embedAuthor[0])
         let submissionNumber
         try {
           submissionNumber = interaction.channel.name.replace("closed-", "").replace("review-", "")
@@ -35,10 +30,7 @@ module.exports = {
             console.log(err, "failed. crit")
           }
         }
-        
-        
-        
-        //console.log(ticketChannel, `review-${submissionNumber}`)
+
         const reviewInDB = await ReviewHistory.findOne({
             where:{
                 id:submissionNumber
@@ -84,14 +76,9 @@ module.exports = {
           }
         ]
         await main(forSpread)
-        //await interaction.user.send(`Name your clip \`${reviewInDB.dataValues.id}\`, then send it to : https://link`)
-        
-        //await interaction.message.reply({content:`Completed ${interaction.message.embeds[0].author.name}`})
         
         await interaction.reply({content:"Good job", ephemeral:true})
         await interaction.channel.delete()
-        //console.log(await interaction.message.embeds[0].author.name.match(/\d{18}/))
-        
-        // do your stuff
+
     },
 };

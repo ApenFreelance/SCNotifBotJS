@@ -1,4 +1,4 @@
-const ReviewHistory = require("../../models/ReviewHistory");
+const ReviewHistory = require("../../../models/ReviewHistory");
 
 async function checkIfHasReviewLink(submissionNumber) {
     const history = await ReviewHistory.findOne({

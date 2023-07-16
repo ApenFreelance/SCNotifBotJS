@@ -1,0 +1,72 @@
+{
+  "wow": {
+    "lastDump": "new",
+    "originLink": "https://www.skill-capped.com/wow/browse3/course/nhlwzygv10/vdnsyrngr8",
+    "findLink": "https://lol-content-dumps.s3.amazonaws.com/courses_v2/wow/course_dump_[0-9]+.json",
+    "logChannelID": "1026809307066535966",
+    "roleDict": {
+      "All Classes": {
+        "id": "1042505315326898236",
+        "channelid": "1042502515293438053",
+        "img": "https://media.discordapp.net/attachments/991013102688555069/994302850580631622/unknown.png"
+      }
+    }
+  },
+  "wrath": {
+    "lastDump": "https://lol-content-dumps.s3.amazonaws.com/courses_v2/wow/course_dump_1674624635709.json",
+    "originLink": "https://www.skill-capped.com/wrath/browse3/course/t1j8zhsx8c/tzvytv5bnj",
+    "findLink": "https://lol-content-dumps.s3.amazonaws.com/courses_v2/wrath/course_dump_[0-9]+.json",
+    "logChannelID": "1025384994077679616",
+    "roleDict": {
+      "All Classes": {
+        "id": "995049041429790730",
+        "channelid": "1041517370025455746",
+        "img": "https://media.discordapp.net/attachments/991013102688555069/994302850580631622/unknown.png"
+      }
+    }
+  },
+  "valorant": {
+    "lastDump": "https://lol-content-dumps.s3.amazonaws.com/courses_v2/valorant/course_dump_1684120339425.json",
+    "findLink": "",
+    "logChannelID": "",
+    "roleDict": {
+      "Sentinel": {
+        "id": "123132",
+        "channelid": "1065568610132697159",
+        "img": "https://media.discordapp.net/attachments/1065568610132697159/1110677059161821234/Sentinel.png?width=578&height=575"
+      },
+      "Dualist": {
+        "id": "1231231",
+        "channelid": "1065568625320275968",
+        "img": "https://media.discordapp.net/attachments/1065568610132697159/1110677058650128414/Duelist.png?width=578&height=577"
+      },
+      "Initiator": {
+        "id": "123123",
+        "channelid": "1065568650750341120",
+        "img": "https://media.discordapp.net/attachments/1065568610132697159/1110677058901790920/Initiator.png?width=577&height=578"
+      },
+      "Controller": {
+        "id": "12313",
+        "channelid": "1065568672309067856",
+        "img": "https://media.discordapp.net/attachments/1065568610132697159/1110677058423623810/Controller.png?width=577&height=578"
+      },
+      "Maps": {
+        "id": "12313",
+        "channelid": "1065568672309067856",
+        "img": ""
+      },
+      "Radiant Earpiece": {
+        "id": "12313",
+        "channelid": "1065568672309067856",
+        "img": "https://media.discordapp.net/attachments/1065568610132697159/1110677683278454924/Rad.png?width=320&height=320"
+      },
+      "All Videos": {
+        "id": "12341",
+        "channelid": "1098760298627874876",
+        "img": "https://media.discordapp.net/attachments/1065568610132697159/1110677524704403466/UI_Icon_Modes_Competitive.png?width=450&height=450"
+      }
+    },
+    "agents":{"Astra": "Controller", "Breach": "Initiator", "Brimstone": "Controller", "Chamber": "Sentinel", "Cypher": "Sentinel", "Jett": "Dualist", "Kayo": "Initiator", "Killjoy": "Sentinel", "Neon": "Dualist", "Omen": "Controller", "Pheonix": "Dualist", "Raze": "Dualist", "Reyna": "Dualist", "Sage": "Sentinel", "Skye": "Initiator", "Sova": "Initiator", "Viper": "Controller", "Yoru": "Dualist", "Harbor": "Controller", "Fade": "Initiator", "Gekko": "Initiator"}
+  },
+  "lol": ""
+}

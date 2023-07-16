@@ -1,5 +1,5 @@
-require("dotenv").config({path: '../.env'})
-
+//require("dotenv").config({path: '../.env'})
+require("dotenv").config()
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v10');
 const fs = require('fs');
@@ -11,7 +11,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 const clientId = process.env.clientId;
 const guildId = process.env.guildID;
 const  token = process.env.BOT_TOKEN
-
+console.log(clientId, guildId, token)
 for (const file of commandFiles) {
     const command = require(`../commands/${file}`);
     console.log("here")

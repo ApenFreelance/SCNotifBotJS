@@ -66,7 +66,7 @@ ${addMessagesToTranscript(ticketMessages)}
     }
     .message-container p {
         grid-column: 2;
-        margin-left: 1.2em;
+        margin: 0 0 0 1.2em;
         min-width: 50%;
     }
     .chatlog-author {
@@ -114,7 +114,6 @@ ${addMessagesToTranscript(ticketMessages)}
     const chatLog= document.querySelectorAll("#content p")
     for (const turn of chatLog) {
         let user = turn.textContent.split("\\n")[0]
-        console.log(user, turn.innerHTML)
         turn.innerHTML = turn.innerHTML.slice(user.length)
         let newA= document.createElement("div")
         let pfp = document.createElement("img")
