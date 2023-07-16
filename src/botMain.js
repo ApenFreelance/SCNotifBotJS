@@ -65,13 +65,7 @@ bot.rest.on('rateLimited', (data) => {
 
 
 bot.on("ready", async () => {
-    //console.log(`>>>>${bot.user.username} has logged in`)
     cLog([`${bot.user.username} has logged in`], {subProcess:"Start-up"})
-    //SCverifiedAccountDB.init(db)
-    //SCverifiedAccountDB.sync(db)
-
-    //SCverifV2.init(db)
-    //SCverifV2.sync(db)
     WoWCharacters.init(db)
     WoWCharacters.sync(db)
 
@@ -80,9 +74,6 @@ bot.on("ready", async () => {
     
     ValReviewHistory.init(db);
     ValReviewHistory.sync(db);
-    
-
-    
 })
 
 
