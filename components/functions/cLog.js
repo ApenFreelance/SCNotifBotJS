@@ -7,15 +7,15 @@ function cLog(args=[], {guild= "System", oneLine= true, spacings=0, subProcess=n
         subProcess = colorSubProcess(subProcess, "yellow")
     }
     
-    else if(guild.id== "855206452771684382") { // Valorant
+    else if(guild.id== "855206452771684382"|| guild== "855206452771684382") { // Valorant
         game = colors.magenta("VALORANT")
         subProcess = colorSubProcess(subProcess, "magenta")
     }
-    else if(guild.id== "294958471953252353") { // WoW
+    else if(guild.id== "294958471953252353" ||guild== "294958471953252353") { // WoW
         game = colors.blue("WoW")
         subProcess = colorSubProcess(subProcess, "blue")
     }
-    else if(guild.id== "1024961321768329246") { // Dev
+    else if(guild.id== "1024961321768329246"||guild== "1024961321768329246") { // Dev
         game = colors.yellow("Dev")
         subProcess = colorSubProcess(subProcess, "yellow")
     }
