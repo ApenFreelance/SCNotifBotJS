@@ -241,50 +241,6 @@ module.exports = {
 
 
     // WOW server stuff
-        if(interaction.customId == "verificationmodal") {
-            const email = interaction.fields.getTextInputValue("email")
-            const password = interaction.fields.getTextInputValue("password")
-            switch(await verifyEmailExists(email, password)) {
-              case "Wrong email or password":
-                await interaction.reply({content:"Email or password incorrect", ephmereal:true})
-                break;
-              case "User has active account":
-                addToSCDB(interaction.user.id, email, interaction.user.tag, interaction)
-                break;
-              case "User has free account":
-                await interaction.reply({content:"You dont seem to have an active subscription", ephmereal:true})
-              break;
-              
-              case "This user is staff":
-                addToSCDB(interaction.user.id, email, interaction.user.tag, interaction)
-               
-                break;
-              case "This user is admin":
-                addToSCDB(interaction.user.id, email, interaction.user.tag, interaction)
-                
-                break;
-              default:
-                await interaction.reply({content:"something went wrong, please contact staff", ephemeral:true})
-            }
-        }
-        if(interaction.customId == "verificationbutton") {
-          const verificationmodal = new ModalBuilder()
-          .setCustomId('verificationmodal')
-          .setTitle('Verification Modal');
-
-          const emailInput = new TextInputBuilder()
-              .setCustomId('email')
-              .setLabel("What is your skill-capped email?")
-              .setStyle(TextInputStyle.Short);
-          const passwordInput = new TextInputBuilder()
-              .setCustomId('password')
-              .setLabel("What is your skill-capped password?")
-              .setStyle(TextInputStyle.Short);
-          const emailVerifRow = new ActionRowBuilder().addComponents(emailInput)
-          const passVerifRow = new ActionRowBuilder().addComponents(passwordInput)
-          verificationmodal.addComponents(emailVerifRow, passVerifRow);
-          await interaction.showModal(verificationmodal);
-        }
         if(interaction.customId == "submissionmodal") {
         await interaction.reply({content:"Processing...", ephemeral:true})
         const email = interaction.fields.getTextInputValue("email")
