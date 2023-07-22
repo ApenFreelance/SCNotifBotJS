@@ -1,6 +1,9 @@
 require("dotenv").config({ path: "./.env" });
 const { Sequelize } = require("sequelize");
-
+const serverInfoJSON = require("../serverInfo.json");
+const DevReviewHistory = require("../models/DevReviewHistory");
+const ValReviewHistory = require("../models/ValReviewHistory");
+const WoWReviewHistory = require("../models/WoWReviewHistory");
 const db = new Sequelize(
   process.env.dbName,
   process.env.dbName,
@@ -15,12 +18,12 @@ const db = new Sequelize(
 async function getCorrectTable(guildId, tableGroup) {
   if (tableGroup === "reviewHistory") {
     try {
-      if (guildId === process.env.ValServerId) {
+      if (guildId === serverInfoJSON["Valorant"].serverId) {
         return ValReviewHistory;
-      } else if (guildId === process.env.WoWServerId) {
-        return ReviewHistory;
-      } else if (guildId === process.env.DevServerId) {
-        return ValReviewHistory;
+      } else if (guildId === serverInfoJSON["WoW"].serverId) {
+        return WoWReviewHistory;
+      } else if (guildId === serverInfoJSON["Dev"].serverId) {
+        return DevReviewHistory;
       }
     } catch (err) {
       cLog(["ERROR ", err], { guild: guildId, subProcess: "getCorrectTable" });
