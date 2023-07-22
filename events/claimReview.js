@@ -1,33 +1,10 @@
-const { EmbedBuilder, ButtonBuilder, PermissionsBitField, ActionRowBuilder } = require("discord.js");
+const { ButtonBuilder, PermissionsBitField, ActionRowBuilder } = require("discord.js");
 const { createWaitingForReviewMessage } = require("../components/actionRowComponents/createWaitingForReview");
-const { main } = require("../components/functions/googleApi");
-const ReviewHistory = require("../models/ReviewHistory");
+const { updateGoogleSheet } = require("../components/functions/googleApi");
+const { getCorrectTable } = require("../src/db")
 const categoryId = "1089996542087278682"
-function updateEmbed(user, embed) {
-    console.log(embed)
-    const updatedEmbed = new EmbedBuilder()
-    .setTitle(embed.title)
-    .setAuthor({name:embed.author.name, iconURL:embed.author.icon_url})
-    .setDescription(embed.description)
-    .setImage(embed.image.url)
-    .setFooter({text:`This submission is claimed by: ${user.tag}`, iconURL:user.displayAvatarURL(true)})
-//console.log(updatedEmbed)
-return([updatedEmbed])
-}
-function updateButtons(channel) {
-    const linkingButton = new ActionRowBuilder()
-        .addComponents(
-        new ButtonBuilder()
-            .setLabel('Go to channel')
-            .setURL(channel.url)
-            .setStyle("Link"),
-        new ButtonBuilder()
-            .setCustomId('completesubmission')
-            .setLabel('Complete')
-            .setStyle("Success")
-        );
-    return([linkingButton])
-}
+const serverInfoJSON = require("../serverInfo.json")
+
 
 
 
@@ -57,7 +34,7 @@ module.exports = {
                 .setCustomId(`closesubmission-${submissionNumber}`))
             //console.log(reviewHistory.claimedAt, reviewHistory.dataValues.claimedAt, "THESE AER BOTH")
             let submissionPos = reviewHistory.dataValues.id
-        const forSpread = [
+        const sheetBody = [
                 {
                   "range": `O${submissionPos}`, //Status 
                   "values": [
@@ -93,7 +70,7 @@ module.exports = {
                     ]
                   }
               ]
-              await main(forSpread)
+              await updateGoogleSheet(sheetBody)
         let newChannel
         try {
           
@@ -164,16 +141,6 @@ module.exports = {
 
 
         await newChannel.send({content:presetMessage,embeds:[interaction.message.embeds[0]], components:[lockRow]})
-        const linkingButton = new ActionRowBuilder()
-            .addComponents(
-              new ButtonBuilder()
-                  .setLabel('I have done this')
-                  .setStyle("Success")
-                  .setCustomId(`clip-${submissionNumber}-review`))
         await interaction.message.delete()
-        //await interaction.user.send({content:"Please upload your clipLink named as your ticket number: https://link", components:[linkingButton]})
-        //await interaction.message.edit({embeds:updateEmbed(interaction.user, interaction.message.embeds[0].data), components:updateButtons(newChannel)})
-       
-        // do your stuff
     },
 };
