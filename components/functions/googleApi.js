@@ -1,6 +1,6 @@
 const { google } = require("googleapis");
 const { GoogleAuth } = require("google-auth-library");
-async function main(data) {
+async function updateGoogleSheet(data) {
   const auth = new GoogleAuth({
     keyFile: "credentials.json", //the key file
     scopes: "https://www.googleapis.com/auth/spreadsheets",
@@ -34,4 +34,4 @@ async function authorize() {
   }
   return authClient;
 }
-module.exports = { main, authorize };
+module.exports = { updateGoogleSheet, authorize };
