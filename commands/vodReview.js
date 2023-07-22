@@ -1,15 +1,5 @@
-const {
-  SlashCommandBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-} = require("discord.js");
-
-const row = new ActionRowBuilder().addComponents(
-  new ButtonBuilder()
-    .setCustomId("submitreview")
-    .setLabel("Submit review")
-    .setStyle("Success")
-);
+const { SlashCommandBuilder } = require("discord.js");
+const { submitReviewButton } = require("../components/buttons");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -19,7 +9,7 @@ module.exports = {
   async execute(interaction) {
     await interaction.reply({
       content: "Click button to submit",
-      components: [row],
+      components: [submitReviewButton],
     });
   },
 };

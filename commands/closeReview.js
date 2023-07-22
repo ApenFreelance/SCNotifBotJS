@@ -1,16 +1,5 @@
-const {
-  SlashCommandBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-} = require("discord.js");
+const { SlashCommandBuilder } = require("discord.js");
 const bot = require("../src/botMain");
-
-const row = new ActionRowBuilder().addComponents(
-  new ButtonBuilder()
-    .setCustomId("submitreview")
-    .setLabel("Submit review")
-    .setStyle("Success")
-);
 
 module.exports = {
   data: new SlashCommandBuilder()
