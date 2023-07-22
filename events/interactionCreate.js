@@ -31,12 +31,12 @@ module.exports = {
         if(interaction.customId == "submitreview") {
           await createSubmissionModal(interaction, server)
         }
+
         if(interaction.customId == "submissionmodal") {
           await interaction.reply({content:"Processing...", ephemeral:true})
-          const track = interaction.fields.getTextInputValue("tracker")
           
           if(validLink(interaction, server.serverName)) {
-            bot.emit("submitValReview", interaction)
+            bot.emit("submitReview", interaction)
           }
           else {
             await interaction.editReply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
@@ -78,19 +78,6 @@ module.exports = {
         return
       }
       // WOW server stuff
-          if(interaction.customId == "submissionmodal") {
-          await interaction.reply({content:"Processing...", ephemeral:true})
-          const arm = interaction.fields.getTextInputValue("armory")
-          
-          if(regexTemplateFullLink.test(arm)) {
-            bot.emit("submitReview", interaction)
-            
-          }
-          else {
-            await interaction.editReply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
-          }
-        }
-
 
         try {
           
