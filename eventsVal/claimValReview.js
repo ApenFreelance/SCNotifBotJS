@@ -1,7 +1,6 @@
-const { EmbedBuilder, ButtonBuilder, PermissionsBitField, ActionRowBuilder } = require("discord.js");
+const { ButtonBuilder, PermissionsBitField, ActionRowBuilder } = require("discord.js");
 const { createValWaitingForReviewMessage } = require("../components/actionRowComponents/createWaitingForReview");
-
-const ValReviewHistory = require("../models/ValReviewHistory");
+const { getCorrectTable } = require("../src/db")
 const { cLog } = require("../components/functions/cLog");
 const categoryId = "1085409586997108746"
 

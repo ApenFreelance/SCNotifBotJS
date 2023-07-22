@@ -2,19 +2,12 @@ require("dotenv").config({ path: "../.env" });
 const blizzard = require("blizzard.js");
 const fs = require("fs");
 
-const {
-  Collection,
-  Client,
-  GatewayIntentBits,
-  SlashCommandBuilder,
-} = require("discord.js");
+const { Collection, Client, GatewayIntentBits } = require("discord.js");
 const db = require("./db");
 const WoWCharacters = require("../models/WoWCharacters");
 const ReviewHistory = require("../models/ReviewHistory");
 const ValReviewHistory = require("../models/ValReviewHistory");
 const { cLog } = require("../components/functions/cLog");
-
-//const logChannelServer = bot.channels.fetch("1024961321768329249").catch(err => console.log(err))
 
 const bot = new Client({
   intents: [
