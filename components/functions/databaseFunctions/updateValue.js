@@ -19,21 +19,7 @@ async function updateClosedReviewDB({
   return review;
 }
 
-async function getCorrectTable(guildId, tableGroup) {
-  if (tableGroup === "reviewHistory") {
-    try {
-      if (guildId === process.env.ValServerId) {
-        return ValReviewHistory;
-      } else if (guildId === process.env.WoWServerId) {
-        return ReviewHistory;
-      } else if (guildId === process.env.DevServerId) {
-        return ValReviewHistory;
-      }
-    } catch (err) {
-      cLog(["ERROR ", err], { guild: guildId, subProcess: "getCorrectTable" });
-    }
-  }
-}
+
 
 async function updatePlayerStats(reviewInDB, { guild, MMRdata = null }) {
   await reviewInDB.update({
@@ -46,4 +32,4 @@ async function updatePlayerStats(reviewInDB, { guild, MMRdata = null }) {
   });
 }
 
-module.exports = { updateClosedReviewDB, getCorrectTable, updatePlayerStats };
+module.exports = { updateClosedReviewDB, updatePlayerStats };
