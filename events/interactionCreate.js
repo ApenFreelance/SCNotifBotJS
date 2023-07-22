@@ -7,8 +7,8 @@ const { createSubmissionModal } = require('../components/modals');
 const serverInfoJSON = require("../serverInfo.json")
 
 
-const regexTemplateFullLink = /(https):\/\/((worldofwarcraft\.blizzard\.com||worldofwarcraft\.com)\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/.+)/
-const regexValFullLink = /(https):\/\/(tracker\.gg\/valorant\/profile\/riot)\/.+/
+const regexWoWLink = /(https):\/\/((worldofwarcraft\.blizzard\.com||worldofwarcraft\.com)\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/.+)/
+const regexValLink = /(https):\/\/(tracker\.gg\/valorant\/profile\/riot)\/.+/
 module.exports = {
     name: 'interactionCreate',
     once: false,
@@ -20,17 +20,22 @@ module.exports = {
           return
         }
         // End of slash command handler
-        const server = selectServer(interaction.guildId)
+        const server = selectServer(interaction.guildId) // 
+        /*
+        Contains:
+          serverName
+          serverId
+          reviewCategoryId
+        */
 
         if(interaction.customId == "submitreview") {
           await createSubmissionModal(interaction, server)
         }
         if(interaction.customId == "submissionmodal") {
           await interaction.reply({content:"Processing...", ephemeral:true})
-          
-          const email = interaction.fields.getTextInputValue("email")
           const track = interaction.fields.getTextInputValue("tracker")
-          if(regexValFullLink.test(track)) {
+          
+          if(validLink(interaction, server.serverName)) {
             bot.emit("submitValReview", interaction)
           }
           else {
@@ -75,7 +80,6 @@ module.exports = {
       // WOW server stuff
           if(interaction.customId == "submissionmodal") {
           await interaction.reply({content:"Processing...", ephemeral:true})
-          const email = interaction.fields.getTextInputValue("email")
           const arm = interaction.fields.getTextInputValue("armory")
           
           if(regexTemplateFullLink.test(arm)) {
@@ -89,9 +93,7 @@ module.exports = {
 
 
         try {
-          if(interaction.customId == "submitreview") {
-            await interaction.showModal(submissionModal);
-          }
+          
           if(interaction.customId == "claimsubmission") {
             bot.emit("claimReview", interaction)
           }
@@ -191,5 +193,17 @@ async function blockIfLacksRole(interaction, game) {
   if (!interaction.member.roles.cache.some(role => role.name === '💎・Infinity+'|| role.name === '🌸・Server Booster')) {
     await interaction.reply({content:"You need to be 💎・Infinity+ or 🌸・Server Booster", ephemeral:true})
     return
+  }
+}
+
+function validLink(interaction, game) {
+  if(game == "WoW") {
+    return regexWoWLink.test(interaction.fields.getTextInputValue("armory"))
+  }
+  else if(game == "Valorant") {
+    return regexValLink.test(interaction.fields.getTextInputValue("tracker"))
+  } else {
+    cLog(["Unknown server for regexCheck"], {guild:interaction.guildId, subProcess:"RegexCheck"})
+    return false
   }
 }
