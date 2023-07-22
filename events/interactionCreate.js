@@ -20,8 +20,9 @@ module.exports = {
           await slashCommandHandler(interaction)
           return
         }
-        await interaction.reply({content:"Processing...", ephemeral:true}) // This is to show something is happening and to prevent timeout. EDIT IT ALONG THE WAY
         // End of slash command handler
+        await interaction.reply({content:"Processing...", ephemeral:true}) // This is to show something is happening and to prevent timeout. EDIT IT ALONG THE WAY
+
         const server = selectServer(interaction.guildId) // 
         /*
         Contains:
@@ -30,8 +31,10 @@ module.exports = {
           reviewCategoryId
         */
 
-        
         if(interaction.customId == "submitreview") { 
+          if(blockIfLacksRole(interaction, server.serverName)) {
+            return
+          }
           // Show the modal for submitting. (By user)
           await createSubmissionModal(interaction, server)
         }
@@ -86,17 +89,13 @@ module.exports = {
           }
           await interaction.editReply({content:"Updated the review link to "+ reviewlink, ephemeral:true})
         }
-
-      // WOW server stuff
-        if(interaction.customId.startsWith("clip-")) {
-          bot.emit("mediaCollection", interaction)
-        }
         if(interaction.customId.includes("userreviewrating")) {
           // Handle user submitted reviews to their review
           bot.emit("rateReview", interaction)
         }
-
-          
+        if(interaction.customId.startsWith("clip-")) { // THIS MIGHT BE DEPRECATED
+          bot.emit("mediaCollection", interaction)
+        }  
     } catch (err) {
       console.log("Failed somewhere during interaction : ", err, interaction.user.tag)
       await interaction.editReply({content:"Something went wrong, please contact staff", ephemeral:true})
@@ -130,9 +129,24 @@ async function slashCommandHandler(interaction) {
 
 
 async function blockIfLacksRole(interaction, game) {
-  if (!interaction.member.roles.cache.some(role => role.name === '💎・Infinity+'|| role.name === '🌸・Server Booster')) {
-    await interaction.reply({content:"You need to be 💎・Infinity+ or 🌸・Server Booster", ephemeral:true})
-    return
+  if(game == "WoW") {
+    if (!
+      interaction.member.roles.cache.some((role) => 
+      role.name === "🧨 Skill Capped Member"||
+      role.name === "💙Premium Member") 
+    ) {
+      await interaction.editReply({content:"You need to be 💎・Infinity+ or 🌸・Server Booster", ephemeral:true})
+      return true
+    }
+  }
+  if(game == "Valorant") {
+    if (!
+      interaction.member.roles.cache.some(role => 
+      role.name === '💎・Infinity+'|| 
+      role.name === '🌸・Server Booster')) {
+      await interaction.editReply({content:"You need to be 💎・Infinity+ or 🌸・Server Booster", ephemeral:true})
+      return true
+    }
   }
 }
 
