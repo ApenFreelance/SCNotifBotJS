@@ -32,4 +32,15 @@ const submitReviewButton = new ActionRowBuilder().addComponents(
     .setStyle("Success")
 );
 
-module.exports = { createReviewButtons, submitReviewButton };
+const waitingForReviewRow = new ActionRowBuilder().addComponents(
+  new ButtonBuilder()
+    .setCustomId("claimsubmission")
+    .setLabel("Claim")
+    .setStyle("Success"),
+  new ButtonBuilder()
+    .setCustomId("rejectsubmission")
+    .setLabel("Reject")
+    .setStyle("Danger")
+);
+
+module.exports = { createReviewButtons, submitReviewButton, waitingForReviewRow };
