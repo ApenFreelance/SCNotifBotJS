@@ -6,22 +6,9 @@ const { getCorrectTable, updatePlayerStats,  } = require("../components/function
 module.exports = {
     name: 'submitValReview',
     once: false,
-    async execute(interaction) { 
-    interaction = interaction;
-    let trackerInput = interaction.fields.getTextInputValue("tracker");
-    let improvement = interaction.fields.getTextInputValue("improvementinput");
-	let link = decodeURI(trackerInput).replace("https://tracker.gg/valorant/profile/riot/", "").replace("%23", "#").replace("/overview/", "/").split("/");
-	cLog([link[0].split("#").join(" ")], {guild:interaction.guild, subProcess:"Decoding Link"});
-	
-	const reviewInDB = await getCorrectTable(interaction.guildId, "reviewHistory")
-	let [verifiedAccount, created] = await reviewInDB.findOrCreate({ 
-        where:{ userID: interaction.user.id }, 
-        defaults:{  status:"Available", 
-        userEmail:interaction.fields.getTextInputValue("email"),
-        userTag:interaction.user.tag,
-        clipLink: interaction.fields.getTextInputValue("ytlink")}, 
-        order: [['CreatedAt', 'DESC']]});
+    async execute(interaction, server) {
 
+	cLog([link[0].split("#").join(" ")], {guild:interaction.guild, subProcess:"Decoding Link"});
 
 		if(created) { // if a new entry is created there is no reason to check the rest
 			try {

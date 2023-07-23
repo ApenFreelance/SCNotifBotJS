@@ -1,19 +1,179 @@
-const { main } = require("../components/functions/googleApi.js");
+const { main, updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi.js");
 const blizzard = require("blizzard.js");
-const { ActionRowBuilder, ButtonBuilder } = require("discord.js");
-const ReviewHistory = require("../models/ReviewHistory");
-const WoWCharacters = require("../models/WoWCharacters");
-const bot = require("../src/botMain");
 const classes = require("../classes.json");
 require("dotenv").config();
-const {
-  createWaitingForReviewMessage,
-} = require("../components/actionRowComponents/createWaitingForReview.js");
+const { createWaitingForReviewMessage } = require("../components/actionRowComponents/createWaitingForReview.js");
 const { cLog } = require("../components/functions/cLog.js");
-const accessToken = process.env.accessToken;
+const { getCorrectTable } = require("../src/db.js");
 
-const testLink =
-  "https://worldofwarcraft.blizzard.com/en-gb/character/eu/tarren-mill/blizo/pve/raids";
+
+module.exports = {
+  name: "submitReview",
+  once: false,
+  async execute(interaction, server) {
+    try {
+      let characterData = null;
+      let linkToUserPage = null;
+      let userAccount = null;
+      let wowClient = null;
+      let accountName = null;
+      let accountRegion = null;
+      let accountSlug = null;
+      let improvement = interaction.fields.getTextInputValue("improvementinput");
+      // get correct link to user page
+      let reviewHistory = await getCorrectTable(server.serverId, "reviewHistory")
+      if(server.serverName== "WoW") {
+        linkToUserPage = interaction.fields.getTextInputValue("armory");
+        userAccount = decodeURI(linkToUserPage)
+          .replace("https://worldofwarcraft.com/", "")
+          .replace("https://worldofwarcraft.blizzard.com/", "")
+          .replace("/character/", "/")
+          .split("/");
+        accountRegion = userAccount[1] 
+        accountSlug = userAccount[2] 
+        accountName = userAccount[3] 
+        // Create a WoW Client connection
+        wowClient = connectToWoW(interaction)
+        try {
+          characterData = await getCharacterInfo(accountRegion,accountSlug,accountName,wowClient,linkToUserPage,interaction.guildId);
+        } catch (err) {
+          if (!err.response.status == 404) {
+            console.log("failed to get character info: ", err);
+          }
+          characterData = null;
+          console.log("Failed to get char, because char doesnt exist or couldnt be found");
+        }
+      } 
+      else if (server.serverName == "Valorant") {
+        linkToUserPage = interaction.fields.getTextInputValue("tracker");
+        userAccount = decodeURI(linkToUserPage)
+          .replace("https://tracker.gg/valorant/profile/riot/", "")
+          .replace("%23", "#")
+          .replace("/overview/", "/")
+          .split("/");
+        accountName = userAccount[0]
+        accountRegion = userAccount[1]
+        characterData = getValorantStats(interaction, accountName, accountRegion, reviewHistory)
+      } 
+      else {
+        await interaction.editReply({content:"This server is unknown", ephemeral:true})
+        return
+      }
+      
+      //console.log(verifiedAccount, created)
+      let [verifiedAccount, created] = await reviewHistory.findOrCreate({
+        where: { userID: interaction.user.id },
+        defaults: {
+          status: "Available",
+          userEmail: interaction.fields.getTextInputValue("email"),
+          userTag: interaction.user.username,
+          clipLink: interaction.fields.getTextInputValue("ytlink"),
+        },
+        order: [["CreatedAt", "DESC"]],
+      });
+
+      if (created) {
+        // if a new entry is created there is no reason to check the rest
+        try {
+          await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement,linkToUserPage,accountName);
+          await interaction.editReply({
+            content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
+            ephemeral: true,
+          });
+        } catch (err) {
+          console.log("Failed when responding or creating message for review for NEW user",err);
+          await interaction.editReply({content: `Something went wrong registering new user.`,ephemeral: true});
+        }
+        let submissionPos = verifiedAccount.id;
+        await updateGoogleSheet(// TODO: Update this to proper function
+          forSpread(verifiedAccount, characterData, submissionPos, arm, link[3]) 
+        );
+        return;
+      }
+
+      if (Date.now() - 2629743 * 1000 <= verifiedAccount.createdAt) {
+        // 30 day reduction
+        await interaction.editReply({content: `You can send a new submission in <t:${verifiedAccount.createdAt / 1000 + 2629743}:R> ( <t:${verifiedAccount.createdAt / 1000 + 2629743}> )`,ephemeral: true});
+        return;
+      }
+
+      // if none of the ones apply, create new entry
+      verifiedAccount = await reviewHistory.create({
+        userEmail: interaction.fields.getTextInputValue("email"),
+        userID: interaction.user.id,
+        status: "Available",
+        userTag: interaction.user.username,
+        clipLink: interaction.fields.getTextInputValue("ytlink"),
+      });
+
+      await verifiedAccount.update({charIdOnSubmission: characterData.id})
+        .catch((err) => {
+          console.log("No charId found");
+        });
+      
+      await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement,linkToUserPage,accountName);
+      let submissionPos = verifiedAccount.id;
+      createSheetBody(submissionPos, {})
+      await main(
+        forSpread(verifiedAccount, characterData, submissionPos, arm, accountName)
+      );
+      await interaction.editReply({
+        content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
+        ephemeral: true,
+      });
+    } catch (e) {
+      console.log(e);
+      await interaction.editReply({
+        content: "Something went wrong when submitting. Please contact staff",
+        ephemeral: true,
+      });
+    }
+  },
+};
+
+
+async function connectToWoW(interaction) {
+  await blizzard.wow
+  .createInstance({
+    key: process.env.BCID,
+    secret: process.env.BCS,
+    origin: link[1], // optional
+    locale: "en_US", // optional
+    token: "", // optional
+  })
+  .catch((err) => {
+    cLog([err], {
+      guild: interaction.guild,
+      subProcess: "CreateWoWInstance",
+    });
+    interaction.editReply({
+      content: "Failed to get character info, continuing",
+      ephemeral: true,
+    })
+  });
+}
+
+async function getValorantStats(interaction, accountName, accountRegion,  reviewHistory) {
+	let accountData = await axios.get(`https://api.henrikdev.xyz/valorant/v1/account/${accountName}/${accountRegion}`)
+		.catch(err => {cLog([accountData.data.status, err], {guild:interaction.guild, subProcess:"AccountData"});});
+	cLog([accountData.data.status], {guild:interaction.guild, subProcess:"AccountData"});
+	if(accountData.data.status != 200) {
+		cLog([accountData.data.errors[0].message], {guild:interaction.guild, subProcess:"AccountData"});
+		return null
+	}
+
+	let MMRdata = await axios.get(`https://api.henrikdev.xyz/valorant/v2/by-puuid/mmr/${accountData.data.data.region}/${accountData.data.data.puuid}`)
+		.catch(err => {cLog([MMRdata.data.status, err], {guild:interaction.guild, subProcess:"MMRdata"})});
+
+	cLog([MMRdata.data.status], {guild:interaction.guild, subProcess:"MMRdata"});
+	if(MMRdata.data.status != 200) {
+		cLog([MMRdata.data.errors[0].message], {guild:interaction.guild, subProcess:"MMRdata"});
+		return null
+	}
+
+	await updatePlayerStats(reviewHistory, {guild:interaction.guildId, MMRdata})
+	return {accountData, MMRdata}
+}
 
 async function getCharacterInfo(
   region,
@@ -29,7 +189,7 @@ async function getCharacterInfo(
   });
   cLog([`Cprofile: ${Cprofile.status}. [ ${Cprofile.statusText} ]`], {
     guild: guildId,
-    subProcess: "WoWChar",
+    subProcess: "characterData",
   });
   const Cpvp = await wowClient.characterPVP({
     realm: slug,
@@ -37,7 +197,7 @@ async function getCharacterInfo(
   });
   cLog([`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`], {
     guild: guildId,
-    subProcess: "WoWChar",
+    subProcess: "characterData",
   });
   let twoVtwoRating =
     (threeVthreeRating =
@@ -68,11 +228,6 @@ async function getCharacterInfo(
 
           threeVthreeRating = bracketInfo.data.rating;
         } else if (
-
-        /*   else if(bracket.href.includes("rbg")) {
-        const bracketInfo = await axios.get(`https://${region}.api.blizzard.com/profile/wow/character/${slug}/${characterName}/pvp-bracket/rbg?namespace=profile-${region}&locale=en_US&access_token=${accessToken}`)
-        tenVtenRating = bracketInfo.data.rating
-      } */
           bracket.href.includes(
             `shuffle-${Cprofile.data.character_class.name
               .toLowerCase()
@@ -187,15 +342,13 @@ async function getCharacterInfo(
     console.log("User most likely has no rank history");
   }
 
-  let wowChar = await WoWCharacters.create({
+  let characterData = await characterDataacters.create({
     armoryLink: armoryLink,
     characterName: Cprofile.data.name,
     characterRegion: region,
     slug: slug,
     armorLevel: Cprofile.data.equipped_item_level,
     characterClass: Cprofile.data.character_class.name,
-    //characterImage:media.data.assets[1].value,
-    //honorableKills:responseSummary.data.honorable_kills,
     twoVtwoRating: twoVtwoRating,
     threeVthreeRating: threeVthreeRating,
     tenVtenRating: tenVtenRating,
@@ -205,63 +358,49 @@ async function getCharacterInfo(
     soloShuffleSpec4Rating: soloShuffleSpec4Rating,
   });
 
-  return wowChar;
+  return characterData;
 }
 
-function isVerifiedByRole(interaction) {
-  if (
-    interaction.member.roles.cache.some(
-      (role) => role.name === "🧨 Skill Capped Member"
-    ) ||
-    interaction.member.roles.cache.some(
-      (role) => role.name === "💙Premium Member"
-    )
-  ) {
-    return true;
-  }
-  //return interaction.member.roles[0] == '🧨 Skill Capped Member'
-  return false;
-}
 
-function forSpread(verifiedAccount, wowChar, submissionPos, arm, name) {
-  if (wowChar == null) {
+function forSpread(verifiedAccount, characterData, submissionPos, arm, name) {
+  if (characterData == null) {
     return [
       //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
       {
         range: `O${submissionPos}`, //Ticket status
-        values: [[verifiedAccount.dataValues.status]],
+        values: [[verifiedAccount.status]],
       },
       //BELOW THIS IS REVIEW HISTORY
       {
         range: `A${submissionPos}`, //Ticket created
-        values: [[verifiedAccount.dataValues.createdAt]],
+        values: [[verifiedAccount.createdAt]],
       },
       {
         range: `B${submissionPos}`, //Ticket ID
-        values: [[verifiedAccount.dataValues.id]],
+        values: [[verifiedAccount.id]],
       },
       {
         range: `C${submissionPos}`, // User ID
-        values: [[verifiedAccount.dataValues.userID]],
+        values: [[verifiedAccount.userID]],
       },
       {
         range: `D${submissionPos}`, // User Tag
-        values: [[verifiedAccount.dataValues.userTag]],
+        values: [[verifiedAccount.userTag]],
       },
       {
         range: `E${submissionPos}`, // User Mail
-        values: [[verifiedAccount.dataValues.userEmail]],
+        values: [[verifiedAccount.userEmail]],
       },
       {
         range: `F${submissionPos}`, // User Clip
         values: [
           [
-            verifiedAccount.dataValues.clipLink,
-            //verifiedAccount.dataValues.userEmail
+            verifiedAccount.clipLink,
+            //verifiedAccount.userEmail
           ],
         ],
       },
-      // BELOW IS ALL FROM WOWCHARACTER AND NOT REVIEWHISTORY
+      // BELOW IS ALL FROM characterDataACTER AND NOT REVIEWHISTORY
       {
         range: `G${submissionPos}`, // Armory Link
         values: [[arm]],
@@ -273,248 +412,70 @@ function forSpread(verifiedAccount, wowChar, submissionPos, arm, name) {
     //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
     {
       range: `O${submissionPos}`, //Ticket status
-      values: [[verifiedAccount.dataValues.status]],
+      values: [[verifiedAccount.status]],
     },
     //BELOW THIS IS REVIEW HISTORY
     {
       range: `A${submissionPos}`, //Ticket created
-      values: [[verifiedAccount.dataValues.createdAt]],
+      values: [[verifiedAccount.createdAt]],
     },
     {
       range: `B${submissionPos}`, //Ticket ID
-      values: [[verifiedAccount.dataValues.id]],
+      values: [[verifiedAccount.id]],
     },
     {
       range: `C${submissionPos}`, // User ID
-      values: [[verifiedAccount.dataValues.userID]],
+      values: [[verifiedAccount.userID]],
     },
     {
       range: `D${submissionPos}`, // User Tag
-      values: [[verifiedAccount.dataValues.userTag]],
+      values: [[verifiedAccount.userTag]],
     },
     {
       range: `E${submissionPos}`, // User Mail
-      values: [[verifiedAccount.dataValues.userEmail]],
+      values: [[verifiedAccount.userEmail]],
     },
     {
       range: `F${submissionPos}`, // User Clip
       values: [
         [
-          verifiedAccount.dataValues.clipLink,
-          //verifiedAccount.dataValues.userEmail
+          verifiedAccount.clipLink,
+          //verifiedAccount.userEmail
         ],
       ],
     },
-    // BELOW IS ALL FROM WOWCHARACTER AND NOT REVIEWHISTORY
+    // BELOW IS ALL FROM characterDataACTER AND NOT REVIEWHISTORY
     {
       range: `G${submissionPos}`, // Armory Link
-      values: [[wowChar.dataValues.armoryLink]],
+      values: [[characterData.armoryLink]],
     },
     {
       range: `H${submissionPos}`, // Character class
-      values: [[wowChar.dataValues.characterClass]],
+      values: [[characterData.characterClass]],
     },
     {
       range: `I${submissionPos}`, // 2v2
-      values: [[wowChar.dataValues.twoVtwoRating]],
+      values: [[characterData.twoVtwoRating]],
     },
     {
       range: `J${submissionPos}`, // 3v3
-      values: [[wowChar.dataValues.threeVthreeRating]],
+      values: [[characterData.threeVthreeRating]],
     },
     {
       range: `K${submissionPos}`, // Solo1
-      values: [[wowChar.dataValues.soloShuffleSpec1Rating]],
+      values: [[characterData.soloShuffleSpec1Rating]],
     },
     {
       range: `L${submissionPos}`, // Solo2
-      values: [[wowChar.dataValues.soloShuffleSpec2Rating]],
+      values: [[characterData.soloShuffleSpec2Rating]],
     },
     {
       range: `M${submissionPos}`, // Solo3
-      values: [[wowChar.dataValues.soloShuffleSpec3Rating]],
+      values: [[characterData.soloShuffleSpec3Rating]],
     },
     {
       range: `N${submissionPos}`, // Solo4
-      values: [[wowChar.dataValues.soloShuffleSpec4Rating]],
+      values: [[characterData.soloShuffleSpec4Rating]],
     },
   ];
 }
-
-module.exports = {
-  name: "submitReview",
-  once: false,
-  async execute(interaction) {
-    try {
-      let wowChar = null;
-      interaction = interaction;
-      let arm = interaction.fields.getTextInputValue("armory");
-      let improvement =
-        interaction.fields.getTextInputValue("improvementinput");
-
-      let link = decodeURI(arm)
-        .replace("https://worldofwarcraft.com/", "")
-        .replace("https://worldofwarcraft.blizzard.com/", "")
-        .replace("/character/", "/")
-        .split("/");
-
-      const wowClient = await blizzard.wow
-        .createInstance({
-          key: process.env.BCID,
-          secret: process.env.BCS,
-          origin: link[1], // optional
-          locale: "en_US", // optional
-          token: "", // optional
-        })
-        .catch((err) => {
-          cLog([err], {
-            guild: interaction.guild,
-            subProcess: "CreateWoWInstance",
-          });
-          interaction.editReply({
-            content: "Failed to get character info, continuing",
-            ephemeral: true,
-          });
-          console.log("region: ", link[1]);
-          console.log("slug: ", link[2]);
-          console.log("name: ", link[3]);
-        });
-      try {
-        wowChar = await getCharacterInfo(
-          link[1],
-          link[2],
-          link[3],
-          wowClient,
-          interaction.fields.getTextInputValue("armory"),
-          interaction.guild.id
-        );
-      } catch (err) {
-        if (!err.response.status == 404) {
-          console.log("failed to get character info: ", err);
-        }
-        wowChar = null;
-        console.log(
-          "Failed to get char, because char doesnt exist or couldnt be found"
-        );
-      }
-
-      if (!isVerifiedByRole(interaction)) {
-        await interaction.editReply({
-          content: "Please make sure you have been verified.",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      //console.log(verifiedAccount, created)
-      let [verifiedAccount, created] = await ReviewHistory.findOrCreate({
-        where: { userID: interaction.user.id },
-        defaults: {
-          status: "Available",
-          userEmail: interaction.fields.getTextInputValue("email"),
-          userTag: interaction.user.tag,
-          clipLink: interaction.fields.getTextInputValue("ytlink"),
-        },
-        order: [["CreatedAt", "DESC"]],
-      });
-
-      if (created) {
-        // if a new entry is created there is no reason to check the rest
-        try {
-          await createWaitingForReviewMessage(
-            interaction,
-            wowChar,
-            verifiedAccount,
-            improvement,
-            process.env.WoWserverId,
-            arm,
-            link[3]
-          );
-          await interaction.editReply({
-            content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
-            ephemeral: true,
-          });
-        } catch (err) {
-          console.log(
-            "Failed when responding or creating message for review for NEW user",
-            err
-          );
-          await interaction.editReply({
-            content: `Something went wrong registering new user.`,
-            ephemeral: true,
-          });
-        }
-        let submissionPos = verifiedAccount.dataValues.id;
-
-        //console.log(forSpread)
-        await main(
-          forSpread(verifiedAccount, wowChar, submissionPos, arm, link[3])
-        );
-
-        return;
-      }
-
-      if (Date.now() - 2629743 * 1000 <= verifiedAccount.createdAt) {
-        // 30 day reduction
-        await interaction.editReply({
-          content: `You can send a new submission in <t:${
-            verifiedAccount.createdAt / 1000 + 2629743
-          }:R> ( <t:${verifiedAccount.createdAt / 1000 + 2629743}> )`,
-          ephemeral: true,
-        });
-        return;
-      }
-
-      // if none of the ones apply, create new entry
-      verifiedAccount = await ReviewHistory.create({
-        userEmail: interaction.fields.getTextInputValue("email"),
-        userID: interaction.user.id,
-        status: "Available",
-        userTag: interaction.user.tag,
-        clipLink: interaction.fields.getTextInputValue("ytlink"),
-      });
-
-      await verifiedAccount
-        .update({
-          charIdOnSubmission: wowChar.id,
-        })
-        .catch((err) => {
-          console.log("No charId found");
-        });
-      //console.log(verifiedAccount)
-      linkingButton = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setLabel("I have done this")
-          .setStyle("Success")
-          .setCustomId(`clip-${verifiedAccount.id}`)
-      );
-
-      //await interaction.reply({content:"Thank you for your submission. If your submission is picked you will be notified.", ephemeral:true})
-      await createWaitingForReviewMessage(
-        interaction,
-        wowChar,
-        verifiedAccount,
-        improvement,
-        process.env.WoWserverId,
-        arm,
-        link[3]
-      );
-      let submissionPos = verifiedAccount.dataValues.id;
-
-      await main(
-        forSpread(verifiedAccount, wowChar, submissionPos, arm, link[3])
-      );
-      await interaction.editReply({
-        content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
-        ephemeral: true,
-      });
-      // do your stuff
-    } catch (e) {
-      console.log(e);
-      await interaction.editReply({
-        content: "Something went wrong when submitting. Please contact staff",
-        ephemeral: true,
-      });
-    }
-  },
-};
