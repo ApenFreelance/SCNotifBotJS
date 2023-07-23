@@ -50,18 +50,19 @@ module.exports = {
         }
         if(interaction.customId == "claimsubmission") {
           // Begin claim handling
-          bot.emit("claimReview", interaction)
+          bot.emit("claimReview", interaction, server)
         }
         if(interaction.customId == "rejectsubmission") {
           // Begin rejection handling
-          bot.emit("rejectReview", interaction)
+          bot.emit("rejectReview", interaction, server)
         }
         if(interaction.customId.startsWith("closesubmission-")) {
           // Close. NOT FINAL STEP. THIS IS WHEN REVIEW STATUS IS SET TO CLOSED. COMPLETE IS LAST
-          bot.emit("closeSubmission", interaction)
+          bot.emit("closeSubmission", interaction, server)
         }
         if(interaction.customId.startsWith("delete-")) {
-          bot.emit("completeReview", interaction)
+          // THIS IS WHAT DELETES CHANNEL AND SO ON
+          bot.emit("completeReview", interaction, server)
         }
         if(interaction.customId.startsWith("completesubmission")) {
           let reviewlink = interaction.fields.getTextInputValue("reviewlink")
@@ -76,9 +77,6 @@ module.exports = {
           await reviewHistory.update({
             reviewLink:reviewlink
           })
-
-          
-
           // WoW logs to sheet as well
           if(server.serverName == "WoW") {
             const sheetBody = [{
@@ -94,7 +92,7 @@ module.exports = {
           bot.emit("rateReview", interaction)
         }
         if(interaction.customId.startsWith("clip-")) { // THIS MIGHT BE DEPRECATED
-          bot.emit("mediaCollection", interaction)
+          bot.emit("mediaCollection", interaction, server)
         }  
     } catch (err) {
       console.log("Failed somewhere during interaction : ", err, interaction.user.tag)
