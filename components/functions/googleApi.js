@@ -34,4 +34,38 @@ async function authorize() {
   }
   return authClient;
 }
-module.exports = { updateGoogleSheet, authorize };
+
+function createSheetBody(submissionPos, {status=null, createdAt=null, id=null, userID=null, userName=null, userEmail=null, clipLink=null, armoryLink=null,charClass=null, twovtwo=null, threevthree=null, solo1=null, solo2=null, solo3=null, solo4=null, claimedDate=null, claimedByID=null, claimedByUsername=null, completedAt=null, reviewLink=null, reviewRating=null, reviewComment=null}) {
+  const properties = [
+    {range: `A${submissionPos}`, value: createdAt},
+    {range: `B${submissionPos}`, value: id},
+    {range: `C${submissionPos}`, value: userID},
+    {range: `D${submissionPos}`, value: userName},
+    {range: `E${submissionPos}`, value: userEmail},
+    {range: `F${submissionPos}`, value: clipLink},
+    {range: `G${submissionPos}`, value: armoryLink},
+    {range: `H${submissionPos}`, value: charClass},
+    {range: `I${submissionPos}`, value: twovtwo},
+    {range: `J${submissionPos}`, value: threevthree},
+    {range: `K${submissionPos}`, value: solo1},
+    {range: `L${submissionPos}`, value: solo2},
+    {range: `M${submissionPos}`, value: solo3},
+    {range: `N${submissionPos}`, value: solo4},
+    {range: `O${submissionPos}`, value: status},
+    {range: `P${submissionPos}`, value: claimedDate},
+    {range: `Q${submissionPos}`, value: claimedByID},
+    {range: `R${submissionPos}`, value: claimedByUsername},
+    {range: `S${submissionPos}`, value: completedAt},
+    {range: `T${submissionPos}`, value: reviewLink},
+    {range: `U${submissionPos}`, value: reviewRating},
+    {range: `V${submissionPos}`, value: reviewComment},
+
+  ];
+
+  const sheetBody = properties
+    .filter(({value}) => value !== null)
+    .map(({range, value}) => ({range, values: [[value]]}));
+
+  return sheetBody;
+}
+module.exports = { updateGoogleSheet, authorize, createSheetBody };
