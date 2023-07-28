@@ -125,6 +125,6 @@ async function createValWaitingForReviewMessage(interaction, charInfo, verifiedA
         .setLabel('Reject')
         .setStyle("Danger")
     );
-      await submissionChannel.send({embeds:[waitingForReviewEmbed], components:[waitingForReviewRow]  })
+      await submissionChannel.send({content:"<@&932795289943826483>", embeds:[waitingForReviewEmbed], components:[waitingForReviewRow]  })
 }
 module.exports = { createWaitingForReviewMessage, createValWaitingForReviewMessage }
