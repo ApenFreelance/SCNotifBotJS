@@ -1,7 +1,7 @@
 
 require("dotenv").config({path: '../.env'});
 const bot = require('../src/botMain');
-const { main } = require('../components/functions/googleApi');
+const { updateGoogleSheet } = require('../components/functions/googleApi');
 const { cLog } = require('../components/functions/cLog');
 const { createSubmissionModal } = require('../components/modals');
 const serverInfoJSON = require("../serverInfo.json");
@@ -21,8 +21,8 @@ module.exports = {
           return
         }
         // End of slash command handler
-        await interaction.reply({content:"Processing...", ephemeral:true}) // This is to show something is happening and to prevent timeout. EDIT IT ALONG THE WAY
-
+        //await interaction.reply({content:"Processing...", ephemeral:true}) // This is to show something is happening and to prevent timeout. EDIT IT ALONG THE WAY
+        // Line above causes issues with modals
         const server = selectServer(interaction.guildId) // 
         /*
         Contains:
@@ -30,9 +30,9 @@ module.exports = {
           serverId
           reviewCategoryId
         */
-
+        console.log(server)
         if(interaction.customId == "submitreview") { 
-          if(blockIfLacksRole(interaction, server.serverName)) {
+          if(await blockIfLacksRole(interaction, server.serverName)) {
             return
           }
           // Show the modal for submitting. (By user)
@@ -45,7 +45,7 @@ module.exports = {
             bot.emit("submitReview", interaction, server)
           }
           else {
-            await interaction.editReply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
+            await interaction.reply({content:"This link is not valid.\n\nThink this is a mistake? Let us know", ephemeral:true})
           }
         }
         if(interaction.customId == "claimsubmission") {
@@ -96,13 +96,14 @@ module.exports = {
         }  
     } catch (err) {
       console.log("Failed somewhere during interaction : ", err, interaction.user.tag)
-      await interaction.editReply({content:"Something went wrong, please contact staff", ephemeral:true})
+      await interaction.reply({content:"Something went wrong, please contact staff", ephemeral:true})
     }} }
     
 
 function selectServer(serverId) {
   for (let key in serverInfoJSON) {
     if (serverInfoJSON[key].serverId === serverId) {
+      serverInfoJSON[key].serverName = key
       return serverInfoJSON[key];
     }
   }
@@ -145,6 +146,9 @@ async function blockIfLacksRole(interaction, game) {
       await interaction.editReply({content:"You need to be 💎・Infinity+ or 🌸・Server Booster", ephemeral:true})
       return true
     }
+  if(game == "Dev") {
+    return false
+  }
   }
 }
 
@@ -156,6 +160,6 @@ function validLink(interaction, game) {
     return regexValLink.test(interaction.fields.getTextInputValue("tracker"))
   } else {
     cLog(["Unknown server for regexCheck"], {guild:interaction.guildId, subProcess:"RegexCheck"})
-    return false
+    return true
   }
 }

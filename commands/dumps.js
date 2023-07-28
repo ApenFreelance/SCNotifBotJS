@@ -38,7 +38,7 @@ module.exports = {
       //const logChannelServer = interaction.guild.channels.fetch("1024961321768329249").catch(err => console.log(err))
       await interaction.deferReply({ ephemeral: true });
       if (game == null) {
-        fs.readFile(jsonLocation, "utf-8", function (err, gameData) {
+        fs.readFile(jsonLocation, "utf8", function (err, gameData) {
           gameData = JSON.parse(gameData);
 
           let dumpList = {};
@@ -70,7 +70,7 @@ module.exports = {
           guild: interaction.guildId,
           subProcess: "Dumps",
         });
-        fs.readFile(jsonLocation, "utf-8", function (err, gameData) {
+        fs.readFile(jsonLocation, "utf8", function (err, gameData) {
           gameData = JSON.parse(gameData);
           let lastDump = gameData[game].lastDump;
           gameData[game].lastDump = newDump;
@@ -220,7 +220,7 @@ async function checkForChanges(
 async function createEmbed(uploads, game, interaction) {
   let breakdown = {};
   let failed = [];
-  fs.readFile(jsonLocation, "utf-8", function (err, data) {
+  fs.readFile(jsonLocation, "utf8", function (err, data) {
     data = JSON.parse(data);
     Object.keys(data[game].roleDict).forEach((tags) => {
       breakdown[tags] = [];

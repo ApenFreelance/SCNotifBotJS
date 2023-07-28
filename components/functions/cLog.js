@@ -1,4 +1,4 @@
-
+const colors = require("colors");
 
 function cLog(args = [], { guild = "System", oneLine = true, spacings = 0, subProcess = null } = {}) {
   let game;

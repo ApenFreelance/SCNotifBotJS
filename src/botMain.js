@@ -3,7 +3,7 @@ const blizzard = require("blizzard.js");
 const fs = require("fs");
 
 const { Collection, Client, GatewayIntentBits } = require("discord.js");
-const db = require("./db");
+const {db} = require("./db");
 const WoWCharacters = require("../models/WoWCharacters");
 const ReviewHistory = require("../models/WoWReviewHistory");
 const ValReviewHistory = require("../models/ValReviewHistory");

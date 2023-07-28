@@ -1,110 +1,65 @@
-
-const { ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle } = require("discord.js");
-const { main } = require("../components/functions/googleApi");
-const ReviewHistory = require("../models/ReviewHistory");
-
-
-function createRatingModal(submissionNumber, ratingNumber) {
-    const feedbackmodal = new ModalBuilder()
-    .setCustomId(`reviewratingmodal${submissionNumber}`)
-    .setTitle(`Feedback Modal`);
-
-    const commentInput = new TextInputBuilder()
-        .setCustomId("feedback")
-        .setLabel("Tell us what you think?")
-        .setStyle(TextInputStyle.Paragraph)
-        .setRequired(false)
-
-    const ratingRow = new ActionRowBuilder().addComponents(commentInput)
-    feedbackmodal.addComponents(ratingRow);
-    return feedbackmodal
-}
-
-
-
-
+const { updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi");
+const { createRatingModal } = require("../components/modals");
+const { update } = require("../models/DevReviewHistory");
+const { getCorrectTable } = require("../src/db");
 
 
 module.exports = {
     name: 'rateReview',
     once: false,
-    async execute(interaction, type) {
-        
-
+    async execute(interaction) {
+      let serverId = null;
+      let ratingNumber = null;
+      let submissionNumber = null;
         if(type == "modal") {
-            //console.log(interaction)
-
-            const submissionNumber = interaction.customId.replace("reviewratingmodal","")
-            //console.log(interaction.fields.fields.get("feedback").value)
-            const history = await ReviewHistory.findOne({
+          if(interaction.customId.includes("valreviewratingmodal")) {
+            serverId = "855206452771684382"
+            submissionNumber = interaction.customId.replace("valreviewratingmodal","")
+          } else {
+            serverId = "294958471953252353"
+            submissionNumber = interaction.customId.replace("reviewratingmodal","")
+          }
+            const reviewHistory = await getCorrectTable(serverId, "reviewHistory").findOne({
                 where:{
                     id: submissionNumber
                 }
             })
-            await history.update({
+            await reviewHistory.update({
                 reviewRatingComment:interaction.fields.fields.get("feedback").value
                 })
-            let submissionPos = history.dataValues.id
-            const forSpread = [
-                {
-                  "range": `U${submissionPos}`, //Rating number
-                  "values": [
-                    [
-                      history.dataValues.reviewRating
-                    ]
-                  ]
-                },
-                {
-                  "range": `V${submissionPos}`, // Rating Comment
-                  "values": [
-                    [
-                      interaction.fields.fields.get("feedback").value
-                    ]
-                  ]
-                }
-              ]
-              
-            await main(forSpread)
+            await updateGoogleSheet(createSheetBody(submissionNumber, {reviewComment:interaction.fields.fields.get("feedback").value}))
             await interaction.reply(`Set comment to\n\n\`\`\`\n ${interaction.fields.fields.get("feedback").value}\n\`\`\``)
+            //TODO: Make it send to a specific channel as well for coaches to see
+            cLog(["Text review given for review nr: " + submissionNumber], {subProcess:"ReviewValRating"})
+
 
 
         }
         if(type == "button") {
-            let ratingNumber = interaction.customId.replace("rating","")
+          if(interaction.customId.includes("valrating")) {
+            serverId = "855206452771684382"
+            ratingNumber = interaction.customId.replace("valrating","")
+          } else {
+            serverId = "294958471953252353"
+            ratingNumber = interaction.customId.replace("rating","")
+          }
             let submissionNumber = ratingNumber.slice(2)
             ratingNumber = ratingNumber.replace(/(-\d+)/, "")
-
-            createRatingModal(submissionNumber)
-            console.log(submissionNumber)
-            const history = await ReviewHistory.findOne({
+            cLog([interaction.user.username + " Rated: " + submissionNumber], {subProcess:"ReviewValRating"})
+            
+            const reviewHistory = await getCorrectTable(serverId, "reviewHistory").findOne({
                 where:{
                     id: submissionNumber
                 }
             })
-            await history.update({
-                reviewRating:parseInt(ratingNumber)
-                
+            await reviewHistory.update({
+                reviewRating:parseInt(ratingNumber) 
             })
-            let submissionPos = history.dataValues.id
-            const forSpread = [
-                {
-                  "range": `U${submissionPos}`, //Rating number
-                  "values": [
-                    [
-                      history.dataValues.reviewRating
-                    ]
-                  ]
-                }
-              ]
-             
-            await main(forSpread)
-            await interaction.showModal(createRatingModal(submissionNumber, ratingNumber))
+            if(serverId == "294958471953252353"){ // WoW ID
+              await updateGoogleSheet(createSheetBody(submissionNumber, {reviewRating:reviewHistory.reviewRating}))
+            }
+            await interaction.showModal(createRatingModal(submissionNumber))
             await interaction.user.send(`Set the rating to ${ratingNumber}`)
         }
-
-       
-        //console.log(await interaction.message.embeds[0].author.name.match(/\d{18}/))
-        
-        // do your stuff
-    },
+    }
 };

@@ -74,7 +74,7 @@ const jsonLocation = "gameData.json";
 async function createEmbed(uploads, game, interaction, bot) {
   let breakdown = {};
   let failed = [];
-  fs.readFile(jsonLocation, "utf-8", function (err, data) {
+  fs.readFile(jsonLocation, "utf8", function (err, data) {
     data = JSON.parse(data);
     Object.keys(data[game].roleDict).forEach((tags) => {
       breakdown[tags] = [];

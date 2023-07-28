@@ -5,7 +5,7 @@ require("dotenv").config();
 const { createWaitingForReviewMessage } = require("../components/actionRowComponents/createWaitingForReview.js");
 const { cLog } = require("../components/functions/cLog.js");
 const { getCorrectTable } = require("../src/db.js");
-
+const axios = require("axios")
 
 module.exports = {
   name: "submitReview",
@@ -52,12 +52,12 @@ module.exports = {
           .replace("%23", "#")
           .replace("/overview/", "/")
           .split("/");
-        accountName = userAccount[0]
-        accountRegion = userAccount[1]
+        accountName = userAccount[0].split("#")[0]
+        accountRegion = userAccount[0].split("#")[1]
         characterData = getValorantStats(interaction, accountName, accountRegion, reviewHistory)
       } 
       else {
-        await interaction.editReply({content:"This server is unknown", ephemeral:true})
+        await interaction.reply({content:"This server is unknown", ephemeral:true})
         return
       }
       
@@ -95,16 +95,16 @@ module.exports = {
           }
           await updateGoogleSheet(sheetBody)
         }
-        await interaction.editReply({
+        await interaction.reply({
           content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
           ephemeral: true,
         });
         return;
       }
 
-      if (Date.now() - 2629743 * 1000 <= verifiedAccount.createdAt) {
+      if (Date.now() - 2629743 * 1000 >= verifiedAccount.createdAt) {
         // 30 day reduction
-        await interaction.editReply({content: `You can send a new submission in <t:${verifiedAccount.createdAt / 1000 + 2629743}:R> ( <t:${verifiedAccount.createdAt / 1000 + 2629743}> )`,ephemeral: true});
+        await interaction.reply({content: `You can send a new submission in <t:${verifiedAccount.createdAt / 1000 + 2629743}:R> ( <t:${verifiedAccount.createdAt / 1000 + 2629743}> )`,ephemeral: true});
         return;
       }
 
@@ -173,7 +173,7 @@ async function connectToWoW(interaction) {
 
 async function getValorantStats(interaction, accountName, accountRegion,  reviewHistory) {
 	let accountData = await axios.get(`https://api.henrikdev.xyz/valorant/v1/account/${accountName}/${accountRegion}`)
-		.catch(err => {cLog([accountData.data.status, err], {guild:interaction.guild, subProcess:"AccountData"});});
+		.catch(err => {cLog([err], {guild:interaction.guild, subProcess:"AccountData"});});
 	cLog([accountData.data.status], {guild:interaction.guild, subProcess:"AccountData"});
 	if(accountData.data.status != 200) {
 		cLog([accountData.data.errors[0].message], {guild:interaction.guild, subProcess:"AccountData"});
@@ -181,7 +181,7 @@ async function getValorantStats(interaction, accountName, accountRegion,  review
 	}
 
 	let MMRdata = await axios.get(`https://api.henrikdev.xyz/valorant/v2/by-puuid/mmr/${accountData.data.data.region}/${accountData.data.data.puuid}`)
-		.catch(err => {cLog([MMRdata.data.status, err], {guild:interaction.guild, subProcess:"MMRdata"})});
+		.catch(err => {cLog([err], {guild:interaction.guild, subProcess:"MMRdata"})});
 
 	cLog([MMRdata.data.status], {guild:interaction.guild, subProcess:"MMRdata"});
 	if(MMRdata.data.status != 200) {

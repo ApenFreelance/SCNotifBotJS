@@ -1,8 +1,8 @@
-const { ActionRowBuilder, ButtonBuilder, TextInputStyle, ModalBuilder, TextInputBuilder } = require("discord.js");
 
-const ValReviewHistory = require("../models/ValReviewHistory");
+
+
 const fs = require("fs")
-const { completeSubmissionEmbed } = require("../components/modals/reviewLinkModal");
+const { completeSubmissionEmbed } = require("../components/modals.js");
 const { cLog } = require("../components/functions/cLog");
 const { createTranscript, createHTMLfile, sendTranscript, addTranscriptToDB } = require("../components/functions/transcript");
 
