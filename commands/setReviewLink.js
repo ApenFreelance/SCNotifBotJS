@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { main } = require("../components/functions/googleApi");
-const ReviewHistory = require("../models/ReviewHistory");
+const { main, updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi");
+const { getCorrectTable } = require("../src/db");
+
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -30,7 +31,7 @@ module.exports = {
       let submissionPos = interaction.channel.name
         .replace("closed-", "")
         .replace("review-", "");
-      const r = await ReviewHistory.findOne({
+      const r = await getCorrectTable(interaction.guildId, "reviewHistory").findOne({
         where: {
           id: submissionPos,
         },
@@ -39,15 +40,9 @@ module.exports = {
       await r.update({
         reviewLink: reviewLink,
       });
-
-      const forSpread = [
-        {
-          range: `T${submissionPos}`, //Rating number
-          values: [[reviewLink]],
-        },
-      ];
-
-      await main(forSpread);
+      if(interaction.guildId == "294958471953252353") { // WoW id
+        await updateGoogleSheet(createSheetBody(submissionPos, {reviewLink:reviewLink}))
+      }
       await interaction.reply({ content: `Review Link set to ${reviewLink}` });
     } catch (err) {
       console.log(err);
