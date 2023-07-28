@@ -1,9 +1,8 @@
 const { ButtonBuilder, PermissionsBitField, ActionRowBuilder } = require("discord.js");
-const { createWaitingForReviewMessage } = require("../components/actionRowComponents/createWaitingForReview");
-const { updateGoogleSheet } = require("../components/functions/googleApi");
+const { updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi");
 const { getCorrectTable } = require("../src/db")
-const categoryId = "1089996542087278682"
-const serverInfoJSON = require("../serverInfo.json")
+
+
 
 
 
@@ -12,70 +11,34 @@ const serverInfoJSON = require("../serverInfo.json")
 module.exports = {
     name: 'claimReview',
     once: false,
-    async execute(interaction) {    
+    async execute(interaction, server) {    
         const submissionNumber = interaction.message.embeds[0].title.replace("Submission ", "")
-        const reviewHistory = await ReviewHistory.findOne({
+        const reviewHistory = await getCorrectTable(interaction.guildId, "reviewHistory").findOne({
             where:{
                 id:submissionNumber
             }}).catch(err => console.log(err))
         
         await reviewHistory.update({
-                status:"Claimed",
-                claimedByID:interaction.user.id,
-                claimedByTag:interaction.user.tag,
-                claimedAt:Date.now()
-            })
+          status:"Claimed",
+          claimedByID:interaction.user.id,
+          claimedByTag:interaction.user.tag,
+          claimedAt:Date.now()
+        })
         const lockRow = new ActionRowBuilder()
             .addComponents(
-            new ButtonBuilder()
+              new ButtonBuilder()
                 .setLabel('Close')
                 .setEmoji("🔒")
                 .setStyle("Secondary")
                 .setCustomId(`closesubmission-${submissionNumber}`))
-            //console.log(reviewHistory.claimedAt, reviewHistory.dataValues.claimedAt, "THESE AER BOTH")
-            let submissionPos = reviewHistory.dataValues.id
-        const sheetBody = [
-                {
-                  "range": `O${submissionPos}`, //Status 
-                  "values": [
-                    [
-                      reviewHistory.dataValues.status
-                    ]
-                  ]
-                },
-
-
-                {
-                  "range": `P${submissionPos}`, // Claimed At
-                  "values": [
-                    [
-                      reviewHistory.dataValues.claimedAt
-                    ]
-                  ]
-                },
-                {
-                    "range": `Q${submissionPos}`, //Claimed by ID
-                    "values": [
-                      [
-                        reviewHistory.dataValues.claimedByID
-                      ]
-                    ]
-                  },
-                  {
-                    "range": `R${submissionPos}`, //Claimed by Tag
-                    "values": [
-                      [
-                        reviewHistory.dataValues.claimedByTag
-                      ]
-                    ]
-                  }
-              ]
-              await updateGoogleSheet(sheetBody)
-        let newChannel
+        let submissionPos = reviewHistory.dataValues.id
+        if(server.serverName == "WoW"){ // update google sheet
+          await updateGoogleSheet(createSheetBody(submissionPos, {status:reviewHistory.status, claimedDate:reviewHistory.claimedAt, claimedByID:reviewHistory.claimedByID, claimedByUsername:reviewHistory.claimedByTag}))
+        }
+       let newChannel
         try {
-          
           newChannel = await interaction.guild.channels.create({
-            parent:categoryId,
+            parent:server.reviewCategoryId,
             name:`review-${submissionNumber}`,
             permissionOverwrites: [
                 {
@@ -83,7 +46,7 @@ module.exports = {
                     deny: [PermissionsBitField.Flags.ViewChannel],
                 },
                 {
-                    id: reviewHistory.dataValues.userID, // Ticket owner
+                    id: reviewHistory.userID, // Ticket owner
                     allow: [PermissionsBitField.Flags.ViewChannel],
                 },
                 {
@@ -97,12 +60,14 @@ module.exports = {
             ],
             
         })
-        await interaction.reply({content:"Submission Claimed", ephemeral:true})
+        await interaction.editReply({content:"Submission Claimed", ephemeral:true})
+        cLog([`Submission ${submissionNumber} claimed`], {subProcess:"ClaimValReview", guild:interaction.guild})
         } catch(err) {
+          cLog([err.name +" "+ err.message], {subProcess:"ClaimValReview", guild:interaction.guild})
           console.log(err)
           try {
             newChannel = await interaction.guild.channels.create({
-              parent:categoryId,
+              parent:server.reviewCategoryId,
               name:`review-${submissionNumber}`,
               permissionOverwrites: [
                   {
@@ -121,25 +86,27 @@ module.exports = {
               
           })
           try {
-            await newChannel.permissionOverwrites.edit(reviewHistory.dataValues.userID, { ViewChannel: true });
-            await interaction.reply({content:"Submission Claimed and user was added after failing once!", ephemeral:true})
+            await newChannel.permissionOverwrites.edit(reviewHistory.userID, { ViewChannel: true });
+            await interaction.editReply({content:"Submission Claimed and user was added after failing once!", ephemeral:true})
           } catch(err) {
-            await interaction.reply({content:"Submission Claimed, but user was not added!", ephemeral:true})
+            await interaction.editReply({content:"Submission Claimed, but user was not added!", ephemeral:true})
           }
           
           } catch(err){
             console.log(err)
-            await interaction.reply({content:"Failed to create channel twice", ephemeral:true})
+            await interaction.editReply({content:"Failed to create channel twice", ephemeral:true})
             return
           }
           
         }
         
-        
-        
-        const presetMessage = `<@${interaction.user.id}>\u00A0<@${reviewHistory.dataValues.userID}> Welcome to your VoD review channel.\nYour <@&970784560914788352> will respond with your uploaded review ASAP.\n\nTo close this ticket, react with 🔒`
-
-
+        let presetMessage = "UNKNOWN SERVER"
+        if(server.serverName == "WoW") {
+          presetMessage = `<@${interaction.user.id}>\u00A0<@${reviewHistory.userID}> Welcome to your VoD review channel.\nYour <@&970784560914788352> will respond with your uploaded review ASAP.\n\nTo close this ticket, react with 🔒`
+        }
+        if(server.serverName == "Valorant") {
+          presetMessage = `<@${interaction.user.id}>\u00A0<@${reviewHistory.userID}> Welcome to your VoD review channel.\nYour <@&932795289943826483> will respond with your uploaded review ASAP.\n\nTo close this ticket, react with 🔒`
+        }
         await newChannel.send({content:presetMessage,embeds:[interaction.message.embeds[0]], components:[lockRow]})
         await interaction.message.delete()
     },
