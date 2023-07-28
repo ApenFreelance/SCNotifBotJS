@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js");
-const ValReviewHistory = require("../models/ValReviewHistory");
-const ReviewHistory = require("../models/ReviewHistory");
+
 const { Op } = require("sequelize");
+const { getCorrectTable } = require("../src/db");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -25,15 +25,8 @@ module.exports = {
     let weeks = interaction.options.getInteger("weeks");
     let coach = interaction.options.getUser("coach");
     let ticket = interaction.options.getInteger("ticket");
-    let database;
-    if (interaction.guild.id == "1024961321768329246") {
-      // Valorant (DEV NOW)
-      database = ValReviewHistory;
-    }
-    if (interaction.guild.id == "294958471953252353") {
-      // WoW
-      database = ReviewHistory;
-    }
+    let database = getCorrectTable(interaction.guildId, "reviewHistory")
+    
 
     if (database == undefined) {
       await interaction.reply("This server is not recorded");

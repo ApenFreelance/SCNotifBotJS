@@ -1,5 +1,4 @@
-const ReviewHistory = require("../../../models/ReviewHistory");
-const ValReviewHistory = require("../../../models/ValReviewHistory");
+
 const { cLog } = require("../cLog");
 require("dotenv").config();
 

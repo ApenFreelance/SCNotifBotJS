@@ -1,7 +1,7 @@
-const { ActionRowBuilder, ButtonBuilder, TextInputStyle, ModalBuilder, TextInputBuilder } = require("discord.js");
-const { main } = require("../components/functions/googleApi");
-const ReviewHistory = require("../models/ReviewHistory");
-const { completeSubmissionEmbed } = require("../components/modals/reviewLinkModal");
+
+const { updateGoogleSheet } = require("../components/functions/googleApi");
+
+const { completeSubmissionEmbed } = require("../components/modals.js");
 
 
 

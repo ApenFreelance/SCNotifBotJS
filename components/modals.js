@@ -82,6 +82,20 @@ async function createSubmissionModal(interaction, game) {
   await interaction.showModal(modal)
   return true
 }
+function createRatingModal(submissionNumber, ratingNumber) {
+  const feedbackmodal = new ModalBuilder()
+  .setCustomId(`reviewratingmodal${submissionNumber}`)
+  .setTitle(`Feedback Modal`);
 
+  const commentInput = new TextInputBuilder()
+      .setCustomId("feedback")
+      .setLabel("Tell us what you think?")
+      .setStyle(TextInputStyle.Paragraph)
+      .setRequired(false)
 
-module.exports = { completeSubmissionEmbed, createSubmissionModal };
+  const ratingRow = new ActionRowBuilder().addComponents(commentInput)
+  feedbackmodal.addComponents(ratingRow);
+  return feedbackmodal
+}
+
+module.exports = { completeSubmissionEmbed, createSubmissionModal, createRatingModal };

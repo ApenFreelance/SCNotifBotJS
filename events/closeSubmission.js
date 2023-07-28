@@ -1,12 +1,10 @@
 const { ButtonBuilder, ActionRowBuilder } = require("discord.js");
 const {
   createReviewButtons,
-} = require("../components/actionRowComponents/createReviewButtons");
-const {
-  updateClosedReviewDB,
-  getCorrectTable,
-} = require("../components/functions/databaseFunctions/updateValue");
+} = require("../components/buttons.js");
+const { updateClosedReviewDB } = require("../components/functions/databaseFunctions/updateValue");
 const { cLog } = require("../components/functions/cLog");
+const { getCorrectTable } = require("../src/db.js");
 
 module.exports = {
   name: "closeSubmission",

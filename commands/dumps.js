@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const bot = require("../src/botMain");
 
-const { parseDump } = require("../components/functions/valorantDumps");
+const { parseDump } = require("../components/functions/dumps/valorantDumps");
 const { cLog } = require("../components/functions/cLog");
 
 const jsonLocation = "./gameData.json";
@@ -309,6 +309,7 @@ async function createEmbed(uploads, game, interaction) {
         });
       }
     };
+
     forLoop().then(() => {
       cLog(["COMPLETED"], { guild: interaction.guildId, subProcess: "Dumps" });
       interaction.editReply({

@@ -1,9 +1,6 @@
-const colors = require("colors");
 
-function cLog(
-  args = [],
-  { guild = "System", oneLine = true, spacings = 0, subProcess = null } = {}
-) {
+
+function cLog(args = [], { guild = "System", oneLine = true, spacings = 0, subProcess = null } = {}) {
   let game;
   if (guild == "System") {
     game = colors.yellow("System");

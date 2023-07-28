@@ -117,14 +117,12 @@ module.exports = {
         clipLink: interaction.fields.getTextInputValue("ytlink"),
       });
 
-      await verifiedAccount.update({charIdOnSubmission: characterData.id})
-        .catch((err) => {
-          console.log("No charId found");
-        });
+      
       
       await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement,linkToUserPage,accountName);
       let submissionPos = verifiedAccount.id;
       if(server.serverName == "WoW") {
+        
         if(characterData == null) {
           sheetBody = createSheetBody(submissionPos, {status:verifiedAccount.status, createdAt:verifiedAccount.createdAt, id:verifiedAccount.id, userID:verifiedAccount.userID, userEmail:verifiedAccount.userEmail, clipLink:verifiedAccount.clipLink, armoryLink:linkToUserPage})
         } else {
@@ -132,6 +130,10 @@ module.exports = {
             charClass:characterData.characterClass, twovtwo:characterData.twoVtwoRating, threevthree:characterData.threeVthreeRating, solo1:characterData.soloShuffleSpec1Rating, solo2:characterData.soloShuffleSpec2Rating, solo3:characterData.soloShuffleSpec3Rating, solo4:characterData.soloShuffleSpec4Rating})
         }
         await updateGoogleSheet(sheetBody)
+        await verifiedAccount.update({charIdOnSubmission: characterData.id})
+        .catch((err) => {
+          console.log("No charId found");
+        });
       }
       await interaction.editReply({
         content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
@@ -375,123 +377,4 @@ async function getCharacterInfo(
   });
 
   return characterData;
-}
-
-
-function forSpread(verifiedAccount, characterData, submissionPos, arm, name) {
-  if (characterData == null) {
-    return [
-      //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
-      {
-        range: `O${submissionPos}`, //Ticket status
-        values: [[verifiedAccount.status]],
-      },
-      //BELOW THIS IS REVIEW HISTORY
-      {
-        range: `A${submissionPos}`, //Ticket created
-        values: [[verifiedAccount.createdAt]],
-      },
-      {
-        range: `B${submissionPos}`, //Ticket ID
-        values: [[verifiedAccount.id]],
-      },
-      {
-        range: `C${submissionPos}`, // User ID
-        values: [[verifiedAccount.userID]],
-      },
-      {
-        range: `D${submissionPos}`, // User Tag
-        values: [[verifiedAccount.userTag]],
-      },
-      {
-        range: `E${submissionPos}`, // User Mail
-        values: [[verifiedAccount.userEmail]],
-      },
-      {
-        range: `F${submissionPos}`, // User Clip
-        values: [
-          [
-            verifiedAccount.clipLink,
-            //verifiedAccount.userEmail
-          ],
-        ],
-      },
-      // BELOW IS ALL FROM characterDataACTER AND NOT REVIEWHISTORY
-      {
-        range: `G${submissionPos}`, // Armory Link
-        values: [[arm]],
-      },
-    ];
-  }
-
-  return [
-    //THIS IS STATUS. ON TOP FOR CONVENIENCE. ALWAYS COLUMN "O"
-    {
-      range: `O${submissionPos}`, //Ticket status
-      values: [[verifiedAccount.status]],
-    },
-    //BELOW THIS IS REVIEW HISTORY
-    {
-      range: `A${submissionPos}`, //Ticket created
-      values: [[verifiedAccount.createdAt]],
-    },
-    {
-      range: `B${submissionPos}`, //Ticket ID
-      values: [[verifiedAccount.id]],
-    },
-    {
-      range: `C${submissionPos}`, // User ID
-      values: [[verifiedAccount.userID]],
-    },
-    {
-      range: `D${submissionPos}`, // User Tag
-      values: [[verifiedAccount.userTag]],
-    },
-    {
-      range: `E${submissionPos}`, // User Mail
-      values: [[verifiedAccount.userEmail]],
-    },
-    {
-      range: `F${submissionPos}`, // User Clip
-      values: [
-        [
-          verifiedAccount.clipLink,
-          //verifiedAccount.userEmail
-        ],
-      ],
-    },
-    // BELOW IS ALL FROM characterDataACTER AND NOT REVIEWHISTORY
-    {
-      range: `G${submissionPos}`, // Armory Link
-      values: [[characterData.armoryLink]],
-    },
-    {
-      range: `H${submissionPos}`, // Character class
-      values: [[characterData.characterClass]],
-    },
-    {
-      range: `I${submissionPos}`, // 2v2
-      values: [[characterData.twoVtwoRating]],
-    },
-    {
-      range: `J${submissionPos}`, // 3v3
-      values: [[characterData.threeVthreeRating]],
-    },
-    {
-      range: `K${submissionPos}`, // Solo1
-      values: [[characterData.soloShuffleSpec1Rating]],
-    },
-    {
-      range: `L${submissionPos}`, // Solo2
-      values: [[characterData.soloShuffleSpec2Rating]],
-    },
-    {
-      range: `M${submissionPos}`, // Solo3
-      values: [[characterData.soloShuffleSpec3Rating]],
-    },
-    {
-      range: `N${submissionPos}`, // Solo4
-      values: [[characterData.soloShuffleSpec4Rating]],
-    },
-  ];
 }

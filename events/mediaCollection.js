@@ -1,10 +1,4 @@
-const ReviewHistory = require("../models/ReviewHistory");
-const WoWCharacters = require("../models/WoWCharacters");
-const bot = require("../src/botMain");
-const classes = require("../classes.json");
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
-const noBreakSpace = "\u00A0"
-const wowServer = "294958471953252353"
+
 
 
 

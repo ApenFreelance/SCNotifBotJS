@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { main, updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi");
+const { updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi");
 const { getCorrectTable } = require("../src/db");
 
 
