@@ -1,4 +1,4 @@
-const { main, updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi.js");
+const { updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi.js");
 const blizzard = require("blizzard.js");
 const classes = require("../classes.json");
 require("dotenv").config();
@@ -12,6 +12,7 @@ module.exports = {
   once: false,
   async execute(interaction, server) {
     try {
+      let sheetBody = null;
       let characterData = null;
       let linkToUserPage = null;
       let userAccount = null;
@@ -37,7 +38,7 @@ module.exports = {
         try {
           characterData = await getCharacterInfo(accountRegion,accountSlug,accountName,wowClient,linkToUserPage,interaction.guildId);
         } catch (err) {
-          if (!err.response.status == 404) {
+          if (err.response.status != 404) {
             console.log("failed to get character info: ", err);
           }
           characterData = null;
@@ -85,9 +86,19 @@ module.exports = {
           await interaction.editReply({content: `Something went wrong registering new user.`,ephemeral: true});
         }
         let submissionPos = verifiedAccount.id;
-        await updateGoogleSheet(// TODO: Update this to proper function
-          forSpread(verifiedAccount, characterData, submissionPos, arm, link[3]) 
-        );
+        if(server.serverName == "WoW") {
+          if(characterData == null) {
+            sheetBody = createSheetBody(submissionPos, {status:verifiedAccount.status, createdAt:verifiedAccount.createdAt, id:verifiedAccount.id, userID:verifiedAccount.userID, userEmail:verifiedAccount.userEmail, clipLink:verifiedAccount.clipLink, armoryLink:linkToUserPage})
+          } else {
+            sheetBody = createSheetBody(submissionPos, {status:verifiedAccount.status, createdAt:verifiedAccount.createdAt, id:verifiedAccount.id, userID:verifiedAccount.userID, userEmail:verifiedAccount.userEmail, clipLink:verifiedAccount.clipLink, armoryLink:linkToUserPage,
+              charClass:characterData.characterClass, twovtwo:characterData.twoVtwoRating, threevthree:characterData.threeVthreeRating, solo1:characterData.soloShuffleSpec1Rating, solo2:characterData.soloShuffleSpec2Rating, solo3:characterData.soloShuffleSpec3Rating, solo4:characterData.soloShuffleSpec4Rating})
+          }
+          await updateGoogleSheet(sheetBody)
+        }
+        await interaction.editReply({
+          content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
+          ephemeral: true,
+        });
         return;
       }
 
@@ -113,10 +124,15 @@ module.exports = {
       
       await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement,linkToUserPage,accountName);
       let submissionPos = verifiedAccount.id;
-      createSheetBody(submissionPos, {})
-      await main(
-        forSpread(verifiedAccount, characterData, submissionPos, arm, accountName)
-      );
+      if(server.serverName == "WoW") {
+        if(characterData == null) {
+          sheetBody = createSheetBody(submissionPos, {status:verifiedAccount.status, createdAt:verifiedAccount.createdAt, id:verifiedAccount.id, userID:verifiedAccount.userID, userEmail:verifiedAccount.userEmail, clipLink:verifiedAccount.clipLink, armoryLink:linkToUserPage})
+        } else {
+          sheetBody = createSheetBody(submissionPos, {status:verifiedAccount.status, createdAt:verifiedAccount.createdAt, id:verifiedAccount.id, userID:verifiedAccount.userID, userEmail:verifiedAccount.userEmail, clipLink:verifiedAccount.clipLink, armoryLink:linkToUserPage,
+            charClass:characterData.characterClass, twovtwo:characterData.twoVtwoRating, threevthree:characterData.threeVthreeRating, solo1:characterData.soloShuffleSpec1Rating, solo2:characterData.soloShuffleSpec2Rating, solo3:characterData.soloShuffleSpec3Rating, solo4:characterData.soloShuffleSpec4Rating})
+        }
+        await updateGoogleSheet(sheetBody)
+      }
       await interaction.editReply({
         content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
         ephemeral: true,
