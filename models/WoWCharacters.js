@@ -24,6 +24,7 @@ module.exports = class WoWCharacters extends Model {
       {
         tableName: "WoWCharacters",
         timestamps: true,
+        raw:true,
         sequelize,
       }
     );

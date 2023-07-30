@@ -10,7 +10,10 @@ module.exports = class ValReviewHistory extends Model {
          clipLink: {type: DataTypes.STRING },
          AllTimeTier: {type: DataTypes.STRING},
          CurrentTier: {type: DataTypes.STRING},
+         claimedByID: {type: DataTypes.STRING},
+         claimedByTag: {type: DataTypes.STRING},
          claimedAt: {type: DataTypes.DATE},
+         closedByTag: {type: DataTypes.STRING},
          completedByID: {type: DataTypes.STRING},
          completedByTag: {type: DataTypes.STRING},
          completedAt: {type: DataTypes.DATE},
@@ -23,6 +26,7 @@ module.exports = class ValReviewHistory extends Model {
             tableName: "DevReviewHistory",
             updatedAt:false,
             createdAt:true,
+            raw:true,
             sequelize
         });
     }

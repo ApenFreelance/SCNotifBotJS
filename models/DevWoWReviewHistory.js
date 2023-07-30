@@ -1,6 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
 
-module.exports = class WoWReviewHistory extends Model {
+module.exports = class DevWoWReviewHistory extends Model {
     static init(sequelize) {
         return super.init({
          status: {type: DataTypes.STRING },
