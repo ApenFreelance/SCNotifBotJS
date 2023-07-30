@@ -70,10 +70,10 @@ async function createSubmissionModal(interaction, game) {
   // Val rows
   const trackerRow = new ActionRowBuilder().addComponents(trackerInput);
   
-  if(game == "WoW") {
+  if(game.serverName == "WoW") {
     modal.addComponents(ytRow, armoryRow, emailRow, improvementRow)
   }
-  else if(game == "Valorant") {
+  else if(game.serverName == "Valorant") {
     modal.addComponents(ytRow, trackerRow, emailRow, improvementRow)
   } else {
     cLog(["This server was NOT NULL but unknown!", interaction.guild.name], {guild:interaction.guildId, subProcess:"CreateSubmissionModal"})
@@ -82,9 +82,9 @@ async function createSubmissionModal(interaction, game) {
   await interaction.showModal(modal)
   return true
 }
-function createRatingModal(submissionNumber, ratingNumber) {
+function createRatingModal(submissionNumber, game) {
   const feedbackmodal = new ModalBuilder()
-  .setCustomId(`reviewratingmodal${submissionNumber}`)
+  .setCustomId(`${game}reviewratingmodal${submissionNumber}`)
   .setTitle(`Feedback Modal`);
 
   const commentInput = new TextInputBuilder()
