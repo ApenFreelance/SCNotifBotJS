@@ -134,7 +134,7 @@ async function blockIfLacksRole(interaction, game) {
       role.name === "🧨 Skill Capped Member"||
       role.name === "💙Premium Member") 
     ) {
-      await interaction.editReply({content:"You need to be 💎・Infinity+ or 🌸・Server Booster", ephemeral:true})
+      await interaction.reply({content:"You need to be 🧨 Skill Capped Member or 💙Premium Member", ephemeral:true})
       return true
     }
   }
@@ -143,7 +143,7 @@ async function blockIfLacksRole(interaction, game) {
       interaction.member.roles.cache.some(role => 
       role.name === '💎・Infinity+'|| 
       role.name === '🌸・Server Booster')) {
-      await interaction.editReply({content:"You need to be 💎・Infinity+ or 🌸・Server Booster", ephemeral:true})
+      await interaction.reply({content:"You need to be 💎・Infinity+ or 🌸・Server Booster", ephemeral:true})
       return true
     }
   if(game == "Dev") {
