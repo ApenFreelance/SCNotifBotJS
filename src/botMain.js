@@ -1,13 +1,14 @@
 require("dotenv").config({ path: "../.env" });
-const blizzard = require("blizzard.js");
 const fs = require("fs");
 
 const { Collection, Client, GatewayIntentBits } = require("discord.js");
 const {db} = require("./db");
 const WoWCharacters = require("../models/WoWCharacters");
-const ReviewHistory = require("../models/WoWReviewHistory");
 const ValReviewHistory = require("../models/ValReviewHistory");
 const { cLog } = require("../components/functions/cLog");
+const DevValReviewHistory = require("../models/DevValReviewHistory");
+const DevWoWReviewHistory = require("../models/DevWoWReviewHistory");
+const WoWReviewHistory = require("../models/WoWReviewHistory");
 
 const bot = new Client({
   intents: [
@@ -72,11 +73,17 @@ bot.on("ready", async () => {
   WoWCharacters.init(db);
   WoWCharacters.sync(db);
 
-  ReviewHistory.init(db);
-  ReviewHistory.sync(db);
+  WoWReviewHistory.init(db);
+  WoWReviewHistory.sync(db);
 
   ValReviewHistory.init(db);
   ValReviewHistory.sync(db);
+
+  DevWoWReviewHistory.init(db);
+  DevWoWReviewHistory.sync(db);
+
+  DevValReviewHistory.init(db);
+  DevValReviewHistory.sync(db);
 });
 
 bot.login(process.env.BOT_TOKEN);
