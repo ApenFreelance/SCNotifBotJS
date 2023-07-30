@@ -16,11 +16,11 @@ module.exports = {
         if(interaction.isModalSubmit()) {
           cLog([interaction.user.username, " : attempting to provide review rating"], {subProcess:"ReviewRatingModal"})
           if(interaction.customId.includes("valorantreviewratingmodal")) {
-            serverId = "1024961321768329246"
+            serverId = serverInfo["Valorant"].serverId
             submissionNumber = interaction.customId.replace("valorantreviewratingmodal","")
             game = "Valorant"
           } else if (interaction.customId.includes("wowreviewratingmodal")){
-            serverId = "1024961321768329246"
+            serverId = serverInfo["WoW"].serverId
             submissionNumber = interaction.customId.replace("wowreviewratingmodal","")
             await updateGoogleSheet(createSheetBody(submissionNumber, {reviewComment:interaction.fields.fields.get("feedback").value}))
             game = "WoW"
@@ -46,11 +46,11 @@ module.exports = {
         if(interaction.isButton()) {
           cLog([interaction.user.username, " : attempting to provide review rating"], {subProcess:"ReviewRatingButton"})
           if(interaction.customId.includes("valorantreviewrating")) {
-            serverId = "855206452771684382"
+            serverId = serverInfo["Valorant"].serverId
             ratingNumber = interaction.customId.replace("valorantreviewrating","")
             game = "valorant"
           } else {
-            serverId = "294958471953252353"
+            serverId = serverInfo["WoW"].serverId
             ratingNumber = interaction.customId.replace("wowreviewrating","")
             game = "wow"
           }
