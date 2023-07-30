@@ -122,7 +122,7 @@ module.exports = {
       });
 
       
-      console.log(linkToUserPage, "2")
+      
       await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement,linkToUserPage,accountName, server);
       let submissionPos = verifiedAccount.id;
       if(server.serverName == "WoW") {
