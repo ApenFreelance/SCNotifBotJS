@@ -18,9 +18,10 @@ module.exports = class WoWReviewHistory extends Model {
          completedAt: {type: DataTypes.DATE},
          reviewLink: { type: DataTypes.STRING },
          reviewRating: {type:DataTypes.INTEGER},
-         reviewRatingComment: {type: DataTypes.TEXT}
+         reviewRatingComment: {type: DataTypes.TEXT},
+         transcript: {type: DataTypes.TEXT},
         }, {
-            tableName: "DevWoWReviewHistory",
+            tableName: "WoWReviewHistory",
             updatedAt:false,
             createdAt:true,
             raw:true,

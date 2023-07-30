@@ -2,20 +2,23 @@
     "Valorant": {
         "serverId": "855206452771684382",
         "reviewCategoryId": "939791605685190686",
-        "submissionChannelId":"",
-        "transcriptChannelId":""
+        "submissionChannelId":"1118571029963481088",
+        "transcriptChannelId":"943971066177552455",
+        "ratingChannelId":"1125965279491543081"
     },
     "WoW": {
         "serverId": "294958471953252353",
         "reviewCategoryId": "1089996542087278682",
-        "submissionChannelId":"",
-        "transcriptChannelId":""
+        "submissionChannelId":"1089997649245126818",
+        "transcriptChannelId":"1135330058953822210",
+        "ratingChannelId":"1135330174678872146"
     },
     "Dev":{
         "serverId": "1024961321768329246",
         "reviewCategoryId": "1085409586997108746",
         "submissionChannelId":"1084873371797434438",
         "serverName": "WoW",
-        "transcriptChannelId":"1124046482337714256"
+        "transcriptChannelId":"1124046482337714256",
+        "ratingChannelId":"1124046482337714256"
     }
 }

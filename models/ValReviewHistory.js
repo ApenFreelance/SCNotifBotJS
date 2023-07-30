@@ -23,7 +23,7 @@ module.exports = class ValReviewHistory extends Model {
          transcript: {type: DataTypes.TEXT},
          
         }, {
-            tableName: "DevReviewHistory",
+            tableName: "ValReviewHistory",
             updatedAt:false,
             createdAt:true,
             raw:true,

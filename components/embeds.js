@@ -12,6 +12,12 @@ async function createWaitingForReviewEmbed(interaction, reviewHistory, member, d
     //.setFooter({text:"This submission is unclaimed"})
     return waitingForReviewEmbed
 }
+async function createRatingEmbed(ratingNumber, ratingText, interaction) {
+    const ratingEmbed = new EmbedBuilder()
+        .setAuthor({name:`${interaction.user.username} (${interaction.user.id})`, iconURL:interaction.user.displayAvatarURL(true)})
+        .setDescription(`${interaction.user.username} rated their review: ${ratingNumber}\n\n${ratingText}`)
 
+    return ratingEmbed
+}
 
-module.exports = { createWaitingForReviewEmbed };
+module.exports = { createWaitingForReviewEmbed, createRatingEmbed };

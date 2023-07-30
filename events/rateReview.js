@@ -2,7 +2,8 @@ const { cLog } = require("../components/functions/cLog");
 const { updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi");
 const { createRatingModal } = require("../components/modals");
 const { getCorrectTable } = require("../src/db");
-
+const serverInfo = require("../serverInfo.json");
+const { createRatingEmbed } = require("../components/embeds");
 
 module.exports = {
     name: 'rateReview',
@@ -17,10 +18,12 @@ module.exports = {
           if(interaction.customId.includes("valorantreviewratingmodal")) {
             serverId = "1024961321768329246"
             submissionNumber = interaction.customId.replace("valorantreviewratingmodal","")
-          } else {
+            game = "Valorant"
+          } else if (interaction.customId.includes("wowreviewratingmodal")){
             serverId = "1024961321768329246"
             submissionNumber = interaction.customId.replace("wowreviewratingmodal","")
             await updateGoogleSheet(createSheetBody(submissionNumber, {reviewComment:interaction.fields.fields.get("feedback").value}))
+            game = "WoW"
           }
             const reviewHistory = await getCorrectTable(serverId, "reviewHistory").then((table) => {
               return table.findOne({
@@ -31,7 +34,8 @@ module.exports = {
             await reviewHistory.update({
                 reviewRatingComment:interaction.fields.fields.get("feedback").value
                 })
-
+            let ratingEmbed = await createRatingEmbed(reviewHistory.ratingNumber, interaction.fields.fields.get("feedback").value, interaction)
+            await interaction.client.guilds.fetch(serverId).then(server => server.channels.fetch(serverInfo[game].ratingChannelId).then(channel => channel.send({embeds:[ratingEmbed]})))
             await interaction.reply(`Set comment to\n\n\`\`\`\n ${interaction.fields.fields.get("feedback").value}\n\`\`\``)
             //TODO: Make it send to a specific channel as well for coaches to see
             cLog(["Text review given for review nr: " + submissionNumber], {subProcess:"ReviewValRating"})
