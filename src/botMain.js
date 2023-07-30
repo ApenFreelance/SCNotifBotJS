@@ -34,9 +34,6 @@ const commandFiles = fs
 const eventFiles = fs
   .readdirSync("./events")
   .filter((file) => file.endsWith(".js"));
-const eventValFiles = fs
-  .readdirSync("./eventsVal")
-  .filter((file) => file.endsWith(".js"));
 for (const file of commandFiles) {
   const command = require(`../commands/${file}`);
   // Set a new item in the Collection
@@ -53,14 +50,7 @@ for (const file of eventFiles) {
     bot.on(event.name, (...args) => event.execute(...args));
   }
 }
-for (const file of eventValFiles) {
-  const event = require(`../eventsVal/${file}`);
-  if (event.once) {
-    bot.once(event.name, (...args) => event.execute(...args));
-  } else {
-    bot.on(event.name, (...args) => event.execute(...args));
-  }
-}
+
 
 //bot.rest.on("restDebug", console.log)
 
