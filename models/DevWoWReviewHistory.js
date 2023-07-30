@@ -1,6 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
 
-module.exports = class ReviewHistory extends Model {
+module.exports = class DevWoWReviewHistory extends Model {
     static init(sequelize) {
         return super.init({
          status: {type: DataTypes.STRING },
@@ -12,16 +12,18 @@ module.exports = class ReviewHistory extends Model {
          claimedByID: {type: DataTypes.STRING},
          claimedByTag: {type: DataTypes.STRING},
          claimedAt: {type: DataTypes.DATE},
+         closedByTag: {type: DataTypes.STRING},
          completedByID: {type: DataTypes.STRING},
          completedByTag: {type: DataTypes.STRING},
          completedAt: {type: DataTypes.DATE},
          reviewLink: { type: DataTypes.STRING },
          reviewRating: {type:DataTypes.INTEGER},
-         reviewRatingComment: {type: DataTypes.STRING}
+         reviewRatingComment: {type: DataTypes.TEXT}
         }, {
-            tableName: "ReviewHistory",
+            tableName: "DevWoWReviewHistory",
             updatedAt:false,
             createdAt:true,
+            raw:true,
             sequelize
         });
     }

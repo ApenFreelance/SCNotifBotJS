@@ -1,10 +1,10 @@
-const fs = require("fs")
+const fs = require("fs");
 const classes = require("../../classes.json");
-const bot = require("../../src/botMain")
-const regex = /\*\*(https:\/\/.*?)\*\*/g
+const bot = require("../../src/botMain");
+const regex = /\*\*(https:\/\/.*?)\*\*/g;
 async function createTranscript(channel, ticket, charInfo = null) {
-    let ticketMessages = await fetchTicketMessages(channel)
-    const transcriptTemplate = `<ticket-overview id="markdown-overview" class="markdown-body">
+  let ticketMessages = await fetchTicketMessages(channel);
+  const transcriptTemplate = `<ticket-overview id="markdown-overview" class="markdown-body">
 
 ${addOverviewToTranscript(ticket, charInfo, ticketMessages.pop())}
 
@@ -66,7 +66,7 @@ ${addMessagesToTranscript(ticketMessages)}
     }
     .message-container p {
         grid-column: 2;
-        margin-left: 1.2em;
+        margin: 0 0 0 1.2em;
         min-width: 50%;
     }
     .chatlog-author {
@@ -114,7 +114,6 @@ ${addMessagesToTranscript(ticketMessages)}
     const chatLog= document.querySelectorAll("#content p")
     for (const turn of chatLog) {
         let user = turn.textContent.split("\\n")[0]
-        console.log(user, turn.innerHTML)
         turn.innerHTML = turn.innerHTML.slice(user.length)
         let newA= document.createElement("div")
         let pfp = document.createElement("img")
@@ -133,62 +132,108 @@ ${addMessagesToTranscript(ticketMessages)}
     </script>
     </body>
 </html>
-    `
-    
-    return transcriptTemplate
+    `;
+
+  return transcriptTemplate;
 }
 
 function addUserObject(messages) {
-    let users = {}
-    messages.reverse().forEach(message => {
-         users[message.username] = message.avatar
-    }); 
-    return users
+  let users = {};
+  messages.reverse().forEach((message) => {
+    users[message.username] = message.avatar;
+  });
+  return users;
 }
 
 function addOverviewToTranscript(ticket, charInfo, firstMessage) {
-    if(firstMessage.length !== 0){
-        return firstMessage.embed[0].data.description.trim().split(/\r?\n/).map(line => {
-            line = line.trim() + "  "
-            if(line.includes("Clip to review")) {
-                line+=`  \nReview link: **${ticket.reviewLink}**  \n`
-            }
-            return line
-        }).join("\n")
-    }
+  if (firstMessage.length !== 0) {
+    return firstMessage.embed[0].data.description
+      .trim()
+      .split(/\r?\n/)
+      .map((line) => {
+        line = line.trim() + "  ";
+        if (line.includes("Clip to review")) {
+          line += `  \nReview link: **${ticket.reviewLink}**  \n`;
+        }
+        return line;
+      })
+      .join("\n");
+  }
 
-    let WoWTranscriptOverview = `
+  let WoWTranscriptOverview = `
     E-mail:**${ticket.userEmail}**
     Armory:**[${charInfo.characterName}](${charInfo.armoryLink})**
     Item level:**${charInfo.armorLevel}**
     Class:**${charInfo.characterClass}**
     Region:**${charInfo.characterRegion}**
-`
-if(charInfo.twoVtwoRating != null) {
-    let n = `\n\n__2v2:${noBreakSpace.repeat()}**${charInfo.twoVtwoRating}**__`.length
-    WoWTranscriptOverview+=`\n\n__2v2:${noBreakSpace.repeat(65-n)}**${charInfo.twoVtwoRating}**__`
+`;
+  if (charInfo.twoVtwoRating != null) {
+    let n = `\n\n__2v2:${noBreakSpace.repeat()}**${charInfo.twoVtwoRating}**__`
+      .length;
+    WoWTranscriptOverview += `\n\n__2v2:${noBreakSpace.repeat(65 - n)}**${
+      charInfo.twoVtwoRating
+    }**__`;
   }
-  if(charInfo.threeVthreeRating != null) {
-    let n = `\n\n__3v3:${noBreakSpace.repeat()}**${charInfo.threeVthreeRating}**__`.length
-    WoWTranscriptOverview+=`\n\n__3v3:${noBreakSpace.repeat(65-n)}**${charInfo.threeVthreeRating}**__`
+  if (charInfo.threeVthreeRating != null) {
+    let n = `\n\n__3v3:${noBreakSpace.repeat()}**${
+      charInfo.threeVthreeRating
+    }**__`.length;
+    WoWTranscriptOverview += `\n\n__3v3:${noBreakSpace.repeat(65 - n)}**${
+      charInfo.threeVthreeRating
+    }**__`;
   }
-  if(charInfo.soloShuffleSpec1Rating != null&& charInfo.soloShuffleSpec1Rating!= undefined) {
-    let n = `\n\n__Shuffle ${classes[charInfo.characterClass][0]}:${noBreakSpace.repeat()}**${charInfo.soloShuffleSpec1Rating}**__`.length
-    WoWTranscriptOverview+=`\n\n__Shuffle ${classes[charInfo.characterClass][0]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.soloShuffleSpec1Rating}**__`
+  if (
+    charInfo.soloShuffleSpec1Rating != null &&
+    charInfo.soloShuffleSpec1Rating != undefined
+  ) {
+    let n = `\n\n__Shuffle ${
+      classes[charInfo.characterClass][0]
+    }:${noBreakSpace.repeat()}**${charInfo.soloShuffleSpec1Rating}**__`.length;
+    WoWTranscriptOverview += `\n\n__Shuffle ${
+      classes[charInfo.characterClass][0]
+    }:${noBreakSpace.repeat(maxLengt - n)}**${
+      charInfo.soloShuffleSpec1Rating
+    }**__`;
   }
-  if(charInfo.soloShuffleSpec2Rating != null&& charInfo.soloShuffleSpec2Rating!= undefined) {
-    let n = `\n\n__Shuffle ${classes[charInfo.characterClass][1]}:${noBreakSpace.repeat()}**${charInfo.soloShuffleSpec2Rating}**__`.length
-    WoWTranscriptOverview+=`\n\n__Shuffle ${classes[charInfo.characterClass][1]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.soloShuffleSpec2Rating}**__`
+  if (
+    charInfo.soloShuffleSpec2Rating != null &&
+    charInfo.soloShuffleSpec2Rating != undefined
+  ) {
+    let n = `\n\n__Shuffle ${
+      classes[charInfo.characterClass][1]
+    }:${noBreakSpace.repeat()}**${charInfo.soloShuffleSpec2Rating}**__`.length;
+    WoWTranscriptOverview += `\n\n__Shuffle ${
+      classes[charInfo.characterClass][1]
+    }:${noBreakSpace.repeat(maxLengt - n)}**${
+      charInfo.soloShuffleSpec2Rating
+    }**__`;
   }
-  if(charInfo.soloShuffleSpec3Rating != null&& charInfo.soloShuffleSpec3Rating!= undefined) {
-    let n = `\n\n__Shuffle ${classes[charInfo.characterClass][2]}:${noBreakSpace.repeat()}**${charInfo.soloShuffleSpec3Rating}**__`.length
-    WoWTranscriptOverview+=`\n\n__Shuffle ${classes[charInfo.characterClass][2]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.soloShuffleSpec3Rating}**__`
+  if (
+    charInfo.soloShuffleSpec3Rating != null &&
+    charInfo.soloShuffleSpec3Rating != undefined
+  ) {
+    let n = `\n\n__Shuffle ${
+      classes[charInfo.characterClass][2]
+    }:${noBreakSpace.repeat()}**${charInfo.soloShuffleSpec3Rating}**__`.length;
+    WoWTranscriptOverview += `\n\n__Shuffle ${
+      classes[charInfo.characterClass][2]
+    }:${noBreakSpace.repeat(maxLengt - n)}**${
+      charInfo.soloShuffleSpec3Rating
+    }**__`;
   }
-  if(charInfo.soloShuffleSpec4Rating != null && charInfo.soloShuffleSpec4Rating!= undefined) {
-    let n = `\n\n__Shuffle ${classes[charInfo.characterClass][3]}:${noBreakSpace.repeat()}**${charInfo.soloShuffleSpec4Rating}**__`.length
-    WoWTranscriptOverview+=`\n\n__Shuffle ${classes[charInfo.characterClass][3]}:${noBreakSpace.repeat(maxLengt-n)}**${charInfo.soloShuffleSpec4Rating}**__`
+  if (
+    charInfo.soloShuffleSpec4Rating != null &&
+    charInfo.soloShuffleSpec4Rating != undefined
+  ) {
+    let n = `\n\n__Shuffle ${
+      classes[charInfo.characterClass][3]
+    }:${noBreakSpace.repeat()}**${charInfo.soloShuffleSpec4Rating}**__`.length;
+    WoWTranscriptOverview += `\n\n__Shuffle ${
+      classes[charInfo.characterClass][3]
+    }:${noBreakSpace.repeat(maxLengt - n)}**${
+      charInfo.soloShuffleSpec4Rating
+    }**__`;
   }
-    
 
   let ValTranscriptOverview = `
   E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${ticket.userEmail}**
@@ -196,73 +241,73 @@ if(charInfo.twoVtwoRating != null) {
   Current Rank:\u00A0**${charInfo.MMRdata.data.data.current_data.currenttierpatched}**
   All-time Rank:\u00A0**${charInfo.MMRdata.data.data.highest_rank.patched_tier}**
   Elo:\u00A0\u00A0\u00A0\u00A0**${charInfo.MMRdata.data.data.current_data.elo}**
-  `
+  `;
 
+  if (channel.guild == "1024961321768329246") return ValTranscriptOverview;
+  if (channel.guild == "1024961321768329246") return WoWTranscriptOverview;
 
-
-
-
-    if(channel.guild == "1024961321768329246") return ValTranscriptOverview;
-    if(channel.guild == "1024961321768329246") return WoWTranscriptOverview;
-
-    return undefined
+  return undefined;
 }
 
-
 function addMessagesToTranscript(messages) {
-    let transcriptText = ""
-    let lastChatter
-    messages.reverse().forEach(message => {
-        if(lastChatter === message.username) {
-            transcriptText += `\n${message.content}  `
-        } else {
-            transcriptText += `\n\n${message.username}  \n${message.content}  `
-        }
-        lastChatter = message.username
-    }); 
-    return transcriptText
+  let transcriptText = "";
+  let lastChatter;
+  messages.reverse().forEach((message) => {
+    if (lastChatter === message.username) {
+      transcriptText += `\n${message.content}  `;
+    } else {
+      transcriptText += `\n\n${message.username}  \n${message.content}  `;
+    }
+    lastChatter = message.username;
+  });
+  return transcriptText;
 }
 
 async function fetchTicketMessages(channel) {
-    const channelMessages = await channel.messages.fetch()
+  const channelMessages = await channel.messages.fetch();
 
-    return channelMessages.map(message => {
-        return {
-            content:message.content,
-            username:message.author.username,
-            avatar:message.author.avatarURL(),
-            embed:message.embeds
-        }
-    })
+  return channelMessages.map((message) => {
+    return {
+      content: message.content,
+      username: message.author.username,
+      avatar: message.author.avatarURL(),
+      embed: message.embeds,
+    };
+  });
 }
 
 async function createHTMLfile(ticket, HTMLContent) {
-
-    const filePath =`./tempHTML/ticket-${ticket.id}.html`
-    fs.writeFile(filePath, HTMLContent, (err) => {
-        if (err)
-          console.log(err);
-        })
-    return filePath
-    }
+  const filePath = `./tempHTML/ticket-${ticket.id}.html`;
+  fs.writeFile(filePath, HTMLContent, (err) => {
+    if (err) console.log(err);
+  });
+  return filePath;
+}
 async function sendTranscript(filePath, transcriptChannel) {
-
-    if(typeof transcriptChannel === "string") {
-        transcriptChannel = await bot.channels.fetch(transcriptChannel)
-    }
-    await transcriptChannel.send({ files: [{
+  if (typeof transcriptChannel === "string") {
+    transcriptChannel = await bot.channels.fetch(transcriptChannel);
+  }
+  await transcriptChannel.send({
+    files: [
+      {
         attachment: filePath,
         name: filePath.replace("./tempHTML/", ""),
-        description: 'Transcript file'
-      }]})
-      
-    return filePath
+        description: "Transcript file",
+      },
+    ],
+  });
+
+  return filePath;
 }
 async function addTranscriptToDB(db, transcript) {
-    db.update({
-        transcript:transcript
-    })
+  db.update({
+    transcript: transcript,
+  });
 }
 
-
-module.exports = {createTranscript, createHTMLfile, sendTranscript, addTranscriptToDB}
+module.exports = {
+  createTranscript,
+  createHTMLfile,
+  sendTranscript,
+  addTranscriptToDB,
+};

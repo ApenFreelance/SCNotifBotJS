@@ -1,10 +1,11 @@
-const { main } = require("../components/functions/googleApi");
-const ReviewHistory = require("../models/ReviewHistory");
+const { updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi");
+const { getCorrectTable } = require("../src/db")
+const { cLog } = require("../components/functions/cLog");
 
 module.exports = {
     name: 'rejectReview',
     once: false,
-    async execute(interaction) {    
+    async execute(interaction, server) {    
         const embedAuthor = interaction.message.embeds[0].author.name.match(/\d{18}/)
         const user = await interaction.guild.members.fetch(embedAuthor[0])
         const submissionNumber = interaction.message.embeds[0].title.replace("Submission ", "")
@@ -15,42 +16,23 @@ module.exports = {
             else {
                 interaction.channel.send(`Unknown error when rejecting ${interaction.message.embeds[0].author.name}`)
             }
-        
         })
-        const reviewInDB = await ReviewHistory.findOne({
-            where:{
-                id:submissionNumber
-            }})
-
+        const reviewInDB = await getCorrectTable(interaction.guildId, "reviewHistory").then((table) => {
+            return table.findOne({
+                where:{
+                    id:submissionNumber
+                }})
+        })
         await reviewInDB.update({
             status:"Rejected",
-            completedBy:interaction.user.id,
+            completedByID:interaction.user.id,
+            completedByTag:interaction.user.username,
             completedAt: Date.now()
         })
-        let submissionPos = reviewInDB.dataValues.id
-        const forSpread = [
-            {
-              "range": `O${submissionPos}`, // Status
-              "values": [
-                [
-                  reviewInDB.dataValues.status
-                ]
-              ]
-            },
-            {
-              "range": `S${submissionPos}`,
-              "values": [
-                [
-                  reviewInDB.dataValues.completedAt //completed at
-                ]
-              ]
-            }
-          ]
-          await main(forSpread)
-        //await interaction.message.reply({content:`Rejected ${interaction.message.embeds[0].author.name}`, ephemeral:true})
+        if(server.serverName == "WoW") {
+          await updateGoogleSheet(createSheetBody(submissionNumber, {status:reviewInDB.status, completedAt:reviewInDB.completedAt}))
+        }
         await interaction.message.delete()
-        //console.log(await interaction.message.embeds[0].author.name.match(/\d{18}/))
-        
-        // do your stuff
+        cLog(["Successfully deleted submission"], {guild:interaction.guildId, subProcess:"Reject Submission"})
     },
 };

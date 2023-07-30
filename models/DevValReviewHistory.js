@@ -1,6 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
 
-module.exports = class ValReviewHistory extends Model {
+module.exports = class DevValReviewHistory extends Model {
     static init(sequelize) {
         return super.init({
          status: {type: DataTypes.STRING },
@@ -23,7 +23,7 @@ module.exports = class ValReviewHistory extends Model {
          transcript: {type: DataTypes.TEXT},
          
         }, {
-            tableName: "DevReviewHistory",
+            tableName: "DevValReviewHistory",
             updatedAt:false,
             createdAt:true,
             raw:true,

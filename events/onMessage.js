@@ -1,4 +1,5 @@
-const { PermissionsBitField, ActionRowBuilder, ButtonBuilder } = require("discord.js")
+const { PermissionsBitField, ActionRowBuilder, ButtonBuilder } = require("discord.js");
+const { createTranscript } = require("../components/functions/transcript");
 const row = new ActionRowBuilder()
 			.addComponents(
 				new ButtonBuilder()
@@ -10,6 +11,8 @@ module.exports = {
     name: 'messageCreate',
     once: false,
     async execute(message) {
+        //await createTranscript(message.channel, {id:2, rank:"Gold", reviewLink:"link", responseLink:"resLink", userEmail:"j@gmail.com"})
+        return
         
         if((message.author.id == "142358733953957888" || message.author.id == "443323751573225472") && message.content == "create vodreview button 1") {
             await message.delete().catch(err => console.log(err))

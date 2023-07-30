@@ -1,5 +1,0 @@
-let videoEmbed = new EmbedBuilder()
-    .setTitle("An error has occured")  
-    .setAuthor({ name: `A new Skill-Capped video has been released!`, iconURL: "https://media.discordapp.net/attachments/991013102688555069/994302850580631622/unknown.png"})
-    .setDescription(`${video.videoTitle}\n[click here to watch](${video.link})`)
-    .setImage(`https://skillcappedzencoder.s3.amazonaws.com/${video.videouuid}/thumbnails/thumbnail_medium_${video.tId}.jpg`)

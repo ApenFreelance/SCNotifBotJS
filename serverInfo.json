@@ -1,0 +1,21 @@
+{
+    "Valorant": {
+        "serverId": "855206452771684382",
+        "reviewCategoryId": "939791605685190686",
+        "submissionChannelId":"",
+        "transcriptChannelId":""
+    },
+    "WoW": {
+        "serverId": "294958471953252353",
+        "reviewCategoryId": "1089996542087278682",
+        "submissionChannelId":"",
+        "transcriptChannelId":""
+    },
+    "Dev":{
+        "serverId": "1024961321768329246",
+        "reviewCategoryId": "1085409586997108746",
+        "submissionChannelId":"1084873371797434438",
+        "serverName": "WoW",
+        "transcriptChannelId":"1124046482337714256"
+    }
+}
