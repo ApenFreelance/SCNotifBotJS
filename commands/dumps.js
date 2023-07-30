@@ -2,7 +2,6 @@ const axios = require("axios");
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const bot = require("../src/botMain");
-
 const { parseDump } = require("../components/functions/dumps/valorantDumps");
 const { cLog } = require("../components/functions/cLog");
 
@@ -16,7 +15,9 @@ module.exports = {
       option
         .setName("game")
         .setDescription("the game you wish to update")
-        .addChoices({ name: "valorant", value: "valorant" })
+        .addChoices({ name: "valorant", value: "valorant" },
+        { name: "wrath", value: "wrath" },
+        { name: "wow", value: "wow" })
     )
     .addStringOption((option) =>
       option
@@ -64,34 +65,18 @@ module.exports = {
         });
         return;
       }
-
       if (newDump != null) {
-        cLog(["Command ran for :" + game], {
-          guild: interaction.guildId,
-          subProcess: "Dumps",
-        });
         fs.readFile(jsonLocation, "utf8", function (err, gameData) {
           gameData = JSON.parse(gameData);
           let lastDump = gameData[game].lastDump;
           gameData[game].lastDump = newDump;
-          try {
-            fs.writeFile(
-              jsonLocation,
-              JSON.stringify(gameData, null, 2),
-              (err) => {
-                if (err)
-                  cLog(["ERROR :" + err], {
-                    guild: interaction.guildId,
-                    subProcess: "Dumps",
-                  });
-                else {
-                  cLog(["Succesfully wrote file"], {
-                    guild: interaction.guildId,
-                    subProcess: "Dumps",
-                  });
-                }
+          fs.writeFile(jsonLocation, JSON.stringify(gameData, null, 2), (err) => {
+              if (err)
+                cLog(["ERROR :" + err], {guild: interaction.guildId,subProcess: "Dumps"});
+              else {
+                cLog(["Succesfully wrote file"], {guild: interaction.guildId,subProcess: "Dumps"});
               }
-            );
+            });
             try {
               cLog(["Trying to set dump"], {
                 guild: interaction.guildId,
@@ -111,19 +96,23 @@ module.exports = {
               });
             }
             try {
-              console.log("checking for changes");
+              cLog(["Checking for changes"], {
+                guild: interaction.guildId,
+                subProcess: "Dumps",
+              });
               if (game == "valorant") {
                 parseDump(newDump, oldDump, "valorant", bot);
                 return;
               }
-              checkForChanges(newDump, oldDump, game, interaction);
+              if(game == "wrath" || game == "wow") {
+                checkForChanges(newDump, oldDump, game, interaction)
+              }
             } catch (err) {
               console.log(err);
             }
-          } catch (err) {
-            console.log(err);
-          }
+          
         });
+        
       }
     } catch (err) {
       cLog(["Failed somewhere: \n" + err + "\n\n"], {
@@ -138,13 +127,12 @@ async function checkForChanges(
   newDumpString,
   oldDumpString,
   game,
-  interaction
+  interaction,
 ) {
   let newDump = await axios.get(newDumpString);
   let oldDump = await axios.get(oldDumpString);
   newDump = newDump.data;
   oldDump = oldDump.data;
-
   let updateObject = {};
   let oldVideos = [];
   cLog(["Sorting old videos"], {
@@ -155,7 +143,6 @@ async function checkForChanges(
   Object.values(oldDump.videos).forEach((video) => {
     oldVideos.push(video.title);
   });
-
   Object.values(newDump.videos).forEach((vid) => {
     if (!oldVideos.includes(vid.title)) {
       //console.log(vid.title)
@@ -172,7 +159,6 @@ async function checkForChanges(
         //console.log(updateObject[video].videouuid, "video")
         for (const course in newDump.videosToCourses) {
           //console.log(newDump.videosToCourses[course].chapters)
-
           if (
             newDump.videosToCourses[course].chapters[0].vids.find(
               (item) => item.uuid == updateObject[video].videouuid
@@ -182,7 +168,6 @@ async function checkForChanges(
             updateObject[video].courseTitle = course;
           }
         }
-
         if (
           newDump.courses.find(
             (item) => item.title == updateObject[video].courseTitle
@@ -213,8 +198,10 @@ async function checkForChanges(
       }
     }
   });
-
-  await createEmbed(updateObject, game, interaction);
+  await interaction.editReply({content:"Dump parsed. Now attempting to post"})
+  .then(message => {
+    createEmbed(updateObject, game, interaction)
+  })
 }
 
 async function createEmbed(uploads, game, interaction) {
@@ -246,10 +233,6 @@ async function createEmbed(uploads, game, interaction) {
     cLog(["THESE FAILED: " + failed], {
       guild: interaction.guildId,
       subProcess: "Dumps",
-    });
-    interaction.editReply({
-      contents: `Will now attempt to post all videos.`,
-      ephemeral: true,
     });
     const forLoop = async (_) => {
       for (const tag in breakdown) {
@@ -304,7 +287,6 @@ async function createEmbed(uploads, game, interaction) {
           } else {
             videoEmbed.setThumbnail(data[game].roleDict[tag].img);
           }
-
           videoChannel.send({ embeds: [videoEmbed] });
         });
       }
@@ -312,10 +294,7 @@ async function createEmbed(uploads, game, interaction) {
 
     forLoop().then(() => {
       cLog(["COMPLETED"], { guild: interaction.guildId, subProcess: "Dumps" });
-      interaction.editReply({
-        contents: `Dump upload completed`,
-        ephemeral: true,
-      });
+      
     });
   });
   //await interaction.editReply({contents:`Dump upload completed`, ephemeral:true}).catch(err => console.log(err))
