@@ -1,7 +1,7 @@
 const { ButtonBuilder, PermissionsBitField, ActionRowBuilder } = require("discord.js");
 const { updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi");
-const { getCorrectTable } = require("../src/db")
-
+const { getCorrectTable } = require("../src/db");
+const { cLog } = require("../components/functions/cLog");
 
 
 
@@ -13,15 +13,16 @@ module.exports = {
     once: false,
     async execute(interaction, server) {    
         const submissionNumber = interaction.message.embeds[0].title.replace("Submission ", "")
-        const reviewHistory = await getCorrectTable(interaction.guildId, "reviewHistory").findOne({
+        const reviewHistory = await getCorrectTable(interaction.guildId, "reviewHistory").then((table) => {
+          return table.findOne({
             where:{
                 id:submissionNumber
             }}).catch(err => console.log(err))
-        
+          })
         await reviewHistory.update({
           status:"Claimed",
           claimedByID:interaction.user.id,
-          claimedByTag:interaction.user.tag,
+          claimedByTag:interaction.user.username,
           claimedAt:Date.now()
         })
         const lockRow = new ActionRowBuilder()
@@ -36,9 +37,10 @@ module.exports = {
           await updateGoogleSheet(createSheetBody(submissionPos, {status:reviewHistory.status, claimedDate:reviewHistory.claimedAt, claimedByID:reviewHistory.claimedByID, claimedByUsername:reviewHistory.claimedByTag}))
         }
        let newChannel
+        let parentCategory = server.reviewCategoryId
         try {
           newChannel = await interaction.guild.channels.create({
-            parent:server.reviewCategoryId,
+            parent:parentCategory,
             name:`review-${submissionNumber}`,
             permissionOverwrites: [
                 {
@@ -50,7 +52,7 @@ module.exports = {
                     allow: [PermissionsBitField.Flags.ViewChannel],
                 },
                 {
-                    id: "1020404504430133269", // Bot
+                    id: interaction.client.user.id, // Bot
                     allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ManageChannels],
                 },
                 {
@@ -60,14 +62,13 @@ module.exports = {
             ],
             
         })
-        await interaction.editReply({content:"Submission Claimed", ephemeral:true})
+        await interaction.reply({content:"Submission Claimed", ephemeral:true})
         cLog([`Submission ${submissionNumber} claimed`], {subProcess:"ClaimValReview", guild:interaction.guild})
         } catch(err) {
           cLog([err.name +" "+ err.message], {subProcess:"ClaimValReview", guild:interaction.guild})
-          console.log(err)
           try {
             newChannel = await interaction.guild.channels.create({
-              parent:server.reviewCategoryId,
+              parent:parentCategory,
               name:`review-${submissionNumber}`,
               permissionOverwrites: [
                   {
@@ -75,7 +76,7 @@ module.exports = {
                       deny: [PermissionsBitField.Flags.ViewChannel],
                   },
                   {
-                      id: "1020404504430133269", // Bot
+                      id: interaction.client.user.id, // Bot
                       allow: [PermissionsBitField.Flags.ViewChannel],
                   },
                   {
@@ -87,14 +88,13 @@ module.exports = {
           })
           try {
             await newChannel.permissionOverwrites.edit(reviewHistory.userID, { ViewChannel: true });
-            await interaction.editReply({content:"Submission Claimed and user was added after failing once!", ephemeral:true})
+            await interaction.reply({content:"Submission Claimed and user was added after failing once!", ephemeral:true})
           } catch(err) {
-            await interaction.editReply({content:"Submission Claimed, but user was not added!", ephemeral:true})
+            await interaction.reply({content:"Submission Claimed, but user was not added!", ephemeral:true})
           }
-          
           } catch(err){
             console.log(err)
-            await interaction.editReply({content:"Failed to create channel twice", ephemeral:true})
+            await interaction.reply({content:"Failed to create channel twice", ephemeral:true})
             return
           }
           

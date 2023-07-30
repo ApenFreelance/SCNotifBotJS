@@ -1,7 +1,7 @@
 
 require("dotenv").config({path: '../.env'});
 const bot = require('../src/botMain');
-const { updateGoogleSheet } = require('../components/functions/googleApi');
+const { updateGoogleSheet, createSheetBody } = require('../components/functions/googleApi');
 const { cLog } = require('../components/functions/cLog');
 const { createSubmissionModal } = require('../components/modals');
 const serverInfoJSON = require("../serverInfo.json");
@@ -30,7 +30,6 @@ module.exports = {
           serverId
           reviewCategoryId
         */
-        console.log(server)
         if(interaction.customId == "submitreview") { 
           if(await blockIfLacksRole(interaction, server.serverName)) {
             return
@@ -68,26 +67,24 @@ module.exports = {
           let reviewlink = interaction.fields.getTextInputValue("reviewlink")
           cLog(["Review nr: ",interaction.customId.replace("completesubmission-", "")], {guild:interaction.guild, subProcess:"setReviewLink"})
           
-          const reviewHistory = await getCorrectTable(server.serverId, "reviewHistory").findOne({
-            // Gets the correct table for server
-            where: {
-              id:interaction.customId.replace("completesubmission-", "")
-            }
+          const reviewHistory = await getCorrectTable(server.serverId, "reviewHistory").then(table => {
+            return table.findOne({
+              // Gets the correct table for server
+              where: {
+                id:interaction.customId.replace("completesubmission-", "")
+              }
+            })
           })
           await reviewHistory.update({
             reviewLink:reviewlink
           })
           // WoW logs to sheet as well
           if(server.serverName == "WoW") {
-            const sheetBody = [{
-              "range": `T${interaction.customId.replace("completesubmission-", "")}`, //Review link
-              "values": [[reviewlink]]
-            }]
-            await updateGoogleSheet(sheetBody)
+            await updateGoogleSheet(createSheetBody(interaction.customId.replace("completesubmission-", ""), {reviewLink:reviewlink}))
           }
-          await interaction.editReply({content:"Updated the review link to "+ reviewlink, ephemeral:true})
+          await interaction.reply({content:"Updated the review link to "+ reviewlink, ephemeral:true})
         }
-        if(interaction.customId.includes("userreviewrating")) {
+        if(interaction.customId.includes("reviewrating")) {
           // Handle user submitted reviews to their review
           bot.emit("rateReview", interaction)
         }
@@ -95,7 +92,7 @@ module.exports = {
           bot.emit("mediaCollection", interaction, server)
         }  
     } catch (err) {
-      console.log("Failed somewhere during interaction : ", err, interaction.user.tag)
+      console.log("Failed somewhere during interaction : ", err, interaction.user.username)
       await interaction.reply({content:"Something went wrong, please contact staff", ephemeral:true})
     }} }
     
@@ -103,6 +100,9 @@ module.exports = {
 function selectServer(serverId) {
   for (let key in serverInfoJSON) {
     if (serverInfoJSON[key].serverId === serverId) {
+      if(key == "Dev") { // THIS IS SET IN SERVERJSON
+        return serverInfoJSON[key];
+      }
       serverInfoJSON[key].serverName = key
       return serverInfoJSON[key];
     }

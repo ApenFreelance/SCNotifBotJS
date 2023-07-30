@@ -10,24 +10,24 @@ async function createWaitingForReviewMessage(interaction,charInfo,
   improvementInput,
   linkToUserPage,
   inputName,
-  channel = "1089997649245126818"
+  server
 ) {
-  const member = await server.members.fetch(interaction.user.id);
-  const submissionChannel = await bot.channels.fetch(channel);
+  const member = await interaction.guild.members.fetch(interaction.user.id);
+  const submissionChannel = await bot.channels.fetch(server.submissionChannelId);
   let description = null;
   if(server.serverName == "WoW") {
     if (charInfo == null) {
       description = `E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${reviewHistory.userEmail}**\nArmory:\u00A0\u00A0\u00A0\u00A0**[${inputName}](${linkToUserPage})**\n\n**Failed to get data from Blizzard**`;
     } else {
-      description = `E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${reviewHistory.userEmail}**\nArmory:\u00A0\u00A0\u00A0\u00A0**[${charInfo.characterName}](${charInfo.linkToUserPage})**\nItem level:\u00A0**${charInfo.armorLevel}**\nClass:\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0**${charInfo.characterClass}**\nRegion:\u00A0\u00A0\u00A0\u00A0**${charInfo.characterRegion}**`;
+      description = `E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${reviewHistory.userEmail}**\nArmory:\u00A0\u00A0\u00A0\u00A0**[${charInfo.characterName}](${linkToUserPage})**\nItem level:\u00A0**${charInfo.armorLevel}**\nClass:\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0**${charInfo.characterClass}**\nRegion:\u00A0\u00A0\u00A0\u00A0**${charInfo.characterRegion}**`;
+      description = addWoWRoleStats(charInfo, description)
     }
-    description += addWoWRoleStats(charInfo, description)
   }
   else if(server.serverName == "Valorant") {
     if (charInfo == null) {
-      description = `Tracker.gg:\u00A0\u00A0\u00A0\u00A0**[${inputName}](${inputTrack})**\n\n**Failed to get data from API**`;
+      description = `Tracker.gg:\u00A0\u00A0\u00A0\u00A0**[${inputName}](${linkToUserPage})**\n\n**Failed to get data from API**`;
     } else {
-      description = `Tracker.gg:\u00A0\u00A0\u00A0\u00A0**[${charInfo.accountData.data.data.name}](${inputTrack})**\nCurrent Rank:\u00A0**${charInfo.MMRdata.data.data.current_data.currenttierpatched}**\nAll-time Rank:\u00A0**${charInfo.MMRdata.data.data.highest_rank.patched_tier}**\nElo:\u00A0\u00A0\u00A0\u00A0**${charInfo.MMRdata.data.data.current_data.elo}**`;
+      description = `Tracker.gg:\u00A0\u00A0\u00A0\u00A0**[${charInfo.accountData.data.data.name}](${linkToUserPage})**\nCurrent Rank:\u00A0**${charInfo.MMRdata.data.data.current_data.currenttierpatched}**\nAll-time Rank:\u00A0**${charInfo.MMRdata.data.data.highest_rank.patched_tier}**\nElo:\u00A0\u00A0\u00A0\u00A0**${charInfo.MMRdata.data.data.current_data.elo}**`;
     }
   }
 

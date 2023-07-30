@@ -22,6 +22,8 @@ module.exports = {
       let accountSlug = null;
       let improvement = interaction.fields.getTextInputValue("improvementinput");
       // get correct link to user page
+      await interaction.reply({content:"Attempting to submit review...", ephemeral:true})
+
       let reviewHistory = await getCorrectTable(server.serverId, "reviewHistory")
       if(server.serverName== "WoW") {
         linkToUserPage = interaction.fields.getTextInputValue("armory");
@@ -34,13 +36,11 @@ module.exports = {
         accountSlug = userAccount[2] 
         accountName = userAccount[3] 
         // Create a WoW Client connection
-        wowClient = connectToWoW(interaction)
+        wowClient = await connectToWoW(interaction, accountRegion)
         try {
           characterData = await getCharacterInfo(accountRegion,accountSlug,accountName,wowClient,linkToUserPage,interaction.guildId);
         } catch (err) {
-          if (err.response.status != 404) {
-            console.log("failed to get character info: ", err);
-          }
+          console.log(err)
           characterData = null;
           console.log("Failed to get char, because char doesnt exist or couldnt be found");
         }
@@ -54,10 +54,10 @@ module.exports = {
           .split("/");
         accountName = userAccount[0].split("#")[0]
         accountRegion = userAccount[0].split("#")[1]
-        characterData = getValorantStats(interaction, accountName, accountRegion, reviewHistory)
+        characterData = await getValorantStats(interaction, accountName, accountRegion)
       } 
       else {
-        await interaction.reply({content:"This server is unknown", ephemeral:true})
+        await interaction.editReply({content:"This server is unknown", ephemeral:true})
         return
       }
       
@@ -76,11 +76,7 @@ module.exports = {
       if (created) {
         // if a new entry is created there is no reason to check the rest
         try {
-          await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement,linkToUserPage,accountName);
-          await interaction.editReply({
-            content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
-            ephemeral: true,
-          });
+          await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement,linkToUserPage,accountName, server);
         } catch (err) {
           console.log("Failed when responding or creating message for review for NEW user",err);
           await interaction.editReply({content: `Something went wrong registering new user.`,ephemeral: true});
@@ -95,7 +91,15 @@ module.exports = {
           }
           await updateGoogleSheet(sheetBody)
         }
-        await interaction.reply({
+        else if (server.serverName == "Valorant") {
+          if(characterData != null) {
+            await verifiedAccount.update({
+              CurrentTier:characterData.MMRdata.data.data.current_data.currenttierpatched,
+              AllTimeTier:characterData.MMRdata.data.data.highest_rank.patched_tier
+            })
+          }
+        }
+        await interaction.editReply({
           content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
           ephemeral: true,
         });
@@ -104,7 +108,7 @@ module.exports = {
 
       if (Date.now() - 2629743 * 1000 >= verifiedAccount.createdAt) {
         // 30 day reduction
-        await interaction.reply({content: `You can send a new submission in <t:${verifiedAccount.createdAt / 1000 + 2629743}:R> ( <t:${verifiedAccount.createdAt / 1000 + 2629743}> )`,ephemeral: true});
+        await interaction.editReply({content: `You can send a new submission in <t:${verifiedAccount.createdAt / 1000 + 2629743}:R> ( <t:${verifiedAccount.createdAt / 1000 + 2629743}> )`,ephemeral: true});
         return;
       }
 
@@ -118,11 +122,10 @@ module.exports = {
       });
 
       
-      
-      await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement,linkToUserPage,accountName);
+      console.log(linkToUserPage, "2")
+      await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement,linkToUserPage,accountName, server);
       let submissionPos = verifiedAccount.id;
       if(server.serverName == "WoW") {
-        
         if(characterData == null) {
           sheetBody = createSheetBody(submissionPos, {status:verifiedAccount.status, createdAt:verifiedAccount.createdAt, id:verifiedAccount.id, userID:verifiedAccount.userID, userEmail:verifiedAccount.userEmail, clipLink:verifiedAccount.clipLink, armoryLink:linkToUserPage})
         } else {
@@ -134,6 +137,14 @@ module.exports = {
         .catch((err) => {
           console.log("No charId found");
         });
+      }
+      else if (server.serverName == "Valorant") {
+        if(characterData != null) {
+          await verifiedAccount.update({
+            CurrentTier:characterData.MMRdata.data.data.current_data.currenttierpatched,
+            AllTimeTier:characterData.MMRdata.data.data.highest_rank.patched_tier
+          })
+        }
       }
       await interaction.editReply({
         content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
@@ -150,12 +161,12 @@ module.exports = {
 };
 
 
-async function connectToWoW(interaction) {
-  await blizzard.wow
+async function connectToWoW(interaction, accountRegion) {
+  const con = await blizzard.wow
   .createInstance({
     key: process.env.BCID,
     secret: process.env.BCS,
-    origin: link[1], // optional
+    origin: accountRegion, // optional
     locale: "en_US", // optional
     token: "", // optional
   })
@@ -164,14 +175,11 @@ async function connectToWoW(interaction) {
       guild: interaction.guild,
       subProcess: "CreateWoWInstance",
     });
-    interaction.editReply({
-      content: "Failed to get character info, continuing",
-      ephemeral: true,
-    })
   });
+  return con
 }
 
-async function getValorantStats(interaction, accountName, accountRegion,  reviewHistory) {
+async function getValorantStats(interaction, accountName, accountRegion) {
 	let accountData = await axios.get(`https://api.henrikdev.xyz/valorant/v1/account/${accountName}/${accountRegion}`)
 		.catch(err => {cLog([err], {guild:interaction.guild, subProcess:"AccountData"});});
 	cLog([accountData.data.status], {guild:interaction.guild, subProcess:"AccountData"});
@@ -188,8 +196,7 @@ async function getValorantStats(interaction, accountName, accountRegion,  review
 		cLog([MMRdata.data.errors[0].message], {guild:interaction.guild, subProcess:"MMRdata"});
 		return null
 	}
-
-	await updatePlayerStats(reviewHistory, {guild:interaction.guildId, MMRdata})
+  
 	return {accountData, MMRdata}
 }
 
@@ -359,8 +366,8 @@ async function getCharacterInfo(
   } catch {
     console.log("User most likely has no rank history");
   }
-
-  let characterData = await characterDataacters.create({
+  let characterData = await getCorrectTable(guildId, "WoWCharacter")
+  characterData = await characterData.create({
     armoryLink: armoryLink,
     characterName: Cprofile.data.name,
     characterRegion: region,

@@ -2,14 +2,13 @@ const { ButtonBuilder, ActionRowBuilder } = require("discord.js");
 const {
   createReviewButtons,
 } = require("../components/buttons.js");
-const { updateClosedReviewDB } = require("../components/functions/databaseFunctions/updateValue");
 const { cLog } = require("../components/functions/cLog");
 const { getCorrectTable } = require("../src/db.js");
 
 module.exports = {
   name: "closeSubmission",
   once: false,
-  async execute(interaction) {
+  async execute(interaction, server) {
     const submissionNr = interaction.customId.replace("closesubmission-", "");
     const lastRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
@@ -28,8 +27,7 @@ module.exports = {
       order: [["CreatedAt", "DESC"]],
     });
 
-    await interaction.channel.permissionOverwrites
-      .delete(reviewInDB.dataValues.userID)
+    await interaction.channel.permissionOverwrites.delete(reviewInDB.userID)
       .catch((e) => {
         cLog([`ERROR(${submissionNr}): `, e], {
           guild: interaction.guild.id,
@@ -45,21 +43,12 @@ module.exports = {
       guild: interaction.guild.id,
       subProcess: "Close Submission",
     });
-    let game;
-    if (interaction.guild.id == process.env.valServerId) {
-      game = "val";
-    } else if (interaction.guild.id == process.env.WoWserverId) {
-      game = "";
-    } else {
+    const user = await interaction.guild.members.fetch(
+      reviewInDB.userID
+    );
       // TODO: Add actual error handling
-      return;
-    }
-    await user
-      .send({
-        content:
-          "Your review has been completed.\n\n\nHow would you rate this review?",
-        components: createReviewButtons(submissionNr, game),
-      })
+
+    await user.send({content:"Your review has been completed.\n\n\nHow would you rate this review?",components: createReviewButtons(submissionNr, server.serverName.toLowerCase())})
       .catch((err) => {
         if (err.rawError.message == "Cannot send messages to this user") {
           interaction.channel.send(
@@ -85,17 +74,11 @@ module.exports = {
           return;
         }
       });
-    await updateClosedReviewDB(
-      reviewInDB,
-      interaction.user.id,
-      interaction.user.username,
-      interaction.guild.id,
-      submissionNr
-    );
-    const user = await interaction.guild.members.fetch(
-      reviewInDB.dataValues.userID
-    );
-
+    await reviewInDB.update({
+        status: "Closed",
+        closedByTag: interaction.user.username,
+      });
+    cLog(["Closing: ", submissionNr], { guild: interaction.guildId, subProcess: "Updated DB" });
     cLog([`Success`], {
       guild: interaction.guild.id,
       subProcess: "Send Rating Request",

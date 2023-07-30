@@ -17,13 +17,16 @@ module.exports = {
                 interaction.channel.send(`Unknown error when rejecting ${interaction.message.embeds[0].author.name}`)
             }
         })
-        const reviewInDB = await getCorrectTable(interaction.guildId, "reviewHistory").findOne({
-            where:{
-                id:submissionNumber
-            }})
+        const reviewInDB = await getCorrectTable(interaction.guildId, "reviewHistory").then((table) => {
+            return table.findOne({
+                where:{
+                    id:submissionNumber
+                }})
+        })
         await reviewInDB.update({
             status:"Rejected",
-            completedBy:interaction.user.id,
+            completedByID:interaction.user.id,
+            completedByTag:interaction.user.username,
             completedAt: Date.now()
         })
         if(server.serverName == "WoW") {
