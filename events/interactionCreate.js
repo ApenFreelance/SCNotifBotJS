@@ -131,7 +131,7 @@ async function blockIfLacksRole(interaction, game) {
   if(game == "WoW") {
     if (!
       interaction.member.roles.cache.some((role) => 
-      role.name === "🧨 Skill Capped Member"||
+      role.name === "🧨 Infinity Member"||
       role.name === "💙Premium Member") 
     ) {
       await interaction.reply({content:"You need to be 🧨 Skill Capped Member or 💙Premium Member", ephemeral:true})
