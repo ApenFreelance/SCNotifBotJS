@@ -34,7 +34,7 @@ module.exports = {
             await reviewHistory.update({
                 reviewRatingComment:interaction.fields.fields.get("feedback").value
                 })
-            let ratingEmbed = await createRatingEmbed(reviewHistory.ratingNumber, interaction.fields.fields.get("feedback").value, interaction)
+            let ratingEmbed = await createRatingEmbed(reviewHistory.reviewRating, interaction.fields.fields.get("feedback").value, interaction)
             await interaction.client.guilds.fetch(serverId).then(server => server.channels.fetch(serverInfo[game].ratingChannelId).then(channel => channel.send({embeds:[ratingEmbed]})))
             await interaction.reply(`Set comment to\n\n\`\`\`\n ${interaction.fields.fields.get("feedback").value}\n\`\`\``)
             //TODO: Make it send to a specific channel as well for coaches to see
