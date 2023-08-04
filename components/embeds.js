@@ -20,7 +20,8 @@ async function createRatingEmbed(ratingNumber, ratingText, interaction) {
     return ratingEmbed
 }
 
-function createOverviewEmbed(counted, time) {
+function createOverviewEmbed(counted, time, selectedReviews) {
+    
     function formatCoachCount() {
         let formattedString = ""
         Object.entries(counted.perCoach).forEach(coach => {
@@ -29,9 +30,22 @@ function createOverviewEmbed(counted, time) {
         })
         return formattedString
     }
-  const overviewEmbed = new EmbedBuilder()
+    function formatReviewSummaries() {
+        for(const review of selectedReviews.reverse()) {
+            let reviewRating = review.reviewRating == null ? "" : `\n> Rated: ${review.reviewRating}` 
+            let reviewAddString = `\n\n**Review-${review.id}**\n> ${review.status}\n> <@${review.userID}> ${reviewRating}`
+            console.log(review)
+            if((description += reviewAddString).length > 4096) {
+                description += "\n\n LIMIT REACHED"
+                break
+            }
+        }  
+    }
+    let description = `**Review Count: ${counted.total}**\n${formatCoachCount()}\n\n`
+    formatReviewSummaries()
+    const overviewEmbed = new EmbedBuilder()
     .setTitle(`Summary: ${time.start} - ${time.end}`)
-    .setDescription(`**Review Count: ${counted.total}**\n${formatCoachCount()}`)
+    .setDescription(description)
 
     return overviewEmbed
 }

@@ -34,7 +34,7 @@ module.exports = {
       return;
     }
     const {selectedReviews, time} = await createDatabaseRequest(database, weeks, coach, ticket, timeFormat);
-    await interaction.reply({embeds:[createOverviewEmbed(countCoachReviews(selectedReviews.map((result) => result.get({ plain: true }))), time)], ephemeral:true})
+    await interaction.reply({embeds:[createOverviewEmbed(countCoachReviews(selectedReviews.map((result) => result.get({ plain: true }))), time, selectedReviews.map((result) => result.get({ plain: true })))], ephemeral:true})
     
   },
 };
