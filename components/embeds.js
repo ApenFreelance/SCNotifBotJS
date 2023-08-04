@@ -20,4 +20,26 @@ async function createRatingEmbed(ratingNumber, ratingText, interaction) {
     return ratingEmbed
 }
 
-module.exports = { createWaitingForReviewEmbed, createRatingEmbed };
+function createOverviewEmbed(counted, time) {
+    function formatCoachCount() {
+        let formattedString = ""
+        Object.entries(counted.perCoach).forEach(coach => {
+            const [coachId, count] = coach  
+            formattedString += `\n<@${coachId}> : ${count}`
+        })
+        return formattedString
+    }
+  const overviewEmbed = new EmbedBuilder()
+    .setTitle(`Summary: ${time.start} - ${time.end}`)
+    .setDescription(`**Review Count: ${counted.total}**\n${formatCoachCount()}`)
+
+    return overviewEmbed
+}
+
+
+
+
+
+
+
+module.exports = { createWaitingForReviewEmbed, createRatingEmbed, createOverviewEmbed };
