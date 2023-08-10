@@ -106,7 +106,7 @@ module.exports = {
         return;
       }
 
-      if (Date.now() - 2629743 * 1000 >= verifiedAccount.createdAt) {
+      if (Date.now() - 2629743 * 1000 <= verifiedAccount.createdAt) {
         // 30 day reduction
         await interaction.editReply({content: `You can send a new submission in <t:${verifiedAccount.createdAt / 1000 + 2629743}:R> ( <t:${verifiedAccount.createdAt / 1000 + 2629743}> )`,ephemeral: true});
         return;
