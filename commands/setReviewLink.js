@@ -31,11 +31,15 @@ module.exports = {
       let submissionPos = interaction.channel.name
         .replace("closed-", "")
         .replace("review-", "");
-      const r = await getCorrectTable(interaction.guildId, "reviewHistory").findOne({
-        where: {
-          id: submissionPos,
-        },
-      });
+
+      const r = await getCorrectTable(interaction.guildId, "reviewHistory").then(table => {
+        return table.findOne({
+          // Gets the correct table for server
+          where: {
+            id: submissionPos,
+          }
+        })
+      })
 
       await r.update({
         reviewLink: reviewLink,
