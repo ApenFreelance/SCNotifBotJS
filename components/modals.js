@@ -46,7 +46,7 @@ async function createSubmissionModal(interaction, game) {
     .setStyle(TextInputStyle.Paragraph);
   const consentInput = new TextInputBuilder()
     .setCustomId("consentinput")
-    .setLabel("I consent to this review being used by SC")
+    .setLabel("Can Skill-Capped use your review for content?")
     .setStyle(TextInputStyle.Short);
   // WoW fields
   const armoryInput = new TextInputBuilder()
