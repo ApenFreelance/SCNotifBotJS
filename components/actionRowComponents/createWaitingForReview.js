@@ -8,6 +8,7 @@ const noBreakSpace = "\u00A0";
 async function createWaitingForReviewMessage(interaction,charInfo,
   reviewHistory,
   improvementInput,
+  consentInput,
   linkToUserPage,
   inputName,
   server
@@ -19,7 +20,7 @@ async function createWaitingForReviewMessage(interaction,charInfo,
     if (charInfo == null) {
       description = `E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${reviewHistory.userEmail}**\nArmory:\u00A0\u00A0\u00A0\u00A0**[${inputName}](${linkToUserPage})**\n\n**Failed to get data from Blizzard**`;
     } else {
-      description = `E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${reviewHistory.userEmail}**\nArmory:\u00A0\u00A0\u00A0\u00A0**[${charInfo.characterName}](${linkToUserPage})**\nItem level:\u00A0**${charInfo.armorLevel}**\nClass:\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0**${charInfo.characterClass}**\nRegion:\u00A0\u00A0\u00A0\u00A0**${charInfo.characterRegion}**`;
+      description = `E-mail:\u00A0\u00A0\u00A0\u00A0\u00A0**${reviewHistory.userEmail}**\nArmory:\u00A0\u00A0\u00A0\u00A0**[${charInfo.characterName}](${linkToUserPage})**\nItem level:\u00A0**${charInfo.armorLevel}**\nClass:\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0**${charInfo.characterClass}**\nRegion:\u00A0\u00A0\u00A0\u00A0**${charInfo.characterRegion}**\n\nI consent to my review being used by Skill-Capped: ${consentInput}  `;
       description = addWoWRoleStats(charInfo, description)
     }
   }
@@ -27,7 +28,7 @@ async function createWaitingForReviewMessage(interaction,charInfo,
     if (charInfo == null) {
       description = `Tracker.gg:\u00A0\u00A0\u00A0\u00A0**[${inputName}](${linkToUserPage})**\n\n**Failed to get data from API**`;
     } else {
-      description = `Tracker.gg:\u00A0\u00A0\u00A0\u00A0**[${charInfo.accountData.data.data.name}](${linkToUserPage})**\nCurrent Rank:\u00A0**${charInfo.MMRdata.data.data.current_data.currenttierpatched}**\nAll-time Rank:\u00A0**${charInfo.MMRdata.data.data.highest_rank.patched_tier}**\nElo:\u00A0\u00A0\u00A0\u00A0**${charInfo.MMRdata.data.data.current_data.elo}**`;
+      description = `Tracker.gg:\u00A0\u00A0\u00A0\u00A0**[${charInfo.accountData.data.data.name}](${linkToUserPage})**\nCurrent Rank:\u00A0**${charInfo.MMRdata.data.data.current_data.currenttierpatched}**\nAll-time Rank:\u00A0**${charInfo.MMRdata.data.data.highest_rank.patched_tier}**\nElo:\u00A0\u00A0\u00A0\u00A0**${charInfo.MMRdata.data.data.current_data.elo}**\n\nI consent to my review being used by Skill-Capped: **${consentInput}**  `;
     }
   }
 

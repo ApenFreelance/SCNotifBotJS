@@ -21,6 +21,7 @@ module.exports = {
       let accountRegion = null;
       let accountSlug = null;
       let improvement = interaction.fields.getTextInputValue("improvementinput");
+      let consentInput = interaction.fields.getTextInputValue("consentinput")
       // get correct link to user page
       await interaction.reply({content:"Attempting to submit review...", ephemeral:true})
 
@@ -76,7 +77,7 @@ module.exports = {
       if (created) {
         // if a new entry is created there is no reason to check the rest
         try {
-          await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement,linkToUserPage,accountName, server);
+          await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement, consentInput ,linkToUserPage,accountName, server);
         } catch (err) {
           console.log("Failed when responding or creating message for review for NEW user",err);
           await interaction.editReply({content: `Something went wrong registering new user.`,ephemeral: true});
@@ -123,7 +124,7 @@ module.exports = {
 
       
       
-      await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement,linkToUserPage,accountName, server);
+      await createWaitingForReviewMessage(interaction,characterData,verifiedAccount,improvement, consentInput,linkToUserPage,accountName, server);
       let submissionPos = verifiedAccount.id;
       if(server.serverName == "WoW") {
         if(characterData == null) {
@@ -147,7 +148,7 @@ module.exports = {
         }
       }
       await interaction.editReply({
-        content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.`,
+        content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.\n\n**Unverified YouTube accounts cannot post videos. Verify here:** https://www.youtube.com/verify`,
         ephemeral: true,
       });
     } catch (e) {

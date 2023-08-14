@@ -42,9 +42,12 @@ async function createSubmissionModal(interaction, game) {
     .setStyle(TextInputStyle.Short);
   const improvementInput = new TextInputBuilder()
     .setCustomId('improvementinput')
-    .setLabel("What are you looking to focus on and improve?")
+    .setLabel("What is your goal with this review")
     .setStyle(TextInputStyle.Paragraph);
-
+  const consentInput = new TextInputBuilder()
+    .setCustomId("consentinput")
+    .setLabel("I consent to this review being used by SC")
+    .setStyle(TextInputStyle.Short);
   // WoW fields
   const armoryInput = new TextInputBuilder()
     .setCustomId('armory')    
@@ -63,7 +66,7 @@ async function createSubmissionModal(interaction, game) {
   const ytRow = new ActionRowBuilder().addComponents(ytInput);
   const emailRow = new ActionRowBuilder().addComponents(emailInput);
   const improvementRow = new ActionRowBuilder().addComponents(improvementInput);
-  
+  const consentRow = new ActionRowBuilder().addComponents(consentInput)
   // WoW rows
   const armoryRow = new ActionRowBuilder().addComponents(armoryInput);
   
@@ -71,10 +74,10 @@ async function createSubmissionModal(interaction, game) {
   const trackerRow = new ActionRowBuilder().addComponents(trackerInput);
   
   if(game.serverName == "WoW") {
-    modal.addComponents(ytRow, armoryRow, emailRow, improvementRow)
+    modal.addComponents(ytRow, armoryRow, emailRow, improvementRow, consentRow)
   }
   else if(game.serverName == "Valorant") {
-    modal.addComponents(ytRow, trackerRow, emailRow, improvementRow)
+    modal.addComponents(ytRow, trackerRow, emailRow, improvementRow, consentRow)
   } else {
     cLog(["This server was NOT NULL but unknown!", interaction.guild.name], {guild:interaction.guildId, subProcess:"CreateSubmissionModal"})
     return null
