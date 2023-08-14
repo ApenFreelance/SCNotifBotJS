@@ -148,7 +148,7 @@ module.exports = {
         }
       }
       await interaction.editReply({
-        content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.\n\n**Unverified YouTube accounts cannot post videos. Verify here:** https://www.youtube.com/verify`,
+        content: `Thank you for requesting a free Skill Capped VoD Review.\n\nIf your submission is accepted, you will be tagged in a private channel where your review will be uploaded.\n\n**Videos above 15 minutes from unverified YouTube accounts will be removed by YouTube. Verify here:** https://www.youtube.com/verify`,
         ephemeral: true,
       });
     } catch (e) {
