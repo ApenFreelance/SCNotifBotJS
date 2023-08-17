@@ -11,7 +11,7 @@ const row = new ActionRowBuilder()
 const refundEmbed = new EmbedBuilder()
 .setColor("#3ba55d")
 .setTitle("How to get a refund")
-.setDescription("Please write an email to `support@scill-capped.com, they should get back to you in a couple of business days`")
+.setDescription("Please write an email to `support@scill-capped.com`, they should get back to you in a couple of business days")
 
 const refundRow = new ActionRowBuilder()
     .addComponents(
