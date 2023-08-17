@@ -1,5 +1,6 @@
-const { PermissionsBitField, ActionRowBuilder, ButtonBuilder } = require("discord.js");
+const { PermissionsBitField, ActionRowBuilder, ButtonBuilder, EmbedBuilder } = require("discord.js");
 const { createTranscript } = require("../components/functions/transcript");
+const { cLog } = require("../components/functions/cLog");
 const row = new ActionRowBuilder()
 			.addComponents(
 				new ButtonBuilder()
@@ -7,40 +8,28 @@ const row = new ActionRowBuilder()
 					.setLabel('Submit review')
 					.setStyle("Success"),
 			);
+const refundEmbed = new EmbedBuilder()
+.setColor("#3ba55d")
+.setTitle("How to get a refund")
+.setDescription("Please write an email to `support@scill-capped.com, they should get back to you in a couple of business days`")
+
+const refundRow = new ActionRowBuilder()
+    .addComponents(
+        new ButtonBuilder()
+            .setCustomId("delete-message")
+            .setLabel("Delete")
+            .setStyle("Danger")
+    )
+
+
 module.exports = {
     name: 'messageCreate',
     once: false,
     async execute(message) {
-        //await createTranscript(message.channel, {id:2, rank:"Gold", reviewLink:"link", responseLink:"resLink", userEmail:"j@gmail.com"})
-        return
-        
-        if((message.author.id == "142358733953957888" || message.author.id == "443323751573225472") && message.content == "create vodreview button 1") {
-            await message.delete().catch(err => console.log(err))
-            await message.channel.send({content:"Click button to submit review", components:[row]}).catch(err => console.log(err))
+        if(message.author.bot) return;
+
+        if(message.content.includes("refund") && (message.guildId == "1024961321768329246" || message.guildId == "855206452771684382"))  {
+            await message.reply({embeds:[refundEmbed], components:[refundRow]})
+            cLog(["Creating Refund Message"], {guild:message.guildId, subProcess:"Refund Message"})
         }
-/*         console.log(message.guild.roles.cache.some(role => role.name == "lars"))
-        const role = await message.guild.roles.create({
-            name:"lars",
-            permissions:[PermissionsBitField.Flags.SendMessages]
-        }).then(role => message.member.roles.add(role))
-        .catch(err => console.log(err)) */
-/*         try {
-            if(message.channel.id == "1076975945816219698") {
-                await message.delete()
-                return
-            }
-    
-            if(message.content.includes("/veri")) {
-                await message.delete()
-                await message.channel.send("Please make sure to write this in a command and not plain text! See <#1076975945816219698> ")
-                return
-            }
-    
-        } catch {
-            console.log("oops")
-        }
-        */
-
-
-
-                        }}
+}}

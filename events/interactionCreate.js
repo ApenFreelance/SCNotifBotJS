@@ -30,6 +30,12 @@ module.exports = {
           serverId
           reviewCategoryId
         */
+        if(interaction.customId == "delete-message") {
+          await interaction.message.delete()
+          cLog(["Deleted refund message"], {guild:server.serverId, subProcess:"Refund Message"})
+        }
+
+
         if(interaction.customId == "submitreview") { 
           if(await blockIfLacksRole(interaction, server.serverName)) {
             return
