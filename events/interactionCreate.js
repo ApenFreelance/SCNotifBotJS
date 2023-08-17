@@ -30,7 +30,7 @@ module.exports = {
           serverId
           reviewCategoryId
         */
-        if(interaction.customId == "delete-message") {
+        if(interaction.customId == "deletemessage") {
           await interaction.message.delete()
           cLog(["Deleted refund message"], {guild:server.serverId, subProcess:"Refund Message"})
         }

@@ -16,7 +16,7 @@ const refundEmbed = new EmbedBuilder()
 const refundRow = new ActionRowBuilder()
     .addComponents(
         new ButtonBuilder()
-            .setCustomId("delete-message")
+            .setCustomId("deletemessage")
             .setLabel("Delete")
             .setStyle("Danger")
     )
