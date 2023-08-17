@@ -28,7 +28,7 @@ module.exports = {
     async execute(message) {
         if(message.author.bot) return;
 
-        if(message.content.includes("refund") && (message.guildId == "1024961321768329246" || message.guildId == "855206452771684382"))  {
+        if(message.content.toLowerCase().includes("refund") && (message.guildId == "1024961321768329246" || message.guildId == "855206452771684382"))  {
             await message.reply({embeds:[refundEmbed], components:[refundRow]})
             cLog(["Creating Refund Message"], {guild:message.guildId, subProcess:"Refund Message"})
         }
