@@ -5,7 +5,8 @@ require("dotenv").config();
 const { createWaitingForReviewMessage } = require("../components/actionRowComponents/createWaitingForReview.js");
 const { cLog } = require("../components/functions/cLog.js");
 const { getCorrectTable } = require("../src/db.js");
-const axios = require("axios")
+const axios = require("axios");
+const { reduceTimeBetweenUses, getOverwrites, getShortestOverwrite } = require("../components/functions/timerOverwrite.js");
 
 module.exports = {
   name: "submitReview",
@@ -106,11 +107,15 @@ module.exports = {
         });
         return;
       }
-
-      if (Date.now() - 2629743 * 1000 <= verifiedAccount.createdAt) {
-        // 30 day reduction
-        await interaction.editReply({content: `You can send a new submission in <t:${verifiedAccount.createdAt / 1000 + 2629743}:R> ( <t:${verifiedAccount.createdAt / 1000 + 2629743}> )`,ephemeral: true});
+      // Reduction decided on in DB
+      const {userTimeBetween, timeBetweenRoles} = await getOverwrites(await interaction.user.id, await interaction.member.roles.cache, server)
+      const shortest = await getShortestOverwrite(userTimeBetween,  timeBetweenRoles, interaction.guildId)
+      if (Date.now() - shortest.timeBetween * 1000 <= verifiedAccount.createdAt) {
+        await interaction.editReply({content: `You can send a new submission in <t:${verifiedAccount.createdAt / 1000 + parseInt(shortest.timeBetween)}:R> ( <t:${verifiedAccount.createdAt / 1000 + parseInt(shortest.timeBetween)}> )`,ephemeral: true});
         return;
+      }
+      if(shortest.uses != "unlimited") {
+        await reduceTimeBetweenUses(shortest.userId, interaction.guildId)
       }
 
       // if none of the ones apply, create new entry
