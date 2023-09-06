@@ -4,8 +4,8 @@ const bot = require('../src/botMain');
 const { updateGoogleSheet, createSheetBody } = require('../components/functions/googleApi');
 const { cLog } = require('../components/functions/cLog');
 const { createSubmissionModal } = require('../components/modals');
-const serverInfoJSON = require("../serverInfo.json");
 const { getCorrectTable } = require("../src/db");
+const { selectServer } = require("../components/functions/selectServer");
 
 
 const regexWoWLink = /(https):\/\/((worldofwarcraft\.blizzard\.com||worldofwarcraft\.com)\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/.+)/
@@ -103,18 +103,7 @@ module.exports = {
     }} }
     
 
-function selectServer(serverId) {
-  for (let key in serverInfoJSON) {
-    if (serverInfoJSON[key].serverId === serverId) {
-      if(key == "Dev") { // THIS IS SET IN SERVERJSON
-        return serverInfoJSON[key];
-      }
-      serverInfoJSON[key].serverName = key
-      return serverInfoJSON[key];
-    }
-  }
-  return null;
-}
+
 
 
 async function slashCommandHandler(interaction) {
@@ -140,7 +129,7 @@ async function blockIfLacksRole(interaction, game) {
       role.name === "🧨 Infinity Member"||
       role.name === "💙Premium Member") 
     ) {
-      await interaction.reply({content:"You need to be 🧨 Skill Capped Member or 💙Premium Member", ephemeral:true})
+      await interaction.reply({content:"You need to be 🧨 Infinity Member or 💙Premium Member", ephemeral:true})
       return true
     }
   }
