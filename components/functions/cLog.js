@@ -5,15 +5,15 @@ function cLog(args = [], { guild = "System", oneLine = true, spacings = 0, subPr
   if (guild == "System") {
     game = colors.yellow("System");
     subProcess = colorSubProcess(subProcess, "yellow");
-  } else if (guild.id == "855206452771684382" || guild == "855206452771684382") {
+  } else if (guild.id == "855206452771684382" || guild == "855206452771684382" || guild.serverId == "855206452771684382") {
     // Valorant
     game = colors.magenta("VALORANT");
     subProcess = colorSubProcess(subProcess, "magenta");
-  } else if (guild.id == "294958471953252353" || guild == "294958471953252353") {
+  } else if (guild.id == "294958471953252353" || guild == "294958471953252353" || guild.serverId == "294958471953252353") {
     // WoW
     game = colors.blue("WoW");
     subProcess = colorSubProcess(subProcess, "blue");
-  } else if (guild.id == "1024961321768329246" || guild == "1024961321768329246") {
+  } else if (guild.id == "1024961321768329246" || guild == "1024961321768329246" || guild.serverId == "1024961321768329246") {
     // Dev
     game = colors.yellow("Dev");
     subProcess = colorSubProcess(subProcess, "yellow");
