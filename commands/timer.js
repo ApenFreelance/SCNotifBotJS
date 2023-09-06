@@ -19,7 +19,7 @@ module.exports = {
             .setName("adduser")
             .setDescription("Add overwrite for user")
             .addUserOption(option => option.setName("user").setDescription("Set user to add").setRequired(true))
-            .addIntegerOption(option => option.setName("days").setDescription("Set time between reviews in days. Leave empty for unlimited").setRequired(true))
+            .addIntegerOption(option => option.setName("days").setDescription("Set time between reviews in days").setRequired(true))
             .addIntegerOption(option => option.setName("uses").setDescription("Set amount of uses. Leave empty for unlimited"))),
     
   async execute(interaction) {
