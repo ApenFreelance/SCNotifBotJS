@@ -9,6 +9,7 @@ const { cLog } = require("../components/functions/cLog");
 const DevValReviewHistory = require("../models/DevValReviewHistory");
 const DevWoWReviewHistory = require("../models/DevWoWReviewHistory");
 const WoWReviewHistory = require("../models/WoWReviewHistory");
+const ReviewTimerOverwrite = require("../models/ReviewTimerOverwrite");
 
 const bot = new Client({
   intents: [
@@ -74,6 +75,9 @@ bot.on("ready", async () => {
 
   DevValReviewHistory.init(db);
   DevValReviewHistory.sync(db);
+
+  ReviewTimerOverwrite.init(db);
+  ReviewTimerOverwrite.sync(db);
 });
 
 bot.login(process.env.BOT_TOKEN);
