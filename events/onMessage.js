@@ -21,6 +21,12 @@ const refundRow = new ActionRowBuilder()
             .setStyle("Danger")
     )
 
+const uiTriggers = ["UI errors", "UI error", "addon error", "addon errors", "UI crashing", "UI crashes", "OmniBar error", "OmniBar crashing", "BigDebuffs error", "BigDebuffs crashing"]
+const uiEmbed = new EmbedBuilder()
+.setColor("#3ba55d")
+.setTitle("UI error")
+.setDescription("UI errors are common with the rework to the Blizzard UI in Dragonflight. The most common triggers for UI errors are:\n\n1) Changing talents\n2) Interacting with the spellbook\n\nTo minimize the risk of a UI error mid game, be sure to /reload UI in the starting room, especially after changing talents.")
+
 
 module.exports = {
     name: 'messageCreate',
@@ -32,4 +38,8 @@ module.exports = {
             await message.reply({embeds:[refundEmbed], components:[refundRow]})
             cLog(["Creating Refund Message"], {guild:message.guildId, subProcess:"Refund Message"})
         }
+        if(uiTriggers.some(substring=>message.content.toLowerCase().includes(substring.toLowerCase()))){
+            await message.reply({embeds: [uiEmbed], components: [refundRow]})
+        }
+        
 }}
