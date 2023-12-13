@@ -194,7 +194,7 @@ async function checkForChanges(
         }
         updateObject[
           video
-        ].link = `https://www.skill-capped.com/${game}/browse3/course/${updateObject[video].videouuid}/${updateObject[video].courseuuid}`;
+        ].link = `https://www.skill-capped.com/${game}/browse/course/${updateObject[video].videouuid}/${updateObject[video].courseuuid}`;
       }
     }
   });
