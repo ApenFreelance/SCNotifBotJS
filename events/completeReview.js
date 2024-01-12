@@ -13,6 +13,7 @@ module.exports = {
     name: 'completeReview',
     once: false,
     async execute(interaction, server) { 
+      let mode = null
       let channel = null
       let submissionNumber
       try {
@@ -24,7 +25,11 @@ module.exports = {
       if(typeof channel === "undefined") {
           channel = interaction.guild.channels.cache.find(channel => channel.name == `closed-${submissionNumber}`);
       }
-
+      if (interaction.channel.id == serverInfo["WoW"]["wowpvp"].submissionChannelId) {
+        mode = "wowpvp";
+      } else if (interaction.channel.id == serverInfo["WoW"]["wowpve"].submissionChannelId) {
+        mode = "wowpve";
+      }
         const reviewHistory = await getCorrectTable(interaction.guild.id, "reviewHistory").then((table) => {
           return table.findOne({
             where:{
@@ -43,7 +48,7 @@ module.exports = {
             completedAt: Date.now()
         })
         if(server.serverName == "WoW") {
-          await updateGoogleSheet(createSheetBody(submissionNumber, {status:reviewHistory.status, completedAt:reviewHistory.completedAt, reviewLink:reviewHistory.reviewLink}))
+          await updateGoogleSheet(createSheetBody(mode, submissionNumber, {status:reviewHistory.status, completedAt:reviewHistory.completedAt, reviewLink:reviewHistory.reviewLink}))
         }
         try {
           await createTranscript(channel, reviewHistory)

@@ -24,7 +24,6 @@ module.exports = {
             //await interaction.reply({content:"Processing...", ephemeral:true}) // This is to show something is happening and to prevent timeout. EDIT IT ALONG THE WAY
             // Line above causes issues with modals
             const server = selectServer(interaction.guildId); //
-            console.log(server);
             /*
             Contains:
             serverName
@@ -67,13 +66,13 @@ module.exports = {
                     });
                 }
             }
-            if (interaction.customId == "claimsubmission") {
+            if (interaction.customId.split("-")[0] == "claimsubmission") {
                 // Begin claim handling
-                bot.emit("claimReview", interaction, server);
+                bot.emit("claimReview", interaction, server, interaction.customId.split("-")[1]);
             }
-            if (interaction.customId == "rejectsubmission") {
+            if (interaction.customId.split("-")[0] == "rejectsubmission") {
                 // Begin rejection handling
-                bot.emit("rejectReview", interaction, server);
+                bot.emit("rejectReview", interaction, server, interaction.customId.split("-")[1]);
             }
             if (interaction.customId.startsWith("closesubmission-")) {
                 // Close. NOT FINAL STEP. THIS IS WHEN REVIEW STATUS IS SET TO CLOSED. COMPLETE IS LAST
@@ -115,6 +114,7 @@ module.exports = {
                 if (server.serverName == "WoW") {
                     await updateGoogleSheet(
                         createSheetBody(
+                            mode,
                             interaction.customId.replace(
                                 "completesubmission-",
                                 ""

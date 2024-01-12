@@ -21,16 +21,19 @@ function submitReviewButton(mode) {
             .setStyle("Success")
     );
 }
-const waitingForReviewRow = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-        .setCustomId("claimsubmission")
+function waitingForReviewRow(mode) {
+    return new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+        .setCustomId(`claimsubmission-${mode}`)
         .setLabel("Claim")
         .setStyle("Success"),
     new ButtonBuilder()
-        .setCustomId("rejectsubmission")
+        .setCustomId(`rejectsubmission-${mode}`)
         .setLabel("Reject")
         .setStyle("Danger")
-);
+    );
+}
+
 
 module.exports = {
     createReviewButtons,

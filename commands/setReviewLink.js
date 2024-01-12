@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi");
 const { getCorrectTable } = require("../src/db");
-
+const serverInfo = require("../serverInfo.json");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -15,6 +15,7 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    let mode = null;
     try {
       let reviewLink = interaction.options.getString("reviewlink");
       if (
@@ -32,7 +33,12 @@ module.exports = {
         .replace("closed-", "")
         .replace("review-", "");
 
-      const r = await getCorrectTable(interaction.guildId, "reviewHistory").then(table => {
+      if (interaction.channel.id == serverInfo["WoW"]["wowpvp"].submissionChannelId) {
+        mode = "wowpvp";
+      } else if (interaction.channel.id == serverInfo["WoW"]["wowpve"].submissionChannelId) {
+        mode = "wowpve";
+      }
+      const r = await getCorrectTable(interaction.guildId, "reviewHistory", mode).then(table => {
         return table.findOne({
           // Gets the correct table for server
           where: {
@@ -45,7 +51,7 @@ module.exports = {
         reviewLink: reviewLink,
       });
       if(interaction.guildId == "294958471953252353") { // WoW id
-        await updateGoogleSheet(createSheetBody(submissionPos, {reviewLink:reviewLink}))
+        await updateGoogleSheet(createSheetBody(mode, submissionPos, {reviewLink:reviewLink}))
       }
       await interaction.reply({ content: `Review Link set to ${reviewLink}` });
     } catch (err) {

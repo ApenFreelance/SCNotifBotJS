@@ -11,9 +11,9 @@ const { cLog } = require("../components/functions/cLog");
 module.exports = {
     name: 'claimReview',
     once: false,
-    async execute(interaction, server) {    
+    async execute(interaction, server, mode = null) {    
         const submissionNumber = interaction.message.embeds[0].title.replace("Submission ", "")
-        const reviewHistory = await getCorrectTable(interaction.guildId, "reviewHistory").then((table) => {
+        const reviewHistory = await getCorrectTable(interaction.guildId, "reviewHistory", mode).then((table) => {
           return table.findOne({
             where:{
                 id:submissionNumber
@@ -34,10 +34,10 @@ module.exports = {
                 .setCustomId(`closesubmission-${submissionNumber}`))
         let submissionPos = reviewHistory.dataValues.id
         if(server.serverName == "WoW"){ // update google sheet
-          await updateGoogleSheet(createSheetBody(submissionPos, {status:reviewHistory.status, claimedDate:reviewHistory.claimedAt, claimedByID:reviewHistory.claimedByID, claimedByUsername:reviewHistory.claimedByTag}))
+          await updateGoogleSheet(createSheetBody(mode, submissionPos, {status:reviewHistory.status, claimedDate:reviewHistory.claimedAt, claimedByID:reviewHistory.claimedByID, claimedByUsername:reviewHistory.claimedByTag}))
         }
        let newChannel
-        let parentCategory = server.reviewCategoryId
+        let parentCategory = server[mode].reviewCategoryId
         try {
           newChannel = await interaction.guild.channels.create({
             parent:parentCategory,

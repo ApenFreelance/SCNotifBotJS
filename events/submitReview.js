@@ -1,12 +1,7 @@
-const {
-    updateGoogleSheet,
-    createSheetBody,
-} = require("../components/functions/googleApi.js");
+const { updateGoogleSheet, createSheetBody } = require("../components/functions/googleApi.js");
 const blizzard = require("blizzard.js");
 const classes = require("../classes.json");
-const {
-    createWaitingForReviewMessage,
-} = require("../components/actionRowComponents/createWaitingForReview.js");
+const { createWaitingForReviewMessage } = require("../components/actionRowComponents/createWaitingForReview.js");
 const { cLog } = require("../components/functions/cLog.js");
 const { getCorrectTable } = require("../src/db.js");
 const axios = require("axios");
@@ -19,7 +14,7 @@ const {
 module.exports = {
     name: "submitReview",
     once: false,
-    async execute(interaction, server) {
+    async execute(interaction, server, mode = null) {
         try {
             let sheetBody = null;
             let characterData = null;
@@ -41,7 +36,8 @@ module.exports = {
 
             let reviewHistory = await getCorrectTable(
                 server.serverId,
-                "reviewHistory"
+                "reviewHistory",
+                mode
             );
             if (server.serverName == "WoW") {
                 linkToUserPage = interaction.fields.getTextInputValue("armory");
@@ -117,7 +113,8 @@ module.exports = {
                         consentInput,
                         linkToUserPage,
                         accountName,
-                        server
+                        server,
+                        mode
                     );
                 } catch (err) {
                     console.log(
@@ -132,7 +129,7 @@ module.exports = {
                 let submissionPos = verifiedAccount.id;
                 if (server.serverName == "WoW") {
                     if (characterData == null) {
-                        sheetBody = createSheetBody(submissionPos, {
+                        sheetBody = createSheetBody(mode, submissionPos, {
                             status: verifiedAccount.status,
                             createdAt: verifiedAccount.createdAt,
                             id: verifiedAccount.id,
@@ -142,7 +139,7 @@ module.exports = {
                             armoryLink: linkToUserPage,
                         });
                     } else {
-                        sheetBody = createSheetBody(submissionPos, {
+                        sheetBody = createSheetBody(mode, submissionPos, {
                             status: verifiedAccount.status,
                             createdAt: verifiedAccount.createdAt,
                             id: verifiedAccount.id,
@@ -229,12 +226,13 @@ module.exports = {
                 consentInput,
                 linkToUserPage,
                 accountName,
-                server
+                server,
+                mode
             );
             let submissionPos = verifiedAccount.id;
             if (server.serverName == "WoW") {
                 if (characterData == null) {
-                    sheetBody = createSheetBody(submissionPos, {
+                    sheetBody = createSheetBody(mode, submissionPos, {
                         status: verifiedAccount.status,
                         createdAt: verifiedAccount.createdAt,
                         id: verifiedAccount.id,
@@ -244,7 +242,7 @@ module.exports = {
                         armoryLink: linkToUserPage,
                     });
                 } else {
-                    sheetBody = createSheetBody(submissionPos, {
+                    sheetBody = createSheetBody(mode, submissionPos, {
                         status: verifiedAccount.status,
                         createdAt: verifiedAccount.createdAt,
                         id: verifiedAccount.id,
@@ -261,6 +259,7 @@ module.exports = {
                         solo4: characterData.soloShuffleSpec4Rating,
                     });
                 }
+
                 await updateGoogleSheet(sheetBody);
                 await verifiedAccount
                     .update({ charIdOnSubmission: characterData.id })
@@ -358,14 +357,7 @@ async function getValorantStats(interaction, accountName, accountRegion) {
     return { accountData, MMRdata };
 }
 
-async function getCharacterInfo(
-    region,
-    slug,
-    characterName,
-    wowClient,
-    armoryLink,
-    guildId
-) {
+async function getCharacterInfo(region,slug,characterName,wowClient,armoryLink,guildId) {
     const Cprofile = await wowClient.characterProfile({
         realm: slug,
         name: characterName,
@@ -382,14 +374,7 @@ async function getCharacterInfo(
         guild: guildId,
         subProcess: "characterData",
     });
-    let twoVtwoRating =
-        (threeVthreeRating =
-        tenVtenRating =
-        soloShuffleSpec1Rating =
-        soloShuffleSpec2Rating =
-        soloShuffleSpec3Rating =
-        soloShuffleSpec4Rating =
-            null);
+    let twoVtwoRating = (threeVthreeRating = tenVtenRating = soloShuffleSpec1Rating = soloShuffleSpec2Rating = soloShuffleSpec3Rating = soloShuffleSpec4Rating = null);
 
     try {
         for (const bracket of Cpvp.data.brackets) {
@@ -502,9 +487,7 @@ async function getCharacterInfo(
                     });
 
                     soloShuffleSpec4Rating = bracketInfo.data.rating;
-                } else {
-                    console.log("FOUND NO MATCH FOR BRACKET: ", bracket.href);
-                }
+                } 
             } catch (err) {
                 if (
                     err

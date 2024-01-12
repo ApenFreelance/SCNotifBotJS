@@ -10,10 +10,11 @@ async function createWaitingForReviewMessage(interaction,charInfo,
   consentInput,
   linkToUserPage,
   inputName,
-  server
+  server,
+  mode = null
 ) {
   const member = await interaction.guild.members.fetch(interaction.user.id);
-  const submissionChannel = await interaction.client.channels.fetch(server.submissionChannelId);
+  const submissionChannel = await interaction.client.channels.fetch(server[mode].submissionChannelId);
   let description = null;
   if(server.serverName == "WoW") {
     if (charInfo == null) {
@@ -33,7 +34,7 @@ async function createWaitingForReviewMessage(interaction,charInfo,
 
   description += `\n\nClip to review: **${reviewHistory.clipLink}**`;
   description += `\nWhat they want to improve on: **${improvementInput}**`;
-  await submissionChannel.send({embeds: [await createWaitingForReviewEmbed(interaction, reviewHistory, member, description)], components:[waitingForReviewRow]})
+  await submissionChannel.send({embeds: [await createWaitingForReviewEmbed(interaction, reviewHistory, member, description)], components:[waitingForReviewRow(mode)]})
   cLog(["Successfully sent submission"], {
     guild: interaction.guildId,
     subProcess: "CreateWaitingForReview",

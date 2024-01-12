@@ -43,6 +43,7 @@ async function authorize() {
 }
 
 function createSheetBody(
+    mode,
     submissionPos,
     {
         status = null,
@@ -69,29 +70,35 @@ function createSheetBody(
         reviewComment = null,
     }
 ) {
+    let sheetName = null;
+    if (mode == "wowpvp") {
+        sheetName = "PVP";
+    } else if (mode == "wowpve") {
+        sheetName = "PVE";
+    }
     const properties = [
-        { range: `A${submissionPos}`, value: createdAt },
-        { range: `B${submissionPos}`, value: id },
-        { range: `C${submissionPos}`, value: userID },
-        { range: `D${submissionPos}`, value: userName },
-        { range: `E${submissionPos}`, value: userEmail },
-        { range: `F${submissionPos}`, value: clipLink },
-        { range: `G${submissionPos}`, value: armoryLink },
-        { range: `H${submissionPos}`, value: charClass },
-        { range: `I${submissionPos}`, value: twovtwo },
-        { range: `J${submissionPos}`, value: threevthree },
-        { range: `K${submissionPos}`, value: solo1 },
-        { range: `L${submissionPos}`, value: solo2 },
-        { range: `M${submissionPos}`, value: solo3 },
-        { range: `N${submissionPos}`, value: solo4 },
-        { range: `O${submissionPos}`, value: status },
-        { range: `P${submissionPos}`, value: claimedDate },
-        { range: `Q${submissionPos}`, value: claimedByID },
-        { range: `R${submissionPos}`, value: claimedByUsername },
-        { range: `S${submissionPos}`, value: completedAt },
-        { range: `T${submissionPos}`, value: reviewLink },
-        { range: `U${submissionPos}`, value: reviewRating },
-        { range: `V${submissionPos}`, value: reviewComment },
+        { range: `${sheetName}!A${submissionPos}`, value: createdAt },
+        { range: `${sheetName}!B${submissionPos}`, value: id },
+        { range: `${sheetName}!C${submissionPos}`, value: userID },
+        { range: `${sheetName}!D${submissionPos}`, value: userName },
+        { range: `${sheetName}!E${submissionPos}`, value: userEmail },
+        { range: `${sheetName}!F${submissionPos}`, value: clipLink },
+        { range: `${sheetName}!G${submissionPos}`, value: armoryLink },
+        { range: `${sheetName}!H${submissionPos}`, value: charClass },
+        { range: `${sheetName}!I${submissionPos}`, value: twovtwo },
+        { range: `${sheetName}!J${submissionPos}`, value: threevthree },
+        { range: `${sheetName}!K${submissionPos}`, value: solo1 },
+        { range: `${sheetName}!L${submissionPos}`, value: solo2 },
+        { range: `${sheetName}!M${submissionPos}`, value: solo3 },
+        { range: `${sheetName}!N${submissionPos}`, value: solo4 },
+        { range: `${sheetName}!O${submissionPos}`, value: status },
+        { range: `${sheetName}!P${submissionPos}`, value: claimedDate },
+        { range: `${sheetName}!Q${submissionPos}`, value: claimedByID },
+        { range: `${sheetName}!R${submissionPos}`, value: claimedByUsername },
+        { range: `${sheetName}!S${submissionPos}`, value: completedAt },
+        { range: `${sheetName}!T${submissionPos}`, value: reviewLink },
+        { range: `${sheetName}!U${submissionPos}`, value: reviewRating },
+        { range: `${sheetName}!V${submissionPos}`, value: reviewComment },
     ];
 
     const sheetBody = properties
