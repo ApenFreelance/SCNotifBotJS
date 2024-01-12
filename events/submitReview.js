@@ -5,11 +5,7 @@ const { createWaitingForReviewMessage } = require("../components/actionRowCompon
 const { cLog } = require("../components/functions/cLog.js");
 const { getCorrectTable } = require("../src/db.js");
 const axios = require("axios");
-const {
-    reduceTimeBetweenUses,
-    getOverwrites,
-    getShortestOverwrite,
-} = require("../components/functions/timerOverwrite.js");
+const { reduceTimeBetweenUses, getOverwrites, getShortestOverwrite } = require("../components/functions/timerOverwrite.js");
 
 module.exports = {
     name: "submitReview",
@@ -362,10 +358,7 @@ async function getCharacterInfo(region,slug,characterName,wowClient,armoryLink,g
         realm: slug,
         name: characterName,
     });
-    cLog([`Cprofile: ${Cprofile.status}. [ ${Cprofile.statusText} ]`], {
-        guild: guildId,
-        subProcess: "characterData",
-    });
+    cLog([`Cprofile: ${Cprofile.status}. [ ${Cprofile.statusText} ]`], {guild: guildId,subProcess: "characterData",});
     const Cpvp = await wowClient.characterPVP({
         realm: slug,
         name: characterName,
@@ -379,126 +372,39 @@ async function getCharacterInfo(region,slug,characterName,wowClient,armoryLink,g
     try {
         for (const bracket of Cpvp.data.brackets) {
             try {
-                if (bracket.href.includes("2v2")) {
+                const bracketType = bracket.href.includes("2v2") ? "2v2"
+                : bracket.href.includes("3v3") ? "3v3"
+                : bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][0].toLowerCase().replace(" ", "")}`) ? `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][0].toLowerCase().replace(" ", "")}`
+                : bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][1].toLowerCase().replace(" ", "")}`) ? `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][1].toLowerCase().replace(" ", "")}`
+                : bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][2].toLowerCase().replace(" ", "")}`) ? `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][2].toLowerCase().replace(" ", "")}`
+                : bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][3].toLowerCase().replace(" ", "")}`) ? `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][3].toLowerCase().replace(" ", "")}`
+                : null;
+                if (bracketType) {
                     const bracketInfo = await wowClient.characterPVP({
                         realm: slug,
                         name: characterName,
-                        bracket: "2v2",
+                        bracket: bracketType,
                     });
-
-                    twoVtwoRating = bracketInfo.data.rating;
-                } else if (bracket.href.includes("3v3")) {
-                    const bracketInfo = await wowClient.characterPVP({
-                        realm: slug,
-                        name: characterName,
-                        bracket: "3v3",
-                    });
-
-                    threeVthreeRating = bracketInfo.data.rating;
-                } else if (
-                    bracket.href.includes(
-                        `shuffle-${Cprofile.data.character_class.name
-                            .toLowerCase()
-                            .replace(" ", "")}-${classes[
-                            Cprofile.data.character_class.name
-                        ][0]
-                            .toLowerCase()
-                            .replace(" ", "")}`
-                    )
-                ) {
-                    const bracketInfo = await wowClient.characterPVP({
-                        realm: slug,
-                        name: characterName,
-                        bracket: `shuffle-${Cprofile.data.character_class.name
-                            .toLowerCase()
-                            .replace(" ", "")}-${classes[
-                            Cprofile.data.character_class.name
-                        ][0]
-                            .toLowerCase()
-                            .replace(" ", "")}`,
-                    });
-                    soloShuffleSpec1Rating = bracketInfo.data.rating;
-                } else if (
-                    bracket.href.includes(
-                        `shuffle-${Cprofile.data.character_class.name
-                            .toLowerCase()
-                            .replace(" ", "")}-${classes[
-                            Cprofile.data.character_class.name
-                        ][1].toLowerCase()}.replace(" ", "")`
-                    )
-                ) {
-                    const bracketInfo = await wowClient.characterPVP({
-                        realm: slug,
-                        name: characterName,
-                        bracket: `shuffle-${Cprofile.data.character_class.name
-                            .toLowerCase()
-                            .replace(" ", "")}-${classes[
-                            Cprofile.data.character_class.name
-                        ][1]
-                            .toLowerCase()
-                            .replace(" ", "")}`,
-                    });
-                    soloShuffleSpec2Rating = bracketInfo.data.rating;
-                } else if (
-                    bracket.href.includes(
-                        `shuffle-${Cprofile.data.character_class.name
-                            .toLowerCase()
-                            .replace(" ", "")}-${classes[
-                            Cprofile.data.character_class.name
-                        ][2]
-                            .toLowerCase()
-                            .replace(" ", "")}`
-                    )
-                ) {
-                    const bracketInfo = await wowClient.characterPVP({
-                        realm: slug,
-                        name: characterName,
-                        bracket: `shuffle-${Cprofile.data.character_class.name
-                            .toLowerCase()
-                            .replace(" ", "")}-${classes[
-                            Cprofile.data.character_class.name
-                        ][2]
-                            .toLowerCase()
-                            .replace(" ", "")}`,
-                    });
-
-                    soloShuffleSpec3Rating = bracketInfo.data.rating;
-                } else if (
-                    bracket.href.includes(
-                        `shuffle-${Cprofile.data.character_class.name
-                            .toLowerCase()
-                            .replace(" ", "")}-${classes[
-                            Cprofile.data.character_class.name
-                        ][3]
-                            .toLowerCase()
-                            .replace(" ", "")}`
-                    )
-                ) {
-                    const bracketInfo = await wowClient.characterPVP({
-                        realm: slug,
-                        name: characterName,
-                        bracket: `shuffle-${Cprofile.data.character_class.name
-                            .toLowerCase()
-                            .replace(" ", "")}-${classes[
-                            Cprofile.data.character_class.name
-                        ][3]
-                            .toLowerCase()
-                            .replace(" ", "")}`,
-                    });
-
-                    soloShuffleSpec4Rating = bracketInfo.data.rating;
-                } 
+    
+                    if (bracketType === "2v2") {
+                        twoVtwoRating = bracketInfo.data.rating;
+                    } else if (bracketType === "3v3") {
+                        threeVthreeRating = bracketInfo.data.rating;
+                    } else if (bracketType.includes("shuffle")) {
+                        if (bracketType.endsWith(classes[Cprofile.data.character_class.name][0].toLowerCase().replace(" ", ""))) {
+                            soloShuffleSpec1Rating = bracketInfo.data.rating;
+                        } else if (bracketType.endsWith(classes[Cprofile.data.character_class.name][1].toLowerCase().replace(" ", ""))) {
+                            soloShuffleSpec2Rating = bracketInfo.data.rating;
+                        } else if (bracketType.endsWith(classes[Cprofile.data.character_class.name][2].toLowerCase().replace(" ", ""))) {
+                            soloShuffleSpec3Rating = bracketInfo.data.rating;
+                        } else if (bracketType.endsWith(classes[Cprofile.data.character_class.name][3].toLowerCase().replace(" ", ""))) {
+                            soloShuffleSpec4Rating = bracketInfo.data.rating;
+                        }
+                    }
+                }
             } catch (err) {
-                if (
-                    err
-                        .toString()
-                        .includes(
-                            "TypeError: Cannot read properties of undefined (reading 'toLowerCase')"
-                        )
-                ) {
-                    console.log(
-                        "This role does not exist in classes, or class is lacking subclass"
-                    );
+                if (err.toString().includes("TypeError: Cannot read properties of undefined (reading 'toLowerCase')")) {
+                    console.log("This role does not exist in classes, or class is lacking subclass");
                 } else {
                     console.log(err, "Error when checking classes");
                 }
@@ -525,4 +431,8 @@ async function getCharacterInfo(region,slug,characterName,wowClient,armoryLink,g
     });
 
     return characterData;
+}
+
+function getMythicPlusScore(wowClient,slug,characterName) {
+    
 }
