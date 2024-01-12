@@ -2,10 +2,10 @@ require("dotenv").config({ path: "../.env" });
 const fs = require("fs");
 
 const { Collection, Client, GatewayIntentBits } = require("discord.js");
-const {db} = require("./db");
+const { db } = require("./db");
+const { cLog } = require("../components/functions/cLog");
 const WoWCharacters = require("../models/WoWCharacters");
 const ValReviewHistory = require("../models/ValReviewHistory");
-const { cLog } = require("../components/functions/cLog");
 const DevValReviewHistory = require("../models/DevValReviewHistory");
 const DevWoWReviewHistory = require("../models/DevWoWReviewHistory");
 const WoWReviewHistory = require("../models/WoWReviewHistory");
@@ -19,14 +19,13 @@ const bot = new Client({
     GatewayIntentBits.GuildMembers,
   ],
 });
-module.exports = bot;
 bot.commands = new Collection();
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled promise rejection:", error);
   //logChannelServer.send()
 });
 process.on("uncaughtException", (error) => {
-  console.error("uncaught excemption : ", error);
+  console.error("Uncaught Exception : ", error);
 });
 
 const commandFiles = fs
@@ -51,6 +50,7 @@ for (const file of eventFiles) {
     bot.on(event.name, (...args) => event.execute(...args));
   }
 }
+// Lukas var her! @lukasolsen
 
 
 //bot.rest.on("restDebug", console.log)
@@ -59,25 +59,24 @@ bot.rest.on("rateLimited", (data) => {
   console.log(`[ RATE LIMIT ]`);
 });
 
+
+const models = [
+  WoWCharacters, 
+  WoWReviewHistory, 
+  ValReviewHistory, 
+  DevWoWReviewHistory, 
+  DevValReviewHistory, 
+  ReviewTimerOverwrite
+];
+
+
 bot.on("ready", async () => {
   cLog([`${bot.user.username} has logged in`], { subProcess: "Start-up" });
-  WoWCharacters.init(db);
-  WoWCharacters.sync(db);
-
-  WoWReviewHistory.init(db);
-  WoWReviewHistory.sync(db);
-
-  ValReviewHistory.init(db);
-  ValReviewHistory.sync(db);
-
-  DevWoWReviewHistory.init(db);
-  DevWoWReviewHistory.sync(db);
-
-  DevValReviewHistory.init(db);
-  DevValReviewHistory.sync(db);
-
-  ReviewTimerOverwrite.init(db);
-  ReviewTimerOverwrite.sync(db);
+  models.forEach((model) => {
+    model.init(db)
+    model.sync();
+    
+  });
 });
 
 bot.login(process.env.BOT_TOKEN);
