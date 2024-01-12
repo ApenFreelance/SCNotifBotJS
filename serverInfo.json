@@ -2,31 +2,31 @@
     "Valorant": {
         "serverId": "855206452771684382",
         "reviewCategoryId": "939791605685190686",
-        "submissionChannelId":"1118571029963481088",
-        "transcriptChannelId":"943971066177552455",
-        "ratingChannelId":"1125965279491543081"
+        "submissionChannelId": "1118571029963481088",
+        "transcriptChannelId": "943971066177552455",
+        "ratingChannelId": "1125965279491543081"
     },
     "WoW": {
         "serverId": "1024961321768329246",
-        "pve": {
+        "wowpve": {
             "reviewCategoryId": "1195408435953545257",
-            "submissionChannelId":"1195408515020357632",
-            "transcriptChannelId":"1195408583265886218",
-            "ratingChannelId":"1195408614626705458"
+            "submissionChannelId": "1195408515020357632",
+            "transcriptChannelId": "1195408583265886218",
+            "ratingChannelId": "1195408614626705458"
         },
-        "pvp": {
+        "wowpvp": {
             "reviewCategoryId": "1195408461937266730",
-            "submissionChannelId":"1195408670545162341",
-            "transcriptChannelId":"1195408732734095480",
-            "ratingChannelId":"1195408753374281862"    
+            "submissionChannelId": "1195408670545162341",
+            "transcriptChannelId": "1195408732734095480",
+            "ratingChannelId": "1195408753374281862"
         }
     },
-    "Dev":{
-        "serverId": "1024961321768329246",
+    "Dev": {
+        "serverId": "102496132178329246",
         "reviewCategoryId": "1085409586997108746",
-        "submissionChannelId":"1084873371797434438",
+        "submissionChannelId": "1084873371797434438",
         "serverName": "WoW",
-        "transcriptChannelId":"1124046482337714256",
-        "ratingChannelId":"1124046482337714256"
+        "transcriptChannelId": "1124046482337714256",
+        "ratingChannelId": "1124046482337714256"
     }
 }
