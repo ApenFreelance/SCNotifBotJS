@@ -1,7 +1,6 @@
 const axios = require("axios");
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const fs = require("fs");
-const bot = require("../src/botMain");
 const { parseDump } = require("../components/functions/dumps/valorantDumps");
 const { cLog } = require("../components/functions/cLog");
 
@@ -101,7 +100,7 @@ module.exports = {
                 subProcess: "Dumps",
               });
               if (game == "valorant") {
-                parseDump(newDump, oldDump, "valorant", bot);
+                parseDump(newDump, oldDump, "valorant", interaction.client);
                 return;
               }
               if(game == "wrath" || game == "wow") {
@@ -249,7 +248,7 @@ async function createEmbed(uploads, game, interaction) {
         });
 
         //console.log(data[game].logChannelID.toString())
-        let videoChannel = await bot.channels
+        let videoChannel = await interaction.client.channels
           .fetch(data[game].roleDict[tag].channelid.toString())
           .catch((err) => {
             if (
