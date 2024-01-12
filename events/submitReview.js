@@ -37,14 +37,12 @@ module.exports = {
             );
             if (server.serverName == "WoW") {
                 linkToUserPage = interaction.fields.getTextInputValue("armory");
-                userAccount = decodeURI(linkToUserPage)
+                [_ , accountRegion, accountSlug, accountName] = decodeURI(linkToUserPage)
                     .replace("https://worldofwarcraft.com/", "")
                     .replace("https://worldofwarcraft.blizzard.com/", "")
                     .replace("/character/", "/")
                     .split("/");
-                accountRegion = userAccount[1];
-                accountSlug = userAccount[2];
-                accountName = userAccount[3];
+
                 // Create a WoW Client connection
                 wowClient = await connectToWoW(interaction, accountRegion);
                 try {
@@ -64,15 +62,13 @@ module.exports = {
                     );
                 }
             } else if (server.serverName == "Valorant") {
-                linkToUserPage =
-                    interaction.fields.getTextInputValue("tracker");
+                linkToUserPage = interaction.fields.getTextInputValue("tracker");
                 userAccount = decodeURI(linkToUserPage)
                     .replace("https://tracker.gg/valorant/profile/riot/", "")
                     .replace("%23", "#")
                     .replace("/overview/", "/")
                     .split("/");
-                accountName = userAccount[0].split("#")[0];
-                accountRegion = userAccount[0].split("#")[1];
+                [accountName, accountRegion] = userAccount[0].split("#")
                 characterData = await getValorantStats(
                     interaction,
                     accountName,
@@ -182,19 +178,9 @@ module.exports = {
                 timeBetweenRoles,
                 interaction.guildId
             );
-            if (
-                Date.now() - shortest.timeBetween * 1000 <=
-                verifiedAccount.createdAt
-            ) {
+            if (Date.now() - shortest.timeBetween * 1000 <= verifiedAccount.createdAt ) {
                 await interaction.editReply({
-                    content: `You can send a new submission in <t:${
-                        verifiedAccount.createdAt / 1000 +
-                        parseInt(shortest.timeBetween)
-                    }:R> ( <t:${
-                        verifiedAccount.createdAt / 1000 +
-                        parseInt(shortest.timeBetween)
-                    }> )`,
-                    ephemeral: true,
+                    content: `You can send a new submission in <t:${verifiedAccount.createdAt / 1000 + parseInt(shortest.timeBetween) }:R> ( <t:${verifiedAccount.createdAt / 1000 + parseInt(shortest.timeBetween)}> )`,ephemeral: true,
                 });
                 return;
             }
@@ -299,10 +285,7 @@ async function connectToWoW(interaction, accountRegion) {
             token: "", // optional
         })
         .catch((err) => {
-            cLog([err], {
-                guild: interaction.guild,
-                subProcess: "CreateWoWInstance",
-            });
+            cLog([err], { guild: interaction.guild, subProcess: "CreateWoWInstance"});
         });
     return con;
 }
@@ -318,10 +301,7 @@ async function getValorantStats(interaction, accountName, accountRegion) {
                 subProcess: "AccountData",
             });
         });
-    cLog([accountData.data.status], {
-        guild: interaction.guild,
-        subProcess: "AccountData",
-    });
+    cLog([accountData.data.status], { guild: interaction.guild, subProcess: "AccountData" });
     if (accountData.data.status != 200) {
         cLog([accountData.data.errors[0].message], {
             guild: interaction.guild,
@@ -331,9 +311,7 @@ async function getValorantStats(interaction, accountName, accountRegion) {
     }
 
     let MMRdata = await axios
-        .get(
-            `https://api.henrikdev.xyz/valorant/v2/by-puuid/mmr/${accountData.data.data.region}/${accountData.data.data.puuid}`
-        )
+        .get(`https://api.henrikdev.xyz/valorant/v2/by-puuid/mmr/${accountData.data.data.region}/${accountData.data.data.puuid}`)
         .catch((err) => {
             cLog([err], { guild: interaction.guild, subProcess: "MMRdata" });
         });
