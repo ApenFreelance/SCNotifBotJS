@@ -16,10 +16,12 @@
     "googleapis": "^105.0.0",
     "isomorphic-fetch": "^3.0.0",
     "mariadb": "^3.1.0",
-    "nodemon": "^2.0.20",
     "passport": "^0.6.0",
     "passport-bnet": "^2.0.0",
     "selenium-webdriver": "^4.8.0",
     "sequelize": "^6.28.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
