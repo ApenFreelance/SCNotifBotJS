@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require("discord.js");
-const bot = require("../src/botMain");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -15,6 +14,6 @@ module.exports = {
       return;
     }
 
-    bot.emit("completeReview", interaction);
+    interaction.client.emit("completeReview", interaction);
   },
 };
