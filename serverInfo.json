@@ -7,11 +7,19 @@
         "ratingChannelId":"1125965279491543081"
     },
     "WoW": {
-        "serverId": "294958471953252353",
-        "reviewCategoryId": "1089996542087278682",
-        "submissionChannelId":"1089997649245126818",
-        "transcriptChannelId":"1135330058953822210",
-        "ratingChannelId":"1135330174678872146"
+        "serverId": "1024961321768329246",
+        "pve": {
+            "reviewCategoryId": "1195408435953545257",
+            "submissionChannelId":"1195408515020357632",
+            "transcriptChannelId":"1195408583265886218",
+            "ratingChannelId":"1195408614626705458"
+        },
+        "pvp": {
+            "reviewCategoryId": "1195408461937266730",
+            "submissionChannelId":"1195408670545162341",
+            "transcriptChannelId":"1195408732734095480",
+            "ratingChannelId":"1195408753374281862"    
+        }
     },
     "Dev":{
         "serverId": "1024961321768329246",
