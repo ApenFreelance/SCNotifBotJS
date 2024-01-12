@@ -1,4 +1,3 @@
-const bot = require("../../src/botMain");
 const classes = require("../../classes.json");
 const { cLog } = require("../functions/cLog");
 const { waitingForReviewRow } = require("../buttons");
@@ -14,7 +13,7 @@ async function createWaitingForReviewMessage(interaction,charInfo,
   server
 ) {
   const member = await interaction.guild.members.fetch(interaction.user.id);
-  const submissionChannel = await bot.channels.fetch(server.submissionChannelId);
+  const submissionChannel = await interaction.client.channels.fetch(server.submissionChannelId);
   let description = null;
   if(server.serverName == "WoW") {
     if (charInfo == null) {
