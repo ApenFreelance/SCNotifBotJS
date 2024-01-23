@@ -31,7 +31,7 @@ module.exports = {
                 .setLabel('Close')
                 .setEmoji("🔒")
                 .setStyle("Secondary")
-                .setCustomId(`closesubmission-${submissionNumber}`))
+                .setCustomId(`closesubmission-${submissionNumber}${mode == null ? "" : "-" + mode}`))
         let submissionPos = reviewHistory.dataValues.id
         if(server.serverName == "WoW"){ // update google sheet
           await updateGoogleSheet(createSheetBody(mode, submissionPos, {status:reviewHistory.status, claimedDate:reviewHistory.claimedAt, claimedByID:reviewHistory.claimedByID, claimedByUsername:reviewHistory.claimedByTag}))
