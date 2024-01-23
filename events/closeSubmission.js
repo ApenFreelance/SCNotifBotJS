@@ -1,7 +1,5 @@
 const { ButtonBuilder, ActionRowBuilder } = require("discord.js");
-const {
-  createReviewButtons,
-} = require("../components/buttons.js");
+const { createReviewButtons } = require("../components/buttons.js");
 const { cLog } = require("../components/functions/cLog");
 const { getCorrectTable } = require("../src/db.js");
 
@@ -65,12 +63,8 @@ module.exports = {
           interaction.channel.send(
             `Unknown error when rejecting ${interaction.message.embeds[0].author.name} ( review-${submissionNr} ), therefor channel has not been deleted.`
           );
-          cLog(
-            [
-              `Unknown error when rejecting ${interaction.message.embeds[0].author.name} ( review-${submissionNr} )`,
-            ],
-            { guild: interaction.guild.id, subProcess: "Send Rating Request" }
-          );
+          cLog([`Unknown error when rejecting ${interaction.message.embeds[0].author.name} ( review-${submissionNr} )`],
+            { guild: interaction.guild.id, subProcess: "Send Rating Request" });
           return;
         }
       });

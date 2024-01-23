@@ -7,8 +7,7 @@ const { createSubmissionModal } = require("../components/modals");
 const { getCorrectTable } = require("../src/db");
 const { selectServer } = require("../components/functions/selectServer");
 
-const regexWoWLink =
-    /(https):\/\/((worldofwarcraft\.blizzard\.com||worldofwarcraft\.com)\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/.+)/;
+const regexWoWLink = /(https):\/\/((worldofwarcraft\.blizzard\.com||worldofwarcraft\.com)\/[\w_-]+\/character\/(us|eu|kr|tw|cn|)\/[\w_-]+\/.+)/;
 const regexValLink = /(https):\/\/(tracker\.gg\/valorant\/profile\/riot)\/.+/;
 module.exports = {
     name: "interactionCreate",
@@ -52,18 +51,9 @@ module.exports = {
                 // Handles response from the submitted submission through modal
                 if (validLink(interaction, server.serverName)) {
                     // Begin submission creation handling
-                    bot.emit(
-                        "submitReview",
-                        interaction,
-                        server,
-                        interaction.customId.split("-")[1]
-                    );
+                    bot.emit("submitReview",interaction,server,interaction.customId.split("-")[1]);
                 } else {
-                    await interaction.reply({
-                        content:
-                            "This link is not valid.\n\nThink this is a mistake? Let us know",
-                        ephemeral: true,
-                    });
+                    await interaction.reply({content:"This link is not valid.\n\nThink this is a mistake? Let us know",ephemeral: true});
                 }
             }
             if (interaction.customId.split("-")[0] == "claimsubmission") {
@@ -83,8 +73,7 @@ module.exports = {
                 bot.emit("completeReview", interaction, server);
             }
             if (interaction.customId.startsWith("completesubmission")) {
-                let reviewlink =
-                    interaction.fields.getTextInputValue("reviewlink");
+                let reviewlink = interaction.fields.getTextInputValue("reviewlink");
                 cLog(
                     [
                         "Review nr: ",
@@ -100,10 +89,7 @@ module.exports = {
                     return table.findOne({
                         // Gets the correct table for server
                         where: {
-                            id: interaction.customId.replace(
-                                "completesubmission-",
-                                ""
-                            ),
+                            id: interaction.customId.replace("completesubmission-","")
                         },
                     });
                 });
@@ -118,9 +104,7 @@ module.exports = {
                             interaction.customId.replace(
                                 "completesubmission-",
                                 ""
-                            ),
-                            { reviewLink: reviewlink }
-                        )
+                            ), { reviewLink: reviewlink })
                     );
                 }
                 await interaction.reply({
