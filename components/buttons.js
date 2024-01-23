@@ -1,11 +1,11 @@
 const { ActionRowBuilder, ButtonBuilder } = require("discord.js");
 
-function createReviewButtons(submissionNumber, game) {
+function createReviewButtons(submissionNumber, game, mode = null) {
     const reviewRow = new ActionRowBuilder();
     const buttonAmount = 5;
     for (let i = 1; i <= buttonAmount; i++) {
         const button = new ButtonBuilder()
-            .setCustomId(`${game}reviewrating${i}-${submissionNumber}`)
+            .setCustomId(`${game}-reviewrating-${i}-${submissionNumber}${mode == null ? "" : "-" + mode}`)
             .setLabel(i.toString())
             .setStyle("Success");
         reviewRow.addComponents(button);
