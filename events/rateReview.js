@@ -11,7 +11,6 @@ module.exports = {
     async execute(interaction) {
       let [game, _ , ratingNumber, submissionNumber, mode] = interaction.customId.split("-")
       let serverId
-      console.log(interaction.customId)
         if(interaction.isModalSubmit()) {
           cLog([interaction.user.username, " : attempting to provide review rating"], {subProcess:"ReviewRatingModal"})
           if(game == "valorant") {
