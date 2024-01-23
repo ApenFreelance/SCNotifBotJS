@@ -20,6 +20,8 @@ module.exports = class WoWCharacters extends Model {
         soloShuffleSpec2Rating: { type: DataTypes.INTEGER, allowNull: true },
         soloShuffleSpec3Rating: { type: DataTypes.INTEGER, allowNull: true },
         soloShuffleSpec4Rating: { type: DataTypes.INTEGER, allowNull: true },
+        specialization: { type: DataTypes.STRING },
+        mythicPlusScore: { type: DataTypes.INTEGER },
       },
       {
         tableName: "WoWCharacters",
