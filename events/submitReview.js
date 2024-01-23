@@ -15,34 +15,25 @@ module.exports = {
             let sheetBody = null;
             let characterData = null;
             let linkToUserPage = null;
-            let userAccount = null;
             let wowClient = null;
             let accountName = null;
             let accountRegion = null;
             let accountSlug = null;
-            let improvement =
-                interaction.fields.getTextInputValue("improvementinput");
-            let consentInput =
-                interaction.fields.getTextInputValue("consentinput");
+            let improvement = interaction.fields.getTextInputValue("improvementinput");
+            let consentInput = interaction.fields.getTextInputValue("consentinput");
             // get correct link to user page
-            await interaction.reply({
-                content: "Attempting to submit review...",
-                ephemeral: true,
-            });
+            await interaction.reply({ content: "Attempting to submit review...", ephemeral: true });
 
-            let reviewHistory = await getCorrectTable(
-                server.serverId,
-                "reviewHistory",
-                mode
-            );
+            let reviewHistory = await getCorrectTable(server.serverId,"reviewHistory",mode);
+
             if (server.serverName == "WoW") {
                 linkToUserPage = interaction.fields.getTextInputValue("armory");
                 [_ , accountRegion, accountSlug, accountName] = decodeURI(linkToUserPage)
+                    .toLowerCase()
                     .replace("https://worldofwarcraft.com/", "")
                     .replace("https://worldofwarcraft.blizzard.com/", "")
                     .replace("/character/", "/")
                     .split("/");
-
                 // Create a WoW Client connection
                 wowClient = await connectToWoW(interaction, accountRegion);
                 try {
@@ -57,28 +48,19 @@ module.exports = {
                 } catch (err) {
                     console.log(err);
                     characterData = null;
-                    console.log(
-                        "Failed to get char, because char doesnt exist or couldnt be found"
-                    );
+                    console.log("Failed to get char, because char doesnt exist or couldnt be found");
                 }
             } else if (server.serverName == "Valorant") {
                 linkToUserPage = interaction.fields.getTextInputValue("tracker");
-                userAccount = decodeURI(linkToUserPage)
+                [accountName, accountRegion] = decodeURI(linkToUserPage)
                     .replace("https://tracker.gg/valorant/profile/riot/", "")
                     .replace("%23", "#")
                     .replace("/overview/", "/")
-                    .split("/");
-                [accountName, accountRegion] = userAccount[0].split("#")
-                characterData = await getValorantStats(
-                    interaction,
-                    accountName,
-                    accountRegion
-                );
+                    .split("/")[0]
+                    .split("#");
+                characterData = await getValorantStats(interaction,accountName,accountRegion);
             } else {
-                await interaction.editReply({
-                    content: "This server is unknown",
-                    ephemeral: true,
-                });
+                await interaction.editReply({content: "This server is unknown",ephemeral: true});
                 return;
             }
 
@@ -109,55 +91,18 @@ module.exports = {
                         mode
                     );
                 } catch (err) {
-                    console.log(
-                        "Failed when responding or creating message for review for NEW user",
-                        err
-                    );
-                    await interaction.editReply({
-                        content: `Something went wrong registering new user.`,
-                        ephemeral: true,
-                    });
+                    console.log("Failed when responding or creating message for review for NEW user",err);
+                    await interaction.editReply({content: `Something went wrong registering new user.`,ephemeral: true});
                 }
                 let submissionPos = verifiedAccount.id;
                 if (server.serverName == "WoW") {
-                    if (characterData == null) {
-                        sheetBody = createSheetBody(mode, submissionPos, {
-                            status: verifiedAccount.status,
-                            createdAt: verifiedAccount.createdAt,
-                            id: verifiedAccount.id,
-                            userID: verifiedAccount.userID,
-                            userEmail: verifiedAccount.userEmail,
-                            clipLink: verifiedAccount.clipLink,
-                            armoryLink: linkToUserPage,
-                        });
-                    } else {
-                        sheetBody = createSheetBody(mode, submissionPos, {
-                            status: verifiedAccount.status,
-                            createdAt: verifiedAccount.createdAt,
-                            id: verifiedAccount.id,
-                            userID: verifiedAccount.userID,
-                            userEmail: verifiedAccount.userEmail,
-                            clipLink: verifiedAccount.clipLink,
-                            armoryLink: linkToUserPage,
-                            charClass: characterData.characterClass,
-                            twovtwo: characterData.twoVtwoRating,
-                            threevthree: characterData.threeVthreeRating,
-                            solo1: characterData.soloShuffleSpec1Rating,
-                            solo2: characterData.soloShuffleSpec2Rating,
-                            solo3: characterData.soloShuffleSpec3Rating,
-                            solo4: characterData.soloShuffleSpec4Rating,
-                        });
-                    }
+                    sheetBody = firstSheetBody(mode, submissionPos, verifiedAccount, characterData, linkToUserPage);
                     await updateGoogleSheet(sheetBody);
                 } else if (server.serverName == "Valorant") {
                     if (characterData != null) {
                         await verifiedAccount.update({
-                            CurrentTier:
-                                characterData.MMRdata.data.data.current_data
-                                    .currenttierpatched,
-                            AllTimeTier:
-                                characterData.MMRdata.data.data.highest_rank
-                                    .patched_tier,
+                            CurrentTier: characterData.MMRdata.data.data.current_data.currenttierpatched,
+                            AllTimeTier: characterData.MMRdata.data.data.highest_rank.patched_tier,
                         });
                     }
                 }
@@ -179,16 +124,11 @@ module.exports = {
                 interaction.guildId
             );
             if (Date.now() - shortest.timeBetween * 1000 <= verifiedAccount.createdAt ) {
-                await interaction.editReply({
-                    content: `You can send a new submission in <t:${verifiedAccount.createdAt / 1000 + parseInt(shortest.timeBetween) }:R> ( <t:${verifiedAccount.createdAt / 1000 + parseInt(shortest.timeBetween)}> )`,ephemeral: true,
-                });
+                await interaction.editReply({content: `You can send a new submission in <t:${verifiedAccount.createdAt / 1000 + parseInt(shortest.timeBetween) }:R> ( <t:${verifiedAccount.createdAt / 1000 + parseInt(shortest.timeBetween)}> )`,ephemeral: true});
                 return;
             }
             if (shortest.uses != "unlimited") {
-                await reduceTimeBetweenUses(
-                    shortest.userId,
-                    interaction.guildId
-                );
+                await reduceTimeBetweenUses(shortest.userId,interaction.guildId);
             }
 
             // if none of the ones apply, create new entry
@@ -213,50 +153,16 @@ module.exports = {
             );
             let submissionPos = verifiedAccount.id;
             if (server.serverName == "WoW") {
-                if (characterData == null) {
-                    sheetBody = createSheetBody(mode, submissionPos, {
-                        status: verifiedAccount.status,
-                        createdAt: verifiedAccount.createdAt,
-                        id: verifiedAccount.id,
-                        userID: verifiedAccount.userID,
-                        userEmail: verifiedAccount.userEmail,
-                        clipLink: verifiedAccount.clipLink,
-                        armoryLink: linkToUserPage,
-                    });
-                } else {
-                    sheetBody = createSheetBody(mode, submissionPos, {
-                        status: verifiedAccount.status,
-                        createdAt: verifiedAccount.createdAt,
-                        id: verifiedAccount.id,
-                        userID: verifiedAccount.userID,
-                        userEmail: verifiedAccount.userEmail,
-                        clipLink: verifiedAccount.clipLink,
-                        armoryLink: linkToUserPage,
-                        charClass: characterData.characterClass,
-                        twovtwo: characterData.twoVtwoRating,
-                        threevthree: characterData.threeVthreeRating,
-                        solo1: characterData.soloShuffleSpec1Rating,
-                        solo2: characterData.soloShuffleSpec2Rating,
-                        solo3: characterData.soloShuffleSpec3Rating,
-                        solo4: characterData.soloShuffleSpec4Rating,
-                    });
-                }
-
+                sheetBody = firstSheetBody(mode, submissionPos, verifiedAccount, characterData, linkToUserPage);
                 await updateGoogleSheet(sheetBody);
-                await verifiedAccount
-                    .update({ charIdOnSubmission: characterData.id })
-                    .catch((err) => {
-                        console.log("No charId found");
-                    });
+                await verifiedAccount.update({ charIdOnSubmission: characterData.id }).catch((err) => {
+                    console.log("No charId found");
+                });
             } else if (server.serverName == "Valorant") {
                 if (characterData != null) {
                     await verifiedAccount.update({
-                        CurrentTier:
-                            characterData.MMRdata.data.data.current_data
-                                .currenttierpatched,
-                        AllTimeTier:
-                            characterData.MMRdata.data.data.highest_rank
-                                .patched_tier,
+                        CurrentTier: characterData.MMRdata.data.data.current_data.currenttierpatched,
+                        AllTimeTier: characterData.MMRdata.data.data.highest_rank.patched_tier,
                     });
                 }
             }
@@ -266,13 +172,9 @@ module.exports = {
             });
         } catch (e) {
             console.log(e);
-            await interaction.editReply({
-                content:
-                    "Something went wrong when submitting. Please contact staff",
-                ephemeral: true,
-            });
+            await interaction.editReply({content:"Something went wrong when submitting. Please contact staff",ephemeral: true});
         }
-    },
+    }
 };
 
 async function connectToWoW(interaction, accountRegion) {
@@ -281,7 +183,7 @@ async function connectToWoW(interaction, accountRegion) {
             key: process.env.BCID,
             secret: process.env.BCS,
             origin: accountRegion, // optional
-            locale: "en_US", // optional
+            //locale: "en_US", // optional
             token: "", // optional
         })
         .catch((err) => {
@@ -332,85 +234,115 @@ async function getValorantStats(interaction, accountName, accountRegion) {
 }
 
 async function getCharacterInfo(region,slug,characterName,wowClient,armoryLink,guildId) {
-    const Cprofile = await wowClient.characterProfile({
-        realm: slug,
-        name: characterName,
-    });
-    cLog([`Cprofile: ${Cprofile.status}. [ ${Cprofile.statusText} ]`], {guild: guildId,subProcess: "characterData",});
-    const Cpvp = await wowClient.characterPVP({
-        realm: slug,
-        name: characterName,
-    });
-    cLog([`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`], {
-        guild: guildId,
-        subProcess: "characterData",
-    });
-    let twoVtwoRating = (threeVthreeRating = tenVtenRating = soloShuffleSpec1Rating = soloShuffleSpec2Rating = soloShuffleSpec3Rating = soloShuffleSpec4Rating = null);
-
-    try {
-        for (const bracket of Cpvp.data.brackets) {
-            try {
-                const bracketType = bracket.href.includes("2v2") ? "2v2"
-                : bracket.href.includes("3v3") ? "3v3"
-                : bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][0].toLowerCase().replace(" ", "")}`) ? `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][0].toLowerCase().replace(" ", "")}`
-                : bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][1].toLowerCase().replace(" ", "")}`) ? `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][1].toLowerCase().replace(" ", "")}`
-                : bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][2].toLowerCase().replace(" ", "")}`) ? `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][2].toLowerCase().replace(" ", "")}`
-                : bracket.href.includes(`shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][3].toLowerCase().replace(" ", "")}`) ? `shuffle-${Cprofile.data.character_class.name.toLowerCase().replace(" ", "")}-${classes[Cprofile.data.character_class.name][3].toLowerCase().replace(" ", "")}`
-                : null;
-                if (bracketType) {
-                    const bracketInfo = await wowClient.characterPVP({
-                        realm: slug,
-                        name: characterName,
-                        bracket: bracketType,
-                    });
+    const Cprofile = await getCharacterProfile(slug, characterName, wowClient, guildId)
+    const pvpData = await getPVPData(slug, characterName, Cprofile.character_class.name, wowClient, guildId);
+    const mythicPlusScore = await getMythicPlusScore(slug, characterName, wowClient, guildId);
     
-                    if (bracketType === "2v2") {
-                        twoVtwoRating = bracketInfo.data.rating;
-                    } else if (bracketType === "3v3") {
-                        threeVthreeRating = bracketInfo.data.rating;
-                    } else if (bracketType.includes("shuffle")) {
-                        if (bracketType.endsWith(classes[Cprofile.data.character_class.name][0].toLowerCase().replace(" ", ""))) {
-                            soloShuffleSpec1Rating = bracketInfo.data.rating;
-                        } else if (bracketType.endsWith(classes[Cprofile.data.character_class.name][1].toLowerCase().replace(" ", ""))) {
-                            soloShuffleSpec2Rating = bracketInfo.data.rating;
-                        } else if (bracketType.endsWith(classes[Cprofile.data.character_class.name][2].toLowerCase().replace(" ", ""))) {
-                            soloShuffleSpec3Rating = bracketInfo.data.rating;
-                        } else if (bracketType.endsWith(classes[Cprofile.data.character_class.name][3].toLowerCase().replace(" ", ""))) {
-                            soloShuffleSpec4Rating = bracketInfo.data.rating;
-                        }
-                    }
-                }
-            } catch (err) {
-                if (err.toString().includes("TypeError: Cannot read properties of undefined (reading 'toLowerCase')")) {
-                    console.log("This role does not exist in classes, or class is lacking subclass");
-                } else {
-                    console.log(err, "Error when checking classes");
-                }
-            }
-        }
-    } catch {
-        console.log("User most likely has no rank history");
-    }
+    
     let characterData = await getCorrectTable(guildId, "WoWCharacter");
     characterData = await characterData.create({
-        armoryLink: armoryLink,
-        characterName: Cprofile.data.name,
+        armoryLink,
+        characterName: Cprofile.name,
         characterRegion: region,
-        slug: slug,
-        armorLevel: Cprofile.data.equipped_item_level,
-        characterClass: Cprofile.data.character_class.name,
-        twoVtwoRating: twoVtwoRating,
-        threeVthreeRating: threeVthreeRating,
-        tenVtenRating: tenVtenRating,
-        soloShuffleSpec1Rating: soloShuffleSpec1Rating,
-        soloShuffleSpec2Rating: soloShuffleSpec2Rating,
-        soloShuffleSpec3Rating: soloShuffleSpec3Rating,
-        soloShuffleSpec4Rating: soloShuffleSpec4Rating,
+        slug,
+        armorLevel: Cprofile.equipped_item_level,
+        characterClass: Cprofile.character_class.name,
+        ...pvpData,
+        specialization: Cprofile.active_spec.name,
+        mythicPlusScore,
     });
-
     return characterData;
 }
 
-function getMythicPlusScore(wowClient,slug,characterName) {
+async function getMythicPlusScore(realm,name, wowClient, guildId) {
+    const mythicScore = await wowClient.characterMythicKeystone({realm, name})
+    cLog([`Mythic+: ${mythicScore.status}. [ ${mythicScore.statusText} ]`], {guild: guildId, subProcess: "getMythic+" });
+    return mythicScore.data.current_mythic_rating.rating || null;
+}
+
+async function findRatings(realm, name, brackets, characterClass, wowClient) {
+    let twoVtwoRating = null;
+    let threeVthreeRating = null;
+    let soloShuffleSpec1Rating = null;
+    let soloShuffleSpec2Rating = null;
+    let soloShuffleSpec3Rating = null;
+    let soloShuffleSpec4Rating = null;
+    for (const bracket of brackets) {
+        try {
+            const bracketType = bracket.href.includes("2v2") ? "2v2"
+            : bracket.href.includes("3v3") ? "3v3"
+            : bracket.href.includes(`shuffle-${characterClass.toLowerCase().replace(" ", "")}-${classes[characterClass][0].toLowerCase().replace(" ", "")}`) ? `shuffle-${characterClass.toLowerCase().replace(" ", "")}-${classes[characterClass][0].toLowerCase().replace(" ", "")}`
+            : bracket.href.includes(`shuffle-${characterClass.toLowerCase().replace(" ", "")}-${classes[characterClass][1].toLowerCase().replace(" ", "")}`) ? `shuffle-${characterClass.toLowerCase().replace(" ", "")}-${classes[characterClass][1].toLowerCase().replace(" ", "")}`
+            : bracket.href.includes(`shuffle-${characterClass.toLowerCase().replace(" ", "")}-${classes[characterClass][2].toLowerCase().replace(" ", "")}`) ? `shuffle-${characterClass.toLowerCase().replace(" ", "")}-${classes[characterClass][2].toLowerCase().replace(" ", "")}`
+            : bracket.href.includes(`shuffle-${characterClass.toLowerCase().replace(" ", "")}-${classes[characterClass][3].toLowerCase().replace(" ", "")}`) ? `shuffle-${characterClass.toLowerCase().replace(" ", "")}-${classes[characterClass][3].toLowerCase().replace(" ", "")}`
+            : null;
+        if (bracketType) {
+            const bracketInfo = await wowClient.characterPVP({ realm,name,bracket: bracketType });
+            cLog([`getBracketData: ${bracketInfo.status}. [ ${bracketInfo.statusText} ]`], { subProcess: "findRatings" });
+            if (bracketType === "2v2") {
+                twoVtwoRating = bracketInfo.data.rating;
+            } else if (bracketType === "3v3") {
+                threeVthreeRating = bracketInfo.data.rating;
+            } else if (bracketType.includes("shuffle")) {
+                if (bracketType.endsWith(classes[characterClass][0].toLowerCase().replace(" ", ""))) {
+                    soloShuffleSpec1Rating = bracketInfo.data.rating;
+                } else if (bracketType.endsWith(classes[characterClass][1].toLowerCase().replace(" ", ""))) {
+                    soloShuffleSpec2Rating = bracketInfo.data.rating;
+                } else if (bracketType.endsWith(classes[characterClass][2].toLowerCase().replace(" ", ""))) {
+                    soloShuffleSpec3Rating = bracketInfo.data.rating;
+                } else if (bracketType.endsWith(classes[characterClass][3].toLowerCase().replace(" ", ""))) {
+                    soloShuffleSpec4Rating = bracketInfo.data.rating;
+                }
+            }
+        }
+        } catch (err) {
+            if (!err.toString().includes("TypeError: Cannot read properties of undefined (reading 'toLowerCase')")) {
+                console.log(err, "Error when checking characterClasses");
+            }
+        }
+    }
+    return {twoVtwoRating, threeVthreeRating, soloShuffleSpec1Rating, soloShuffleSpec2Rating, soloShuffleSpec3Rating, soloShuffleSpec4Rating};
+}
+
+async function getPVPData(realm, name, characterClass, wowClient, guildId) {
+    const Cpvp = await wowClient.characterPVP({ realm, name });
+    cLog([`pvpSummary: ${Cpvp.status}. [ ${Cpvp.statusText} ]`], {guild: guildId, subProcess: "getPVPData" });
+    try {
+        if(Cpvp.data.brackets) {
+            return await findRatings(realm, name, Cpvp.data.brackets, characterClass, wowClient);
+        }
+    } catch(e) {
+        console.log(e)
+        console.log("User most likely has no rank history");
+    }
+}
+
+
+async function getCharacterProfile(realm, name, wowClient, guildId) {
+    const Cprofile = await wowClient.characterProfile({ realm,name });
+    cLog([`Cprofile: ${Cprofile.status}. [ ${Cprofile.statusText} ]`], {guild: guildId,subProcess: "characterData"});
+    return Cprofile.data;
+}
+
+function firstSheetBody(mode, submissionPos, verifiedAccount, characterData, armoryLink) {
+    let sheetBodyData = {
+        status: verifiedAccount.status,
+        createdAt: verifiedAccount.createdAt,
+        id: verifiedAccount.id,
+        userID: verifiedAccount.userID,
+        userEmail: verifiedAccount.userEmail,
+        clipLink: verifiedAccount.clipLink,
+        armoryLink,
+    };
     
+    if (characterData != null) {
+        sheetBodyData.charClass = characterData.characterClass;
+        sheetBodyData.twovtwo = characterData.twoVtwoRating;
+        sheetBodyData.threevthree = characterData.threeVthreeRating;
+        sheetBodyData.solo1 = characterData.soloShuffleSpec1Rating;
+        sheetBodyData.solo2 = characterData.soloShuffleSpec2Rating;
+        sheetBodyData.solo3 = characterData.soloShuffleSpec3Rating;
+        sheetBodyData.solo4 = characterData.soloShuffleSpec4Rating;
+    }
+    return createSheetBody(mode, submissionPos, sheetBodyData);
 }
