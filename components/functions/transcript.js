@@ -1,6 +1,5 @@
 const fs = require("fs");
 const classes = require("../../classes.json");
-const bot = require("../../src/botMain");
 const regex = /\*\*(https:\/\/.*?)\*\*/g;
 async function createTranscript(channel, ticket, charInfo = null) {
   let ticketMessages = await fetchTicketMessages(channel);
