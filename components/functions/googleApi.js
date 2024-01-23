@@ -111,8 +111,8 @@ function createSheetBody(
         { range: `${sheetName}!F${submissionPos}`, value: clipLink },
         { range: `${sheetName}!G${submissionPos}`, value: armoryLink },
         { range: `${sheetName}!H${submissionPos}`, value: charClass },
-        { range: `${sheetName}!I${submissionPos}`, value: mythicPlusScore },
-        { range: `${sheetName}!J${submissionPos}`, value: specialization },
+        { range: `${sheetName}!I${submissionPos}`, value: specialization },
+        { range: `${sheetName}!J${submissionPos}`, value: mythicPlusScore },
         { range: `${sheetName}!K${submissionPos}`, value: status },
         { range: `${sheetName}!L${submissionPos}`, value: claimedDate },
         { range: `${sheetName}!M${submissionPos}`, value: claimedByID },
@@ -122,7 +122,6 @@ function createSheetBody(
         { range: `${sheetName}!Q${submissionPos}`, value: reviewRating },
         { range: `${sheetName}!S${submissionPos}`, value: reviewComment },
     ];
-
     const properties = mode == "wowpvp" ? pvpproperties : pveproperties;
     const sheetBody = properties
         .filter(({ value }) => value !== null)
