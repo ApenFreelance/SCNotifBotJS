@@ -68,6 +68,8 @@ function createSheetBody(
         reviewLink = null,
         reviewRating = null,
         reviewComment = null,
+        mythicPlusScore = null,
+        specialization = null
     }
 ) {
     let sheetName = null;
@@ -76,7 +78,7 @@ function createSheetBody(
     } else if (mode == "wowpve") {
         sheetName = "PVE";
     }
-    const properties = [
+    const pvpproperties = [
         { range: `${sheetName}!A${submissionPos}`, value: createdAt },
         { range: `${sheetName}!B${submissionPos}`, value: id },
         { range: `${sheetName}!C${submissionPos}`, value: userID },
@@ -100,7 +102,28 @@ function createSheetBody(
         { range: `${sheetName}!U${submissionPos}`, value: reviewRating },
         { range: `${sheetName}!V${submissionPos}`, value: reviewComment },
     ];
+    const pveproperties = [
+        { range: `${sheetName}!A${submissionPos}`, value: createdAt },
+        { range: `${sheetName}!B${submissionPos}`, value: id },
+        { range: `${sheetName}!C${submissionPos}`, value: userID },
+        { range: `${sheetName}!D${submissionPos}`, value: userName },
+        { range: `${sheetName}!E${submissionPos}`, value: userEmail },
+        { range: `${sheetName}!F${submissionPos}`, value: clipLink },
+        { range: `${sheetName}!G${submissionPos}`, value: armoryLink },
+        { range: `${sheetName}!H${submissionPos}`, value: charClass },
+        { range: `${sheetName}!I${submissionPos}`, value: mythicPlusScore },
+        { range: `${sheetName}!J${submissionPos}`, value: specialization },
+        { range: `${sheetName}!K${submissionPos}`, value: status },
+        { range: `${sheetName}!L${submissionPos}`, value: claimedDate },
+        { range: `${sheetName}!M${submissionPos}`, value: claimedByID },
+        { range: `${sheetName}!N${submissionPos}`, value: claimedByUsername },
+        { range: `${sheetName}!O${submissionPos}`, value: completedAt },
+        { range: `${sheetName}!P${submissionPos}`, value: reviewLink },
+        { range: `${sheetName}!Q${submissionPos}`, value: reviewRating },
+        { range: `${sheetName}!S${submissionPos}`, value: reviewComment },
+    ];
 
+    const properties = mode == "wowpvp" ? pvpproperties : pveproperties;
     const sheetBody = properties
         .filter(({ value }) => value !== null)
         .map(({ range, value }) => ({ range, values: [[value]] }));
