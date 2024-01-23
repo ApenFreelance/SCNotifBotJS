@@ -6,17 +6,18 @@ const { getCorrectTable } = require("../src/db.js");
 module.exports = {
   name: "closeSubmission",
   once: false,
-  async execute(interaction, server) {
-    const submissionNr = interaction.customId.replace("closesubmission-", "");
+  async execute(interaction, server, mode) {
+    const submissionNr = interaction.customId.split("-")[1];
     const lastRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId(`delete-${submissionNr}`)
+        .setCustomId(`delete-${submissionNr}${mode == null ? "" : "-" + mode}`)
         .setLabel("Delete")
         .setStyle("Danger")
     );
     let reviewInDB = await getCorrectTable(
       interaction.guildId,
-      "reviewHistory"
+      "reviewHistory",
+      mode
     );
     reviewInDB = await reviewInDB.findOne({
       where: {
@@ -46,7 +47,7 @@ module.exports = {
     );
       // TODO: Add actual error handling
 
-    await user.send({content:"Your review has been completed.\n\n\nHow would you rate this review?",components: createReviewButtons(submissionNr, server.serverName.toLowerCase())})
+    await user.send({content:"Your review has been completed.\n\n\nHow would you rate this review?",components: createReviewButtons(submissionNr, server.serverName.toLowerCase(), mode)})
       .catch((err) => {
         if (err.rawError.message == "Cannot send messages to this user") {
           interaction.channel.send(
