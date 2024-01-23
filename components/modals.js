@@ -88,7 +88,7 @@ async function createSubmissionModal(interaction, game, mode = "") {
             emailRow,
             improvementRow,
             consentRow
-        );
+        )
     } else if (game.serverName == "Valorant") {
         modal.addComponents(
             ytRow,

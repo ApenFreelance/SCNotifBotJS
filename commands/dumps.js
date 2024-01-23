@@ -251,11 +251,7 @@ async function createEmbed(uploads, game, interaction) {
         let videoChannel = await interaction.client.channels
           .fetch(data[game].roleDict[tag].channelid.toString())
           .catch((err) => {
-            if (
-              err
-                .toString()
-                .startsWith("DiscordAPIError[10003]: Unknown Channel")
-            ) {
+            if (err.toString().startsWith("DiscordAPIError[10003]: Unknown Channel")) {
               cLog([err], { guild: interaction.guildId, subProcess: "Dumps" });
               //interaction.editReply({contents:`This channel does not exist in this server: ${tag} ( Set to: ${data[game].roleDict[tag].channelid.toString()})`, ephemeral:true})
               return;

@@ -45,10 +45,7 @@ async function getCorrectTable(guildId, tableGroup, mode = null) {
         }
         return table;
     } catch (err) {
-        cLog(["ERROR ", err], {
-            guild: guildId,
-            subProcess: "getCorrectTable",
-        });
+        cLog(["ERROR ", err], { guild: guildId,subProcess: "getCorrectTable" });
     }
 }
 
