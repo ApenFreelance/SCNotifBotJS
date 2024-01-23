@@ -282,7 +282,7 @@ async function createHTMLfile(ticket, HTMLContent) {
   });
   return filePath;
 }
-async function sendTranscript(filePath, transcriptChannel) {
+async function sendTranscript(filePath, transcriptChannel, bot) {
   if (typeof transcriptChannel === "string") {
     transcriptChannel = await bot.channels.fetch(transcriptChannel);
   }
