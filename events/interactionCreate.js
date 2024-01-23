@@ -64,32 +64,28 @@ module.exports = {
                 // Begin rejection handling
                 bot.emit("rejectReview", interaction, server, interaction.customId.split("-")[1]);
             }
-            if (interaction.customId.startsWith("closesubmission-")) {
+            if (interaction.customId.split("-")[0] == "closesubmission") {
                 // Close. NOT FINAL STEP. THIS IS WHEN REVIEW STATUS IS SET TO CLOSED. COMPLETE IS LAST
-                bot.emit("closeSubmission", interaction, server);
+                bot.emit("closeSubmission", interaction, server, interaction.customId.split("-")[2] || null);
             }
-            if (interaction.customId.startsWith("delete-")) {
+            if (interaction.customId.split("-")[0] == "delete") {
                 // THIS IS WHAT DELETES CHANNEL AND SO ON
-                bot.emit("completeReview", interaction, server);
+                bot.emit("completeReview", interaction, server, interaction.customId.split("-")[2] || null);
             }
-            if (interaction.customId.startsWith("completesubmission")) {
+            if (interaction.customId.split("-")[0] == "completesubmission") {
+                // Triggers BEFORE deleting channel if missing reviewLink
                 let reviewlink = interaction.fields.getTextInputValue("reviewlink");
-                cLog(
-                    [
-                        "Review nr: ",
-                        interaction.customId.replace("completesubmission-", ""),
-                    ],
-                    { guild: interaction.guild, subProcess: "setReviewLink" }
-                );
+                cLog(["Review nr: ",interaction.customId.split("-")[1],],{ guild: interaction.guild, subProcess: "reviewLinkEmpty" });
 
                 const reviewHistory = await getCorrectTable(
                     server.serverId,
-                    "reviewHistory"
+                    "reviewHistory",
+                    interaction.customId.split("-")[2] || null
                 ).then((table) => {
                     return table.findOne({
                         // Gets the correct table for server
                         where: {
-                            id: interaction.customId.replace("completesubmission-","")
+                            id: interaction.customId.split("-")[1]
                         },
                     });
                 });
@@ -100,11 +96,8 @@ module.exports = {
                 if (server.serverName == "WoW") {
                     await updateGoogleSheet(
                         createSheetBody(
-                            mode,
-                            interaction.customId.replace(
-                                "completesubmission-",
-                                ""
-                            ), { reviewLink: reviewlink })
+                            interaction.customId.split("-")[2],
+                            interaction.customId.split("-")[1], { reviewLink: reviewlink })
                     );
                 }
                 await interaction.reply({
@@ -112,7 +105,7 @@ module.exports = {
                     ephemeral: true,
                 });
             }
-            if (interaction.customId.includes("reviewrating")) {
+            if (interaction.customId.split("-")[1] == "reviewrating" || interaction.customId.split("-")[2] == "reviewrating") {
                 // Handle user submitted reviews to their review
                 bot.emit("rateReview", interaction);
             }
