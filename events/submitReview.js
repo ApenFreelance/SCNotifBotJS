@@ -257,7 +257,7 @@ async function getCharacterInfo(region,slug,characterName,wowClient,armoryLink,g
 async function getMythicPlusScore(realm,name, wowClient, guildId) {
     const mythicScore = await wowClient.characterMythicKeystone({realm, name})
     cLog([`Mythic+: ${mythicScore.status}. [ ${mythicScore.statusText} ]`], {guild: guildId, subProcess: "getMythic+" });
-    return mythicScore.data.current_mythic_rating.rating || null;
+    return Math.floor(mythicScore?.data?.current_mythic_rating?.rating) || null;
 }
 
 async function findRatings(realm, name, brackets, characterClass, wowClient) {
@@ -334,7 +334,6 @@ function firstSheetBody(mode, submissionPos, verifiedAccount, characterData, arm
         clipLink: verifiedAccount.clipLink,
         armoryLink,
     };
-    
     if (characterData != null) {
         sheetBodyData.charClass = characterData.characterClass;
         sheetBodyData.twovtwo = characterData.twoVtwoRating;
@@ -343,6 +342,8 @@ function firstSheetBody(mode, submissionPos, verifiedAccount, characterData, arm
         sheetBodyData.solo2 = characterData.soloShuffleSpec2Rating;
         sheetBodyData.solo3 = characterData.soloShuffleSpec3Rating;
         sheetBodyData.solo4 = characterData.soloShuffleSpec4Rating;
+        sheetBodyData.mythicPlusScore = characterData.mythicPlusScore;
+        sheetBodyData.specialization = characterData.specialization;
     }
     return createSheetBody(mode, submissionPos, sheetBodyData);
 }
