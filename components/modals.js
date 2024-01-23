@@ -6,9 +6,9 @@ const {
 } = require("discord.js");
 const { cLog } = require("./functions/cLog");
 
-async function completeSubmissionEmbed(interaction, submissionModal) {
+async function completeSubmissionEmbed(interaction, submissionModal, mode = null) {
     const modal = new ModalBuilder()
-        .setCustomId(`completesubmission-${submissionModal}`)
+        .setCustomId(`completesubmission-${submissionModal}${mode == null ? "" : "-" + mode}`)
         .setTitle("Close submission");
     const closeInput = new TextInputBuilder()
         .setCustomId("reviewlink")
@@ -107,9 +107,9 @@ async function createSubmissionModal(interaction, game, mode = "") {
     await interaction.showModal(modal);
     return true;
 }
-function createRatingModal(submissionNumber, game) {
+function createRatingModal(submissionNumber, game, mode) {
     const feedbackmodal = new ModalBuilder()
-        .setCustomId(`${game}reviewratingmodal${submissionNumber}`)
+        .setCustomId(`${game}-modal-reviewrating-${submissionNumber}${mode == null ? "" : "-" + mode}`)
         .setTitle(`Feedback Modal`);
 
     const commentInput = new TextInputBuilder()
