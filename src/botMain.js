@@ -11,6 +11,7 @@ const DevWoWReviewHistory = require("../models/DevWoWReviewHistory");
 const WoWReviewHistory = require("../models/WoWReviewHistory");
 const ReviewTimerOverwrite = require("../models/ReviewTimerOverwrite");
 const DevPVEWoWReviewHistory = require("../models/DevPVEWoWReviewHistory");
+const PVEWoWReviewHistory = require("../models/PVEWoWReviewHistory");
 
 const bot = new Client({
     intents: [
@@ -59,7 +60,7 @@ bot.rest.on("rateLimited", (data) => {
     console.log(`[ RATE LIMIT ]`);
 });
 
-const models = [DevWoWReviewHistory, ReviewTimerOverwrite, DevPVEWoWReviewHistory, WoWCharacters];
+const models = [WoWReviewHistory, ReviewTimerOverwrite, PVEWoWReviewHistory, WoWCharacters];
 
 bot.on("ready", async () => {
     cLog([`${bot.user.username} has logged in`], { subProcess: "Start-up" });
