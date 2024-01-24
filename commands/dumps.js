@@ -14,7 +14,7 @@ module.exports = {
       option
         .setName("game")
         .setDescription("the game you wish to update")
-        .addChoices({ name: "valorant", value: "valorant" },
+        .addChoices(
         { name: "wrath", value: "wrath" },
         { name: "wow", value: "wow" })
     )

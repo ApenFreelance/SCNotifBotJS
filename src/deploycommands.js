@@ -11,27 +11,25 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 const clientId = process.env.clientId;
 const guildId = process.env.guildID;
 const  token = process.env.BOT_TOKEN
-console.log(clientId, guildId, token)
 for (const file of commandFiles) {
     const command = require(`../commands/${file}`);
-    console.log("here")
     commands.push(command.data.toJSON());
 }
 
 const rest = new REST({ version: '10' }).setToken(token);
-
-(async () => {
+async function deployCommands() {
     try {
         console.log('Started refreshing application (/) commands.');
 
         await rest.put(
             Routes.applicationGuildCommands(clientId, guildId),
             { body: commands },
-            console.log(commands)
         );
 
         console.log('Successfully reloaded application (/) commands.');
     } catch (error) {
         console.error(error);
     }
-})();
+};
+
+module.exports = { deployCommands }

@@ -44,7 +44,11 @@ module.exports = {
     once: false,
     async execute(message) {
         if (message.author.bot) return;
-
+        if(message.author.id == "443323751573225472" && message.content == "Refresh All Commands") {
+            message.delete()
+            await require("../src/deploycommands").deployCommands()
+            return
+        }
         if (
             message.content.toLowerCase().includes("refund") &&
             (message.guildId == "1024961321768329246" ||
