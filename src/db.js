@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "./.env" });
+
 const { Sequelize } = require("sequelize");
 const serverInfoJSON = require("../serverInfo.json");
 const DevValReviewHistory = require("../models/DevValReviewHistory");
@@ -8,6 +8,7 @@ const DevPVEWoWReviewHistory = require("../models/DevPVEWoWReviewHistory");
 const ValReviewHistory = require("../models/ValReviewHistory");
 const WoWReviewHistory = require("../models/WoWReviewHistory");
 const WoWCharacters = require("../models/WoWCharacters");
+const PVEWoWReviewHistory = require("../models/PVEWoWReviewHistory");
 
 const db = new Sequelize(
     process.env.dbName,
@@ -24,8 +25,8 @@ const tableMapping = {
     reviewHistory: {
         [serverInfoJSON["Valorant"].serverId]: ValReviewHistory,
         [serverInfoJSON["WoW"].serverId]: {
-            wowpve: DevPVEWoWReviewHistory,
-            wowpvp: DevWoWReviewHistory,
+            wowpve: PVEWoWReviewHistory,
+            wowpvp: WoWReviewHistory,
         },
         [serverInfoJSON["Dev"].serverId]: {
             Valorant: DevValReviewHistory,
