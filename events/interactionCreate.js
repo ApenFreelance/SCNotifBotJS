@@ -164,7 +164,7 @@ async function blockIfLacksRole(interaction, game) {
         ) {
             await interaction.reply({ // idk why i made this by name. Will change to id later in TS version since this 
                 content:
-                    "You need to be 🧨 Premium Member or 💙Premium Member",
+                    "Please use <#782740025661063248> to link your Skill Capped account in order to request a VoD Review",
                 ephemeral: true,
             });
             return true;
