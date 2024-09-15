@@ -39,13 +39,8 @@ function verificationButton(guildId){
         return new ActionRowBuilder().addComponents(
             new ButtonBuilder()
             .setCustomId("verify-user-wowpvp")
-            .setLabel("Verify for PVP")
-            .setStyle("Success"),
-            new ButtonBuilder()
-            .setCustomId("verify-user-wowpve")
-            .setLabel("Verify for PVE")
-            .setStyle("Success"),
-            
+            .setLabel("Verify")
+            .setStyle("Success"), 
         )
     }
 
