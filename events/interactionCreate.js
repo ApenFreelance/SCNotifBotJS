@@ -158,14 +158,13 @@ async function blockIfLacksRole(interaction, game) {
         if (
             !interaction.member.roles.cache.some(
                 (role) =>
-                    role.name === "🧨 Infinity Member" ||
-                    role.name === "💙Premium Member" ||
-                    role.name === "🧨Mythic Member"
+                    role.name === "🧨 Premium Member" ||
+                    role.name === "💙Premium Member"
             )
         ) {
-            await interaction.reply({
+            await interaction.reply({ // idk why i made this by name. Will change to id later in TS version since this 
                 content:
-                    "You need to be 🧨 Infinity Member or 💙Premium Member",
+                    "You need to be 🧨 Premium Member or 💙Premium Member",
                 ephemeral: true,
             });
             return true;
